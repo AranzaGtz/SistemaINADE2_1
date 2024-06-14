@@ -1,0 +1,81 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestión de servicios{% endblock %}
+{% block header %}Gestión de servicios{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Editar servicio</h1>
+    <hr />
+    <!-- FORMULARIO -->
+    <div class="d-flex justify-content-center">
+        <form action="{% url 'servicio_update' servicio.id %}" method="post" class="col-md-7" id="servicioForm">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Método</h2>
+                    <div class="form-group">
+                        <label for="metodo_select">Método:</label>
+                        <select id="metodo_select" class="form-control" name="metodo">
+                            <option value="" selected>Seleccione un método</option>
+                            {% for metodo in metodos %}
+                            <option value="{{ metodo.id }}" {% if servicio.metodo.id == metodo.id %}selected{% endif %}>{{ metodo.nombre }}</option>
+                            {% endfor %}
+                            <option value="nuevo">Crear nuevo método</option>
+                        </select>
+                    </div>
+                    <div id="nuevo_metodo_form" style="display: none;">
+                        {{ metodo_form.as_p }}
+                    </div>
+                    <h2>Servicio</h2>
+                    {{ servicio_form.as_p }}
+                </div>
+            </div>
+
+            <div class="form-group text-right">
+                <input type="submit" class="btn btn-success" value="Registrar">
+                <input type="button" class="btn btn-danger" value="Cancelar" onclick="location.href='{% url 'servicios_list' %}'">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var metodoSelect = document.getElementById('metodo_select');
+        var nuevoMetodoForm = document.getElementById('nuevo_metodo_form');
+        var nombreInput = document.querySelector('#nuevo_metodo_form #id_nombre');
+        var leyendaInput = document.querySelector('#nuevo_metodo_form #id_leyenda');
+
+        function toggleNuevoMetodoForm() {
+            if (metodoSelect.value === 'nuevo') {
+                nuevoMetodoForm.style.display = 'block';
+                if (nombreInput) {
+                    nombreInput.removeAttribute('disabled');
+                    nombreInput.setAttribute('required', 'required');
+                }
+                if (leyendaInput) {
+                    leyendaInput.removeAttribute('disabled');
+                    leyendaInput.setAttribute('required', 'required');
+                }
+            } else {
+                nuevoMetodoForm.style.display = 'none';
+                if (nombreInput) {
+                    nombreInput.setAttribute('disabled', 'disabled');
+                    nombreInput.removeAttribute('required');
+                }
+                if (leyendaInput) {
+                    leyendaInput.setAttribute('disabled', 'disabled');
+                    leyendaInput.removeAttribute('required');
+                }
+            }
+        }
+
+        metodoSelect.addEventListener('change', toggleNuevoMetodoForm);
+        toggleNuevoMetodoForm(); // Para configurar correctamente al cargar la página
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+/* Colores usados en el CSS ajustado
+    - Blanco con opacidad para gradiente: rgba(255, 255, 255, 0.1)
+    - Gris para gradiente: rgba(121, 121, 121, 0.3)
+    - Fondo gris claro para <main>: #f0f0f0
+    - Color de fondo de header y textos: #3d3d3d
+    - Color de fondo del sidebar: #333
+    - Color de fondo del hover en los enlaces del sidebar: #555
+    - Color de fondo del footer: #2e2e2e
+    - Color de texto principal del footer: #ffffff8d
+    - Color de enlaces en el footer: #8cd147
+    - https://www.flaticon.es/autores/pixel-perfect/flat?author_id=168&type=standard
+*/
+
+/* ETIQUETA PARA EL FONDO DE TODA LA VENTANA */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 89vh;
+}
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: -200px; /* Ajustar al nuevo ancho de la sidebar */
+    width: 200px; /* Ajustar al nuevo ancho de la sidebar */
+    height: 100%;
+    background-color: #333;
+    transition: left 0.3s;
+    overflow-y: auto;
+    z-index: 10000; /* Asegura que la sidebar esté por encima de otros elementos */
+}
+
+#sidebar.visible {
+    left: 0;
+}
+
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sidebar ul li {
+    margin: 10px 0;
+}
+
+#sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 1rem;
+    display: block;
+}
+
+#sidebar ul li a:hover {
+    background-color: #555;
+}
+
+#sidebar ul ul {
+    background-color: #444; /* Color de fondo para los submenús */
+    padding-left: 20px; /* Espacio a la izquierda para indicar subnivel */
+}
+
+#sidebar ul ul li {
+    margin: 5px 0; /* Espaciado entre elementos del submenú */
+}
+
+#sidebar ul ul li a {
+    padding: 10px; /* Espaciado interno de los enlaces del submenú */
+}
+
+#sidebar ul ul li a:hover {
+    background-color: #666; /* Color de fondo al pasar el ratón sobre los enlaces del submenú */
+}
+
+/* Oculta los subniveles por defecto */
+.submenu {
+    display: none;
+    opacity: 0; /* Para la transición suave */
+    transition: opacity 0.3s ease-in-out; /* Ajusta el tiempo de la transición según lo necesites */
+}
+
+/* Muestra los subniveles cuando se pasa el cursor sobre la opción principal */
+.has-submenu:hover .submenu {
+    display: block;
+    opacity: 1; /* Para la transición suave */
+}
+
+  
+footer {
+    background-color: #2e2e2e;
+    color: #ffffff8d;
+    padding: 50px;
+    width: 100%;
+    z-index: 1; /* Asegúrate de que el footer tenga un z-index menor */
+    margin-top: auto; /* Asegura que el pie de página se mantenga al final de la página */
+}

@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=, initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'css/estiloslogin.css' %}" />
+    <title>Sistema INADE</title>
+  </head>
+
+  <body>
+    <div class="logincontent">
+      <div class="barra_titulo">
+        <div class="titulo">
+          <h1>SISTEMA INADE</h1>
+          <h2>Por favor, inicia sesión</h2>
+        </div>
+
+        <img src="{% static 'img/logo.webp' %}" />
+      </div>
+
+      <hr />
+
+      <!-- Aqui parrafo para errores -->
+      {% if error %}
+        <p class="error">{{ error }} !!.</p>
+      {% endif %}
+      {% if message %}
+        <p class="error">{{ message }} !!.</p>
+      {% endif %}
+
+      <!-- Aqui formulario de login -->
+      <form method="post" id="form-login" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <input type="text" name="username" id="username" required placeholder=" " />
+          <label for="username">Nombre de usuario</label>
+        </div>
+        <div class="form-group">
+          <input type="password" name="password" id="password" required placeholder=" " />
+          <label for="password">Contraseña</label>
+        </div>
+        <input type="submit" value="Iniciar secion" />
+        <!-- <a href="">Olvide contraseña</a> AUN NO SE CREA ESTA SECCION PARA RESTAURAR O GENERAR NUEVA CONTRASEÑA -->
+      </form>
+    </div>
+  </body>
+</html>

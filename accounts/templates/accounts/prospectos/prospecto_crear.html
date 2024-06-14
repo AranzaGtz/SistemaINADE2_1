@@ -1,0 +1,110 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestion de clientes{% endblock %}
+{% block header %}Gestion de clientes{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Nuevo prospecto</h1>
+    <hr />
+    <!-- FORMULARIO -->
+    <form action="{% url 'prospecto_create' %}" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h2>Empresa</h2>
+
+                    <label for="id_nombre_empresa">Nombre:</label>
+                    <input type="text" class="form-control" name="nombre_empresa" maxlength="100" required id="id_nombre_empresa">
+
+                    <label for="id_rfc">Rfc:</label>
+                    <input type="text" class="form-control" name="rfc" maxlength="50" id="id_rfc">
+
+                    <label for="id_moneda">Moneda:</label>
+                    <select name="moneda" id="id_moneda" class="form-control">
+                        <option value="" selected>---------</option>
+                        <option value="mxn">MXN - Moneda Nacional Mexicana</option>
+                        <option value="usd">USD - Dolar Estadunidense</option>
+                    </select>
+
+                    <label for="id_condiciones_pago">Condiciones pago por día:</label>
+                    <input type="text" class="form-control" name="condiciones_pago" value="15" maxlength="200" id="id_condiciones_pago">
+                </div>
+
+                <div class="form-group">
+                    <h2>Direccion</h2>
+
+                    <label for="id_calle">Calle:</label>
+                    <input type="text" class="form-control" name="calle" maxlength="50" required id="id_calle">
+
+                    <label for="id_numero">Numero:</label>
+                    <input type="text" class="form-control" name="numero" maxlength="50" required id="id_numero">
+
+                    <label for="id_colonia">Colonia:</label>
+                    <input type="text" class="form-control" name="colonia" maxlength="100" required id="id_colonia">
+
+                    <label for="id_ciudad">Ciudad:</label>
+                    <input type="text" class="form-control" name="ciudad" maxlength="100" required id="id_ciudad">
+
+                    <label for="id_codigo">Codigo:</label>
+                    <input type="text" class="form-control" name="codigo" maxlength="6" required id="id_codigo">
+
+                    <label for="id_estado">Estado:</label>
+                    <input type="text" class="form-control" name="estado" maxlength="100" required id="id_estado">
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h2>Prospecto</h2>
+
+                    <label for="id_nombre">Nombre:</label>
+                    <input type="text" class="form-control" name="nombre" maxlength="50" required id="id_nombre">
+
+                    <label for="id_apellidos">Apellidos:</label>
+                    <input type="text" class="form-control" name="apellidos" required id="id_apellidos">
+
+                    <label for="id_titulo">Titulo:</label>
+                    <select name="titulo" id="id_titulo" class="form-control">
+                        <option value="">---------</option>
+                        <option value="1">Ingeniero</option>
+                        <option value="2">Licenciado</option>
+                        <option value="3">Arquitecto</option>
+                        <option value="4">Contador Público</option>
+                        <option value="5">Doctor</option>
+                        <option value="6">Maestro</option>
+                        <option value="7">Maestra</option>
+                        <option value="8">Técnico</option>
+                        <option value="9">Químico</option>
+                        <option value="10">Contador</option>
+                        <option value="11">Administrador</option>
+                        <option value="12">Abogado</option>
+                    </select>
+
+                    <label for="id_correo_electronico">Correo electronico:</label>
+                    <input type="email" class="form-control" name="correo_electronico" maxlength="254" required id="id_correo_electronico">
+
+                    <label for="id_telefono">Telefono:</label>
+                    <input type="text" class="form-control" name="telefono" maxlength="120" id="id_telefono">
+
+                    <label for="id_celular">Celular:</label>
+                    <input type="text" class="form-control" name="celular" maxlength="20" id="id_celular" required>
+
+                    <label for="id_fax">Fax:</label>
+                    <input type="text" class="form-control" name="fax" maxlength="20" id="id_fax">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            <input type="submit" class="btn btn-success" value="Registrar">
+            <input type="button" class="btn btn-danger" value="Cancelar" onclick="location.href='{% url 'prospecto_list' %}'">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

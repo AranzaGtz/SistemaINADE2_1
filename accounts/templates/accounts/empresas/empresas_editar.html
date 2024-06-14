@@ -1,0 +1,70 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestion de clientes{% endblock %}
+{% block header %}Gestion de clientes{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Editar empresa</h1>
+    <hr />
+    <!-- FORMULARIO -->
+    <form action="{% url 'empresa_update' empresa.id %}" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h2>Direccion</h2>
+        
+                    <label for="id_calle">Calle:</label>
+                    <input type="text" class="form-control" name="calle" maxlength="50" required id="id_calle"  value="{{ empresa.direccion.calle }}">
+        
+                    <label for="id_numero">Numero:</label>
+                    <input type="text" class="form-control" name="numero" maxlength="50" required id="id_numero" value="{{ empresa.direccion.numero }}">
+        
+                    <label for="id_colonia">Colonia:</label>
+                    <input type="text" class="form-control" name="colonia" maxlength="100" required id="id_colonia" value="{{ empresa.direccion.colonia }}">
+        
+                    <label for="id_ciudad">Ciudad:</label>
+                    <input type="text" class="form-control" name="ciudad" maxlength="100" required id="id_ciudad" value="{{ empresa.direccion.ciudad }}">
+        
+                    <label for="id_codigo">Codigo:</label>
+                    <input type="text" class="form-control" name="codigo" maxlength="6" required id="id_codigo" value="{{ empresa.direccion.codigo }}">
+        
+                    <label for="id_estado">Estado:</label>
+                    <input type="text" class="form-control" name="estado" maxlength="100" required id="id_estado" value="{{ empresa.direccion.estado }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h2>Empresa</h2>
+        
+                    <label for="id_nombre_empresa">Nombre:</label>
+                    <input type="text" class="form-control" name="nombre_empresa" maxlength="100" required id="id_nombre_empresa" value="{{ empresa.nombre_empresa }}">
+        
+                    <label for="id_rfc">Rfc:</label>
+                    <input type="text" class="form-control" name="rfc" maxlength="50" id="id_rfc" value="{{ empresa.rfc }}">
+        
+                    <label for="id_moneda">Moneda:</label>
+                    <select name="moneda" id="id_moneda" class="form-control">
+                        <option value="" {% if empresa.moneda == "" %}selected{% endif %}>---------</option>
+                        <option value="mxn" {% if empresa.moneda == "mxn" %}selected{% endif %}>MXN - Moneda Nacional Mexicana</option>
+                        <option value="usd" {% if empresa.moneda == "usd" %}selected{% endif %}>USD - Dolar Estadunidense</option>
+                    </select>
+        
+                    <label for="id_condiciones_pago">Condiciones pago por día:</label>
+                    <input type="text" class="form-control" name="condiciones_pago" value="15" maxlength="200" id="id_condiciones_pago" value="{{ empresa.condiciones_pago }}">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            <input type="submit" class="btn btn-success" value="Actualizar">
+            <input type="button" class="btn btn-danger" value="Cancelar" onclick="location.href='{% url 'empresas_cont_list' %}'">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

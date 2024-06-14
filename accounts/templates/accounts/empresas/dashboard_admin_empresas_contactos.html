@@ -1,0 +1,135 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestion de empresas y contactos{% endblock %}
+{% block header %}Gestion de empresas y contactos{% endblock %}
+
+{% block content %}
+
+
+<!-- MENSAJES DE ALERTA -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+{% endif %}
+
+<!-- CONTENEDOR DE EMPRESA -->
+<div class="container mt-4">
+    <!-- SECCION DE TITULO ENCABEZANDO DIV -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Empresas</h1>
+            <hr />
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="row">
+        <div class="col" style="position: relative; z-index: 1;">
+            <table class="table table-hover table-light table-bordered" >
+                <!-- ENCABEZADO DE TABLA -->
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Empresa</th>
+                        <th>RFC</th>
+                        <th>Direccion</th>
+                        <th>Moneda</th>
+                        <th>Condiciones de pago</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+    
+                <!-- CUERPO DE TABLA -->
+                <tbody>
+                    {% for e in empresas %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ e.nombre_empresa }}</td>
+                        <td>{{ e.rfc }}</td>
+                        <td>{{ e.direccion }}</td>
+                        <td>{{ e.moneda }}</td>
+                        <td>{{ e.condiciones_pago }}</td>
+
+                        <td>
+                            <a href="{% url 'empresa_edit' e.id %}" class="btn btn-info btn-sm">Editar</a>
+                            <a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- CONTENEDOR DE CONTACTOS -->
+<div class="container mt-4">
+    <!-- SECCION DE TITULO ENCABEZANDO DIV -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Contactos</h1>
+            <hr />
+        </div>
+    </div>
+
+    <!-- TABLA -->
+    <div class="row">
+        <div class="col" style="position: relative; z-index: 1;">
+            <table class="table table-hover table-light table-bordered" >
+                <!-- ENCABEZADO DE TABLA -->
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Titulo</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Informacion personal</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+    
+                <!-- CUERPO DE TABLA -->
+                <tbody>
+                    {% for c in contactos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ c.nombre }}</td>
+                        <td>{{ c.apellidos }}</td>
+                        <td>{{ c.titulo }}</td>
+                        <td>{{ c.informacion_contacto }}</td>
+                        <td>{{ c.condiciones_pago }}</td>
+
+                        <td>
+                            <a href="{% url 'contacto_edit' c.id %}" class="btn btn-info btn-sm">Editar</a>
+                            <a href="{% url 'contacto_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+<script src="{% static 'js/alertas.js' %}"></script>
+<!-- Incluye Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Incluye jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Incluye Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Incluye tu archivo JS personalizado -->
+<script src="{% static 'js/alertas.js' %}"></script>
