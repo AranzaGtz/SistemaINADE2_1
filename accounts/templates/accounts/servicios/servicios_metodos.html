@@ -1,0 +1,88 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestión de clientes{% endblock %}
+{% block header %}Gestión de clientes{% endblock %}
+
+{% block content %}
+
+<!-- MENSAJES DE ALERTA -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+{% endif %}
+
+<!-- CONTENEDOR DE METODOS -->
+<div class="container mt-4">
+    <h1 class="text-center">Métodos existentes</h1>
+    <hr />
+    
+    <div class="row">
+        <!-- FORMULARIO -->
+        <div class="col-md-3">
+            <h2>Crear nuevo método</h2>
+
+            <form action="{% url 'metodo_create' %}" method="POST">    
+               
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_nombre">Nombre del Metodo</label>
+                    <input type="text" name="nombre" class="form-control" maxlength="100" id="id_nombre"  />
+                </div>
+                <div class="form-group">
+                    <label for="id_leyenda">Leyenda</label>
+                    <textarea name="leyenda" class="form-control" rows="4" id="id_leyenda" ></textarea>
+                </div>
+                <input type="submit" class="btn btn-success" value="Registrar" />
+            </form>
+        </div>
+
+        <!-- SECCIÓN DE LISTADO DE MÉTODOS -->
+        <div class="col-md-9">
+            <h2>Lista de métodos</h2>
+            <table class="table table-hover table-light table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Método</th>
+                        <th>Leyenda</th>
+                        <th colspan="1">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in metodos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ m.nombre }}</td>
+                        <td>{{ m.leyenda }}</td>
+                        <td><a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+<script src="{% static 'js/alertas.js' %}"></script>
+<!-- Incluye Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Incluye jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Incluye Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Incluye tu archivo JS personalizado -->
+<script src="{% static 'js/alertas.js' %}"></script>

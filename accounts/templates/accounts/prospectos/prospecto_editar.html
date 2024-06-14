@@ -1,0 +1,60 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestion de clientes{% endblock %}
+{% block header %}Gestion de clientes{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Editar prospecto</h1>
+    <hr />
+    <!-- FORMULARIO -->
+    <form action="{% if cont %}{% url 'contacto_update' prospecto.id %}{% else %}{% url 'prospecto_update' prospecto.id %}{% endif %}" method="post">
+        {% csrf_token %}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <h2>Prospecto</h2>
+        
+                    <label for="id_nombre">Nombre:</label>
+                    <input type="text" class="form-control" name="nombre" maxlength="50" required id="id_nombre" value="{{ prospecto.nombre }}">
+        
+                    <label for="id_apellidos">Apellidos:</label>
+                    <input type="text" class="form-control" name="apellidos" required id="id_apellidos" value="{{ prospecto.apellidos }}">
+        
+                    <label for="id_titulo">Titulo:</label>
+                    <select name="titulo" id="id_titulo" class="form-control">
+                        <option value="">---------</option>
+                        {% for titulo in titulos %}
+                        <option value="{{titulo.id}}" {% if prospecto.titulo.id == titulo.id %}selected{% endif %}>
+                            {{titulo.titulo}}
+                        </option>
+                        {% endfor %}
+                    </select>
+        
+                    <label for="id_correo_electronico">Correo electrónico:</label>
+                    <input type="email" class="form-control" name="correo_electronico" maxlength="254" required id="id_correo_electronico" value="{{ prospecto.informacion_contacto.correo_electronico }}">
+        
+                    <label for="id_telefono">Teléfono:</label>
+                    <input type="text" class="form-control" name="telefono" maxlength="120" id="id_telefono" value="{{ prospecto.informacion_contacto.telefono }}">
+        
+                    <label for="id_celular">Celular:</label>
+                    <input type="text" class="form-control" name="celular" maxlength="20" required id="id_celular" value="{{ prospecto.informacion_contacto.celular }}">
+        
+                    <label for="id_fax">Fax:</label>
+                    <input type="text" class="form-control" name="fax" maxlength="20" id="id_fax" value="{{ prospecto.informacion_contacto.fax }}">
+                </div>
+    
+            </div>
+        </div>
+
+        <div class="form-group text-right">
+            <input type="submit" class="btn btn-success" value="Actualizar">
+            <input type="button" class="btn btn-danger" value="Cancelar" onclick="location.href='{% url 'prospecto_list' %}'">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

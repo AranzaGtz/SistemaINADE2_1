@@ -1,0 +1,141 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% load static %}
+
+{% block title %}Gestion de usuarios{% endblock %}
+{% block header %}Gestion de usuarios{% endblock %}
+
+{% block content %}
+
+<!-- Incluye Bootstrap CSS -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- MENSAJES DE ALERTA -->
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+{% endif %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Administrar usuario</h1>
+    <hr />
+    
+    <div class="row">
+        <!-- FORMULARIO -->
+        <div class="col-md-4">
+            <h2>{% if edit %}Editar usuario{% else %}Crear nuevo usuario{% endif %}</h2>
+            <form action="{% if edit %}{% url 'usuario_edit2' usuario.username %}{% else %}{% url 'usuario_create' %}{% endif %}" method="POST">
+                {% csrf_token %}
+
+                {% if edit %}
+                <input type="hidden" name="username" value="{{ usuario.username }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="id_username">Nombre de usuario</label>
+                    <input type="text" name="username" class="form-control" maxlength="150" id="id_username" value="{{ usuario.username|default_if_none:'' }}" {% if edit %}readonly{% endif %} />
+                </div>
+
+                <div class="form-group">
+                    <label for="id_first_name">Nombre</label>
+                    <input type="text" name="first_name" class="form-control" maxlength="150" id="id_first_name" value="{{ usuario.first_name|default_if_none:'' }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_last_name">Apellidos</label>
+                    <input type="text" name="last_name" class="form-control" maxlength="150" id="id_last_name" value="{{ usuario.last_name|default_if_none:'' }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email">Correo</label>
+                    <input type="email" name="email" class="form-control" maxlength="254" id="id_email" value="{{ usuario.email|default_if_none:'' }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_celular">Celular</label>
+                    <input type="text" name="celular" class="form-control" maxlength="15" id="id_celular" value="{{ usuario.celular|default_if_none:'' }}"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_rol">Rol</label>
+                    <select class="form-control" name="rol" id="id_rol">
+                        <option value="" selected="">Elije rol</option>
+                        <option value="admin" {% if usuario.rol == "admin" %}selected{% endif %}>Administrador</option>
+                        <option value="coordinador" {% if usuario.rol == "coordinador" %}selected{% endif %}>Coordinador</option>
+                        <option value="muestras" {% if usuario.rol == "muestras" %}selected{% endif %}>Muestras</option>
+                        <option value="informes" {% if usuario.rol == "informes" %}selected{% endif %}>Informes</option>
+                        <option value="laboratorio" {% if usuario.rol == "laboratorio" %}selected{% endif %}>Laboratorio</option>
+                        <option value="calidad" {% if usuario.rol == "calidad" %}selected{% endif %}>Calidad</option>
+                    </select>
+                </div>
+
+                {% if not edit %}
+                <div class="form-group">
+                    <label for="id_password1">Contraseña</label>
+                    <input type="password" name="password1" class="form-control" autocomplete="new-password" required="" id="id_password1" />
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password2">Verifique contraseña</label>
+                    <input type="password" name="password2" class="form-control" autocomplete="new-password" required="" id="id_password2" />
+                </div>
+                {% endif %}
+                
+                <div class="form-group text-right">
+                    <input type="submit" class="btn btn-success" value="{% if edit %}Actualizar{% else %}Registrar{% endif %}" />
+                </div>
+            </form>
+        </div>
+
+        <!-- SECCION DE LISTADO DE USUARIOS -->
+        <div class="col-md-8">
+            <h2>Lista de usuarios</h2>
+            <table class="table table-hover table-light table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Correo</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Celular</th>
+                        <th>Rol</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in usuarios %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ c.username }}</td>
+                        <td>{{ c.email }}</td>
+                        <td>{{ c.first_name }}</td>
+                        <td>{{ c.last_name }}</td>
+                        <td>{{ c.celular }}</td>
+                        <td>{{ c.rol }}</td>
+                        <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-info btn-sm">Editar</a></td>
+                        <td><a href="{% url 'usuario_delete' c.username %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+<!-- Incluye jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Incluye Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Incluye tu archivo JS personalizado -->
+<script src="{% static 'js/alertas.js' %}"></script>
