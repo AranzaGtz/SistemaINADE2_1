@@ -1,183 +1,75 @@
 {% extends 'accounts/base_dashboard.html' %}
-
 {% load static %}
-
-{% block title %}
-  Gestion de clientes
-{% endblock %}
-{% block header %}
-  Gestion de clientes
-{% endblock %}
-
+{% block title %}Cotizaciones{% endblock %}
+{% block header %}Cotizaciones{% endblock %}
 {% block content %}
-  <link rel="stylesheet" href="{% static 'css/dashboardHijo.css' %}" />
 
-  <div class="contentadmin">
-    <!-- SECCION DE CLIENTES -->
-    <div>
-      <div class="content_titulo">
-        <h1>Administrar clientes</h1><hr />
-      </div>
+<!-- MENSAJES DE ALERTA -->
 
-      <div class="content-context">
-
-         <!-- TITULO Y BOTON DE NUEVO-->
-        <div class="content-formulario">
-          <h2>Agregar Cliente</h2>
-          <a href="" class="btn-tabla-modificar" id="">Agregar cliente</a>
-        </div>
-
-         <!-- TABLA DE COTIZACIONES-->
-        <div class="content-list">
-          <h2>Lista de clientes</h2> <!-- QUIERO QUE EN TABLA ESTE REPRESENTANTE / EMRPESA / DIRECCION -->
-
-          <!-- TABLA -->
-          <table>
-            <!-- ENCABEZADO DE TABLA -->
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Representante</th>
-                <th>Empresa</th>
-                <th>Direccion</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
-      </div>
+{% if messages %}
+{% for message in messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
+{% endfor %}
+{% endif %}
 
-    <!-- SECCION DE EMPRESAS -->
-    <div>
-
-      <div class="content_titulo">
-        <h1>Empresas</h1><hr />
-      </div>
-
-      <div class="content-context">
-        
-        <div class="content-formulario">
-          <h2>Agregar empresa</h2>
-          <a href="#" class="btn-tabla-modificar" id="openModalBtn">Agregar empresa</a>
+  <!-- CONTENEDOR SERVICIOS -->
+  <div class="container mt-4">
+    <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Cotizaciones</h1>
+            <hr />
         </div>
-
-        <div class="content-list">
-          <h2>Lista de empresas</h2> <!-- QUIERO QUE EN TABLA ESTE REPRESENTANTE / EMRPESA / DIRECCION -->
-          <!-- TABLA -->
-          <table>
-            <!-- ENCABEZADO DE TABLA -->
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Empresa</th>
-                <th>RFC</th>
-                <th>Direccion</th>
-                <th colspan="2">Opciones</th>
-              </tr>
-            </thead>
-
-            <!-- CUERPO DE TABLA -->
-            <tbody>
-              {% for c in empresas %}
-                <tr>
-                  
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ c.nombre_empresa }}</td>
-                  <td>{{ c.rfc }}</td>
-                  <td>{{ c.direccion }}</td>
-
-                  <td>
-                    <!-- BOTON QUE MODIFICA EMPRESA -->
-                    {% comment %} <a href="{% url 'edicion_usuario' c.username %}" class="btn-tabla-modificar btnModificacion" value="Modificar">Editar</a> {% endcomment %}
-                    <a href="" class="btn-tabla-modificar" value="Modificar">Editar</a>
-                  </td>
-                  <td>
-                    <!-- BOTON QUE MODIFICA EMPRESA -->
-                    <a href="" class="btn-tabla-elimina" value="Borrar">Eliminar</a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
-
-  </div>
-
-  <!-- VENTANA MODAL -->
-  <div id="myModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-
-      <div>
-        <h1>Registrar cliente</h1>
-        <hr />
-        <form method="post" action="">
-          {% csrf_token %}
-
-          <div class="div-columnas">
-            <div class="content-formulario" style="margin: 30px; width: 40%;">
-              <h2>Direccion</h2>
-
-              <label for="id_calle">Calle:</label>
-              <input type="text" name="calle" maxlength="50" required="" id="id_calle" />
-
-              <label for="id_numero">Numero:</label>
-              <input type="text" name="numero" maxlength="50" required="" id="id_numero" />
-
-              <label for="id_colonia">Colonia:</label>
-              <input type="text" name="colonia" maxlength="100" required="" id="id_colonia" />
-
-              <label for="id_ciudad">Ciudad:</label>
-              <input type="text" name="ciudad" maxlength="100" required="" id="id_ciudad" />
-
-              <label for="id_codigo">Codigo:</label>
-              <input type="text" name="codigo" maxlength="6" required="" id="id_codigo" />
-
-              <label for="id_estado">Estado:</label>
-              <input type="text" name="estado" maxlength="100" required="" id="id_estado" />
-            </div>
-
-            <div class="content-formulario" style="margin: 30px; width: 40%;">
-              <h2>Empresa</h2>
-
-              <label for="id_nombre_empresa">Nombre empresa:</label>
-              <input type="text" name="nombre_empresa" maxlength="100" required="" id="id_nombre_empresa" data-listener-added_3cd02df1="true" />
-
-              <label for="id_rfc">RFC:</label>
-              <input type="text" name="rfc" maxlength="50" required="" id="id_rfc" />
-              <input type="submit" value="Registrar" />
-          </div>
-
-            
-          </div>
-          
-        </form>
-      </div>
+    <!-- BOTON NUEVO -->
+    <div class="row mb-3">
+        <div class="col text-right">
+            <a href="{% url 'cotizacion_new' %}" class="btn btn-primary">Nuevo</a>
+        </div>
+    </div>
+    <!-- TABLA -->
+    <div class="row">
+        <div class="col" style="position: relative; z-index: 1;">
+            <table class="table table-hover table-light table-bordered" >
+                <!-- ENCABEZADO DE TABLA -->
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Metodo</th>
+                        <th>Descripcion</th>
+                        <th>Precio sugerido</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+                <!-- CUERPO DE TABLA -->
+                <tbody>
+                    {% for s in servicios %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ s.servicio }}</td>
+                        <td>{{ s.metodo.nombre }}</td>
+                        <td>{{ s.descripcion }}</td>
+                        <td>{{ s.precio_sugerido }}</td>
+                        <td>
+                            <a href="{% url 'servicio_edit' s.id %}" class="btn btn-info btn-sm">Editar</a>
+                        </td>
+                        <td>
+                            <a href="{% url 'servicio_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var modal = document.getElementById('myModal')
-      var btn = document.getElementById('openModalBtn')
-      var span = document.getElementsByClassName('close')[0]
-    
-      btn.onclick = function () {
-        modal.style.display = 'block'
-      }
-    
-      span.onclick = function () {
-        modal.style.display = 'none'
-      }
-    
-      window.onclick = function (event) {
-        if (event.target == modal) {
-          modal.style.display = 'none'
-        }
-      }
-    })
-  </script>
 {% endblock %}
+<!-- Mensajes de alertas -->
+<script src="{% static 'js/alertas.js' %}"></script>

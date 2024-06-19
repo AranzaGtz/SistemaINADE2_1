@@ -1,5 +1,9 @@
+from datetime import date
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
+# Opcional: Agregar señales para manejar el cálculo del subtotal, IVA y total automáticamente cuando se guarden los objetos CotizacionConcepto.
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 # En accounts/models.py, define el modelo de usuario personalizado que tenga campos adicionales para los diferentes roles.
 
@@ -126,22 +130,19 @@ class Persona(models.Model):
     informacion_contacto = models.ForeignKey(InformacionContacto, on_delete=models.SET_NULL, null=True, blank=True)  # null=True
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
 
-    class Meta:
-        abstract = True
-
     def __str__(self):
         return f"{self.nombre} {self.apellidos}"
 
 # MODELO PARA PROSPECTO
-class Prospecto(Persona):
-    pass
+class Prospecto(models.Model):
+    persona = models.OneToOneField(Persona, on_delete=models.CASCADE, related_name='prospecto')
 
 # MODELO PARA CLIENTE
-class Cliente(Persona):
-    pass
+class Cliente(models.Model):
+    persona = models.OneToOneField(Persona, on_delete=models.CASCADE, related_name='cliente')
 
 #----------------------------------------------------
-# NUEVO MODELO PARA CONCEPTOS
+# MODELO PARA CONCEPTOS
 #----------------------------------------------------
 
 # MODELO PARA METODO
@@ -172,3 +173,56 @@ class Concepto(models.Model):
 
     def __str__(self):
         return f'{self.servicio.nombre_concepto} - {self.cantidad_servicios}'
+    
+#----------------------------------------------------
+# MODELO PARA COTIZACIONES
+#----------------------------------------------------
+
+# MODELO DE COTIZACION
+class Cotizacion(models.Model):
+    fecha_solicitada = models.DateField()
+    fecha_caducidad = models.DateField()
+    metodo_pago = models.CharField(max_length=100)
+    tasa_iva = models.DecimalField(max_digits=4, decimal_places=2, default=0.16)
+    notas = models.TextField(blank=True, null=True)
+    correoss_adicionales = models.TextField(blank=True, null=True, help_text=("Lista de correos adicionales separados por comas"))
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    iva = models.DecimalField(max_digits=10,decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE,blank=True, null=True)
+    prospecto = models.ForeignKey(Prospecto, on_delete=models.CASCADE, blank=True, null=True)
+    id_personalizado = models.CharField(max_length=20, unique=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.id_personalizado:
+            today = date.today()
+            last_cotizacion = Cotizacion.objects.filter(fecha_solicitud=today).count() + 1
+            self.id_personalizado = f"{today.strftime('%y%m%d')}-{last_cotizacion:02d}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.id_personalizado
+     
+# MODELO DE COTIZACION CONCEPTO
+class CotizacionConcepto(models.Model):
+    cotizacion = models.ForeignKey(Cotizacion, on_delete=models.CASCADE)
+    concepto = models.ForeignKey(Concepto, on_delete=models.CASCADE)
+    cantidad = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.cotizacion.id_personalizado} - {self.concepto.nombre_concepto.servicio}"
+
+@receiver(post_save, sender=CotizacionConcepto)
+@receiver(post_delete, sender=CotizacionConcepto)
+
+def actualizar_totales(sender, instance, **kwargs):
+    cotizacion = instance.cotizacion
+    conceptos = CotizacionConcepto.objects.filter(cotizacion=cotizacion)
+    subtotal = sum(concepto.concepto.total() for concepto in conceptos)
+    iva = subtotal * cotizacion.tasa_iva
+    total = subtotal + iva
+    Cotizacion.objects.filter(id=cotizacion.id).update(subtotal=subtotal, iva=iva, total=total)
+    
+    
+# Cotizacion: Modelo para las cotizaciones, con campos para las fechas, método de pago, tasa de IVA, notas, correos adicionales, subtotal, IVA, total, cliente (opcional), prospecto, e ID personalizado.
+# CotizacionConcepto: Modelo para asociar conceptos a una cotización, con una relación many-to-many entre Cotizacion y Concepto y un campo para la cantidad.
