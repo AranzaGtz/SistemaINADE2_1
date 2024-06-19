@@ -1,10 +1,7 @@
 {% extends 'accounts/base_dashboard.html' %}
-
 {% load static %}
-
-{% block title %}Gestión de servicios{% endblock %}
-{% block header %}Gestión de servicios{% endblock %}
-
+{% block title %}Servicios{% endblock %}
+{% block header %}Servicios{% endblock %}
 {% block content %}
 
 <!-- MENSAJES DE ALERTA -->
@@ -19,7 +16,7 @@
 {% endfor %}
 {% endif %}
 
-<!-- CONTENEDOR DE METODOS -->
+<!-- CONTENEDOR SERVICIOS -->
 <div class="container mt-4">
     <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
     <div class="row">
@@ -29,7 +26,7 @@
         </div>
     </div>
 
-    <!-- BOTON VERDE -->
+    <!-- BOTON NUEVO -->
     <div class="row mb-3">
         <div class="col text-right">
             <a href="{% url 'servicio_new' %}" class="btn btn-primary">Nuevo</a>
@@ -44,7 +41,7 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>#</th>
-                        <th >Nombre</th>
+                        <th>Nombre</th>
                         <th>Metodo</th>
                         <th>Descripcion</th>
                         <th>Precio sugerido</th>
@@ -78,9 +75,9 @@
 
 </div>
 
-
 {% endblock %}
 
+<!-- Mensajes de alertas -->
 <script src="{% static 'js/alertas.js' %}"></script>
 <!-- Incluye Bootstrap CSS -->
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">

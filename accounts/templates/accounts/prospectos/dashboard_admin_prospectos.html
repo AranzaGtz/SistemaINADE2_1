@@ -1,13 +1,8 @@
 {% extends 'accounts/base_dashboard.html' %}
-
 {% load static %}
-
-{% block title %}Gestion de clientes{% endblock %}
-{% block header %}Gestion de clientes{% endblock %}
-
+{% block title %}Prospecto{% endblock %}
+{% block header %}Prospecto{% endblock %}
 {% block content %}
-
-
 <!-- MENSAJES DE ALERTA -->
 {% if messages %}
 {% for message in messages %}
@@ -56,11 +51,11 @@
                     {% for p in prospectos %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ p.titulo }}</td>
-                        <td>{{ p.nombre }}</td>
-                        <td>{{ p.apellidos }}</td>
-                        <td>{{ p.empresa.nombre_empresa }}</td>
-                        <td>{{ p.informacion_contacto.correo_electronico }}</td>
+                        <td>{{ p.persona.titulo }}</td>
+                        <td>{{ p.persona.nombre }}</td>
+                        <td>{{ p.persona.apellidos }}</td>
+                        <td>{{ p.persona.empresa.nombre_empresa }}</td>
+                        <td>{{ p.persona.informacion_contacto.correo_electronico }}</td>
                         <td>
                             <a href="{% url 'prospecto_edit' p.id %}" class="btn btn-info btn-sm">Editar</a>
                             <button class="btn btn-secondary btn-sm">Cotizar</button>

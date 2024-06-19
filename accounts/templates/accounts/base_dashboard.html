@@ -11,7 +11,6 @@
 </head>
 
 <body>
-
   <div class="wrapper">
       <!-- BARRA DE ENCABEZADO -->
       <header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
@@ -26,7 +25,6 @@
               </div>
           </div>
       </header>
-
       <!-- BARRA DE NAVEGACION -->
       <nav id="sidebar" class="sidebar bg-dark text-white p-3 sidebar-sticky" style="z-index:6;">
           <h4 class="text-center">Menú</h4>
@@ -44,7 +42,7 @@
 
             <!-- Opción para abrir cotizaciones -->
             <li class="nav-item has-submenu">
-                <a href="{% url 'int_cotizaciones' %}" class="nav-link text-white">Cotizaciones</a>
+                <a href="{% url 'cotizaciones_list' %}" class="nav-link text-white">Cotizaciones</a>
                 <ul class="submenu">
                     <li class="nav-item"><a href="{% url 'prospecto_list' %}" class="nav-link text-white">Prospectos</a></li>
                     <li class="nav-item"><a href="{% url 'empresas_cont_list' %}" class="nav-link text-white">Empresas y contactos</a></li>
@@ -70,7 +68,6 @@
             </li>
           </ul>
       </nav>
-
       <div class="content">
           <!-- CONTENIDO VARIANTE -->
           <main class="container mt-4">
@@ -80,7 +77,6 @@
       </div>
       
   </div>
-
  <!-- PIE DE PAGINA -->
   <footer class="bg-dark text-white py-4 mt-auto" style="width: 100%; padding: 50px;margin-top: auto;">
     <div class="container">

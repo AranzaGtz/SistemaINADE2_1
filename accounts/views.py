@@ -7,4 +7,3 @@ from django.http import JsonResponse
 # Resto de tu código de vistas aquí...
 
 
-
