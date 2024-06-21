@@ -17,8 +17,8 @@
 {% endfor %}
 {% endif %}
 
-  <!-- CONTENEDOR SERVICIOS -->
-  <div class="container mt-4">
+<!-- CONTENEDOR COTIZACIONES -->
+<div class="container mt-4">
     <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
     <div class="row">
         <div class="col">
@@ -29,7 +29,7 @@
     <!-- BOTON NUEVO -->
     <div class="row mb-3">
         <div class="col text-right">
-            <a href="{% url 'cotizacion_new' %}" class="btn btn-primary">Nuevo</a>
+            <a href="{% url 'cotizacion_form' %}" class="btn btn-primary">Nuevo</a>
         </div>
     </div>
     <!-- TABLA -->
@@ -39,28 +39,32 @@
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-dark">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Metodo</th>
-                        <th>Descripcion</th>
-                        <th>Precio sugerido</th>
-                        <th colspan="2">Opciones</th>
+                        <th>Cotizacion</th>
+                        <th>Empresa</th>
+                        <th colspan="2">Contacto</th>
+                        <th>Solicitud</th>
+                        <th>Expiración</th>
+                        <th>Moneda</th>
+                        <th>Estado</th>
+                        <th>Opciones</th>
                     </tr>
                 </thead>
                 <!-- CUERPO DE TABLA -->
                 <tbody>
-                    {% for s in servicios %}
+                    {% for c in cotizaciones %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ s.servicio }}</td>
-                        <td>{{ s.metodo.nombre }}</td>
-                        <td>{{ s.descripcion }}</td>
-                        <td>{{ s.precio_sugerido }}</td>
+                        <td>{{ c.id_personalizado }}</td>
+                        <td>{{ c.persona.empresa.nombre_empresa }}</td>
+                        <td>{{ c.persona.nombre }} </td>
+                        <td>{{ c.persona.apellidos }}</td>
+                        <td>{{ c.fecha_solicitud }}</td>
+                        <td>{{ c.fecha_caducidad }}</td>
+                        <td>{{ c.metodo_pago }}</td>
+                        <td> NA </td>
                         <td>
-                            <a href="{% url 'servicio_edit' s.id %}" class="btn btn-info btn-sm">Editar</a>
-                        </td>
-                        <td>
-                            <a href="{% url 'servicio_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            <a href="" class="btn btn-info btn-sm">Editar</a>
+                            <a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-info btn-sm">Detalles</a>
+                            <a href="" class="btn btn-danger btn-sm">Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -68,7 +72,7 @@
             </table>
         </div>
     </div>
-  </div>
+</div>
 
 {% endblock %}
 <!-- Mensajes de alertas -->

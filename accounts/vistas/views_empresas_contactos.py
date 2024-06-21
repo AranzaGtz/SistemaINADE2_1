@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm
-from accounts.models import Empresa, Prospecto, Titulo
+from accounts.models import Empresa, Persona, Prospecto, Titulo
 from django.contrib import messages
 
 # VISTA MOSTRAR EMPRESAS
 def empresa_cont_list(request):
     empresas = Empresa.objects.all()
-    contactos = Prospecto.objects.all()
+    contactos = Persona.objects.all()
     return render(request, "accounts/empresas/dashboard_admin_empresas_contactos.html",
         {"empresas": empresas,
         'contactos':contactos})

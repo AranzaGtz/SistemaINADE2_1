@@ -3,68 +3,47 @@ from django.shortcuts import redirect, render, get_object_or_404
 from accounts.forms import MetodoForm, ServicioForm
 from accounts.models import Metodo, Servicio
 
-def metodos_list(request):
-    metodos = Metodo.objects.all()
-    return render(request,'accounts/servicios/servicios_metodos.html', {'metodos': metodos})
-
-def metodo_create(request):
-    if request.method == 'POST':
-        form = MetodoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('metodos_list')
-    else:
-        form = MetodoForm()
-    return render(request, 'metodo_form.html', {'form': form})
-
-# VISTA PARA ELIMINAR METODOS
-def metodo_delete(request,pk):
-    metodo = Metodo.objects.get(id = pk)
-    metodo.delete()
-    messages.success(request, 'Metodo eliminado exitosamente!.')
-    return redirect('metodos_list')
-
 # VISTA PARA DIRIGIR A INTERFAZ DE SERVICIOS
 def servicios_list(request):
-    servicios = Servicio.objects.all()
-    return render(request,'accounts/servicios/dashboard_admin_servicios.html',{'servicios':servicios})
+    context = {
+        'servicios' : Servicio.objects.all(),
+        'metodos' : Metodo.objects.all(),
+        'metodos_form' : MetodoForm()
+    }
+    return render(request,'accounts/servicios/servicios.html',context)
 
 # VISTA PARA CREAR UN SERVICIO
 def servicio_new(request):
     metodo_form = MetodoForm()
     servicio_form = ServicioForm()
     lista_metodos = Metodo.objects.all()
-    return render(request, "accounts/servicios/servicios_crear.html", {'metodo_form': metodo_form, 'servicio_form': servicio_form, 'metodos': lista_metodos})
+    context = {
+        'metodo_form': metodo_form, 
+        'servicio_form': servicio_form, 
+        'metodos': lista_metodos
+        }
+    return render(request, "accounts/servicios/servicios_crear.html", context)
 
 # VISTA PARA CREAR UN SERVICIO
 def servicio_create(request):
     if request.method == 'POST':
-        if 'metodo' in request.POST and request.POST['metodo'] == 'nuevo':
-            metodo_form = MetodoForm(request.POST)
-            servicio_form = ServicioForm(request.POST)
-            if metodo_form.is_valid() and servicio_form.is_valid():
-                nuevo_metodo = metodo_form.save()
-                servicio = servicio_form.save(commit=False)
-                servicio.metodo = nuevo_metodo
-                servicio.save()
-                return redirect('servicios_list')
-        else:
-            servicio_form = ServicioForm(request.POST)
-            if servicio_form.is_valid():
-                servicio = servicio_form.save(commit=False)
-                servicio.metodo_id = request.POST.get('metodo')
-                servicio.save()
-                return redirect('servicios_list')
+        servicio_form = ServicioForm(request.POST)
+        metodo_form = MetodoForm(request.POST)
+
+        if servicio_form.is_valid():
+            servicio = servicio_form.save(commit=False)
+            servicio.metodo_id = request.POST.get('metodo')
+            servicio.save()
+            return redirect('servicios_list') 
     else:
         metodo_form = MetodoForm()
         servicio_form = ServicioForm()
     
-    metodos = Metodo.objects.all()
-    return render(request, 'accounts/servicios/dashboard_admin_servicios.html', {
-        'metodo_form': metodo_form,
+    context = {
         'servicio_form': servicio_form,
-        'metodos': metodos
-    })
+        'metodo_form': metodo_form,
+    }
+    return render(request, 'accounts/servicios/servicios.html', context)
 
 # VISTA PARA EDITAR UN SERVICIO
 def servicio_edit(request, pk):
@@ -123,4 +102,25 @@ def servicio_delete(request, pk):
     servicio = get_object_or_404(Servicio, pk=pk)
     servicio.delete()
     messages.success(request, 'Servicio eliminado exitosamente!')
+    return redirect('servicios_list')
+
+# VISTA PARA BORRAR METODO
+def metodo_create(request):
+    if request.method == 'POST':
+        form = MetodoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Metodo agregado exitosamente!.')
+            return redirect('servicios_list')
+    else:
+        context = {
+            'form' : MetodoForm()
+        }
+    return render(request, 'servicios_list', context)
+
+# VISTA PARA ELIMINAR METODOS
+def metodo_delete(request,pk):
+    metodo = Metodo.objects.get(id = pk)
+    metodo.delete()
+    messages.success(request, 'Metodo eliminado exitosamente!.')
     return redirect('servicios_list')

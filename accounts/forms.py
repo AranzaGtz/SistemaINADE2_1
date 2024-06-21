@@ -1,7 +1,8 @@
 from django import forms
 from .models import Concepto, CustomUser, Metodo,Persona,Prospecto, Cliente, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion
 from django.contrib.auth.forms import UserCreationForm
-from django.forms import modelformset_factory
+from django.forms import inlineformset_factory
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -36,7 +37,7 @@ class PersonaForm (forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Nombre del método','required':'True'}),
             'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ambos apellidos','required':'True'}),
-            'titulo': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona un titulo','required':'True'}),
+            'titulo': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona un titulo','required':'False'}),
         }
 
 #   FORMULARIO PARA PROSPECTO        
@@ -84,20 +85,20 @@ class EmpresaForm(forms.ModelForm):
 class MetodoForm(forms.ModelForm):
     class Meta:
         model = Metodo
-        fields = ['nombre', 'leyenda']
+        fields = ['metodo']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del método'}),
-            'leyenda': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Leyenda descriptiva del método'}),
+            'metodo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del método'}),
         }
 
 #   FORMULARIO PARA SERVICIO
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['servicio', 'descripcion', 'precio_sugerido']
+        fields = ['metodo','nombre_servicio', 'descripcion', 'precio_sugerido' ]
         widgets = {
-            'servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto'}),
+            'metodo': forms.Select(attrs={'class': 'form-control'}),
+            'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto','rows': 2}),
             'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
         }
 
@@ -105,23 +106,24 @@ class ServicioForm(forms.ModelForm):
 class ConceptoForm(forms.ModelForm):
     class Meta:
         model = Concepto
-        fields = ['nombre_concepto', 'cantidad_servicios', 'notas']
+        fields = ['cantidad_servicios', 'precio', 'notas', 'servicio']
         widgets = {
-            'nombre_concepto': forms.Select(attrs={'class': 'form-control'}),
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
-            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales'}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales','rows': 3}),
+            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'})
         }
+ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1)
 
 #   FORMULARIO PARA COTIZACION
 class CotizacionForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
-        fields = ['fecha_solicitada', 'fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correoss_adicionales']
+        fields = ['fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales', 'persona']
         widgets = {
-            'fecha_solicitada': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa fecha de solicitud'}),
-            'fecha_caducidad': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa fecha de caducidad'}),
+            'fecha_caducidad': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa fecha de caducidad', 'type': 'date'}),
             'metodo_pago': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona Tipo de Moneda','required':'True'}),
             'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
-            'Notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa tus notas aquí.'}),
-            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas'}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).','rows': 3}),
+            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)','rows': 3}),
+            'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente'}),
         }
