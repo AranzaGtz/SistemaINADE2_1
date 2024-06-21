@@ -30,7 +30,6 @@ urlpatterns = [
     path('contacto/<int:pk>/update/',views_empresas_contactos.contacto_update,name='contacto_update'),
     path('contacto/<int:pk>/delete/',views_empresas_contactos.contacto_delete, name='contacto_delete'),
     
-    path('metodo/',views_servicios.metodos_list,name='metodos_list'),
     path('metodo/new/',views_servicios.metodo_create,name='metodo_create'),
     path('metodo/<int:pk>/delete/',views_servicios.metodo_delete,name='metodo_delete'),
     
@@ -42,10 +41,10 @@ urlpatterns = [
     path('servicio/<int:pk>/delete/',views_servicios.servicio_delete,name='servicio_delete'),
     
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
-    path('cotizacion/new', views_cotizaciones.cotizacion_new, name='cotizacion_new'),
-    path('cotizacion/register/', views_cotizaciones.cotizacion_register, name='cotizacion_register')
+    path('cotizaciones/nueva/', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
+    path('cotizaciones/<int:pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
+    path('cotizaciones/crear/', views_cotizaciones.crear_cotizacion, name='crear_cotizacion'),
 
-    
     
     # Define otras rutas según las vistas que hayas definido
 ]

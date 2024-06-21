@@ -1,44 +1,71 @@
-# VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, render, redirect
+from accounts.models import Cotizacion
+from accounts.forms import CotizacionForm, ConceptoFormSet
 
-from accounts.forms import ConceptoForm, CotizacionForm, DireccionForm, EmpresaForm, InformacionContactoForm, PersonaForm, ProspectoForm
-from accounts.models import Empresa, Persona, Prospecto
+# VISTA DE COTIZACIONES
+def cotizaciones_list(request):
+    cotizaciones = Cotizacion.objects.all()
+    return render(request, "accounts/cotizaciones/cotizaciones.html",{'cotizaciones': cotizaciones})
 
-
-def cotizaciones_list (request):
-    # Lista_clientes = Empresa.objects.all()
-    return render(request, "accounts/cotizaciones/dashboard_admin_cotizaciones.html") #,{"empresas":Lista_clientes}
-
-def cotizacion_new (request):
-    context = {
-        'persona_form': PersonaForm(),
-        'informacion_contacto_form': InformacionContactoForm(),
-        'personas': Persona.objects.all(),
-        'empresas': Empresa.objects.all(),
-        'direccion_form':DireccionForm(),
-        'empresa_form': EmpresaForm(),
-    }
-    return render(request, "accounts/cotizaciones/cotizaciones_crear.html",context)
-
-def cotizacion_register(request):
+# AGREGAR NUEVA COTIZACION
+def cotizacion_form(request):
     if request.method == 'POST':
-        persona_id = request.POST.get('persona')
-        if persona_id == 'nuevo':
-            persona_form = PersonaForm(request.POST)
-            informacion_contacto_form = InformacionContactoForm(request.POST)
-            if persona_form.is_valid() and informacion_contacto_form.is_valid():
-                nueva_persona = persona_form.save()
-                nueva_informacion_contacto = informacion_contacto_form.save(commit=False)
-                nueva_informacion_contacto.persona = nueva_persona
-                nueva_informacion_contacto.save()
-                prospecto = Prospecto(persona=nueva_persona)
-                prospecto.save()
-                # Aquí puedes proceder a crear la cotización con el nuevo prospecto
-                return redirect('cotizaciones_list')
-        else:
-            persona = Persona.objects.get(id=persona_id)
-            prospecto, created = Prospecto.objects.get_or_create(persona=persona)
-            # Aquí puedes proceder a crear la cotización con el prospecto existente
-            return redirect('cotizaciones_list')
+        cotizacion_form = CotizacionForm(request.POST)
+        concepto_formset = ConceptoFormSet(request.POST)
+
+        if cotizacion_form.is_valid() and concepto_formset.is_valid():
+            cotizacion = cotizacion_form.save()
+            conceptos = concepto_formset.save(commit=False)
+            for concepto in conceptos:
+                concepto.cotizacion = cotizacion
+                concepto.save()
+            cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in conceptos])
+            cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
+            cotizacion.total = cotizacion.subtotal + cotizacion.iva
+            cotizacion.save()
+            return redirect('cotizacion_detalle', pk=cotizacion.pk)
     else:
-        return render(request, "accounts/cotizaciones/cotizaciones_registro.html")
+        cotizacion_form = CotizacionForm()
+        concepto_formset = ConceptoFormSet()
+
+    return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
+        'cotizacion_form': cotizacion_form,
+        'concepto_formset': concepto_formset,
+    })
+
+def cotizacion_detalle(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, pk=pk)
+    conceptos = cotizacion.conceptos.all()
+    for concepto in conceptos:
+        concepto.subtotal = concepto.cantidad_servicios * concepto.precio
+    
+    return render(request, 'accounts/cotizaciones/cotizacion_detalle.html', {
+        'cotizacion': cotizacion,
+        'conceptos': conceptos,
+    })
+
+def crear_cotizacion(request):
+    if request.method == 'POST':
+        cotizacion_form = CotizacionForm(request.POST)
+        concepto_formset = ConceptoFormSet(request.POST)
+        
+        if cotizacion_form.is_valid() and concepto_formset.is_valid():
+            cotizacion = cotizacion_form.save()
+            conceptos = concepto_formset.save(commit=False)
+            for concepto in conceptos:
+                concepto.cotizacion = cotizacion
+                concepto.save()
+            cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in conceptos])
+            cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
+            cotizacion.total = cotizacion.subtotal + cotizacion.iva
+            cotizacion.save()
+            return redirect('cotizacion_detalle', pk=cotizacion.pk)
+    else:
+        cotizacion_form = CotizacionForm()
+        concepto_formset = ConceptoFormSet()
+    
+    return render(request, 'accounts/cotizaciones/cotizaciones.html', {
+        'cotizacion_form': cotizacion_form,
+        'concepto_formset': concepto_formset,
+    })
+

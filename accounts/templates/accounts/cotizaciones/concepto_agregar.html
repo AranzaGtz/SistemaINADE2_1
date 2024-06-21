@@ -1,0 +1,119 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Registrar Cotización{% endblock %}
+{% block header %}Registrar Cotización{% endblock %}
+{% block content %}
+
+<!-- MENSAJES DE ALERTA -->
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+     <strong>{{ message }}</strong>
+     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+     </button>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- CONTENEDOR REGISTRO DE COTIZACION -->
+<div class="container mt-4">
+     <h1 class="text-center">Registro de cotización</h1>
+     <hr />
+     <div class="form-group bg-light p-4 rounded">
+          <h4 class="text-info text-center ">Emrpesa <cite title="Título fuente">{{ cotizacion.prospecto.persona.empresa.nombre_empresa }}</cite>
+          </h4>
+          <p class="text-dark text-center mt-0">Cliente <cite title="Título fuente">{{cotizacion.prospecto.persona }}</cite></h4>
+               <br> - Retraso de pago (preferido) <cite title="Título fuente">{{ cotizacion.prospecto.persona.empresa.condiciones_pago }}</cite> días.
+               <br> - Contacto: <cite title="Título fuente">{{ cotizacion.prospecto.persona.informacion_contacto }}</cite>
+          </p>
+     </div>
+
+     <!-- AGREGAR CONCEPOTOS EN LA COTIZACION  -->
+     <h2 class="mt-6">Conceptos</h2>
+     <div class="row">
+          <!-- FORMULARIO -->
+          <div class="col-md-3">
+               <form action="{% url 'registrar_concepto' cotizacion.id %}" method="POST">
+                    {% csrf_token %}
+                    <!-- SELECCIONAR METODO -->
+                    <div class="form-group">
+                         <label for="metodo_select">Método:</label>
+                         <select id="metodo_select" class="form-control" name="metodo">
+                              <option value="" {% if not servicio.metodo %}selected{% endif %}>Seleccione un método</option>
+                              {% for metodo in metodos %}
+                              <option value="{{ metodo.id }}" {% if servicio.metodo.id == metodo.id %}selected{% endif %}>{{ metodo.metodo }}</option>
+                              {% endfor %}
+                              <option value="nuevo">Crear nuevo método</option>
+                         </select>
+                    </div>
+                    <!-- FORMULARIO PARA CREAR METODO -->
+                    <div id="nuevo_metodo_form" style="display: none;">
+                         {{ metodo_form.as_p }}
+                    </div>
+
+                    <!-- FORMULARIO DE SERVICIO -->
+                    {{ servicio_form.as_p }}
+
+                    <!-- FORMULARIO DE CONCEPTO -->
+                    {{ concepto_form.as_p }}
+
+                    <!-- BOTONES ACEPTAR CANDELAR-->
+                    <div class="form-group text-right">
+                         <input type="submit" class="btn btn-success" value="Agregar Concepto">
+                    </div>
+               </form>
+          </div>
+          <!-- SECCIÓN DE LISTADO DE SERVICIOS -->
+          <div class="col-md-9">
+               <div class="table-responsive" style="height: 400px; overflow-y: scroll;">
+                    <table class="table table-hover table-light table-bordered table-striped">
+                         <!-- ENCABEZADO DE TABLA -->
+                         <thead class="thead bg-info">
+                              <tr>
+                                   <th class="text-light col-md-2">Metodo</th>
+                                   <th class="text-light col-md-2">Nombre</th>
+                                   <th class="text-light col-md-4">Descripción</th>
+                                   <th class="text-light col-md-1">Precio</th>
+
+                                   <th colspan="1" class="col-md-1 text-light">Opciones</th>
+                              </tr>
+                         </thead>
+
+                         <!-- CUERPO DE TABLA -->
+                         <tbody>
+                              {% for s in servicios %}
+                              <tr>
+                                   <td>{{ s.metodo.metodo }}</td>
+                                   <td>{{ s.servicio }}</td>
+                                   <td>{{ s.descripcion }}</td>
+                                   <td>{{ s.precio_sugerido }}</td>
+                                   <td><a href="{% url 'cotizacion_captura' s.id cotizacion.id %}" class="btn btn-success btn-sm">Cargar</a></td>
+                              </tr>
+                              {% endfor %}
+                         </tbody>
+                    </table>
+               </div>
+          </div>
+     </div>
+
+     <!-- CONCEPTOS AGREGADOS  -->
+     <h3 class="mt-6 ">Conceptos agregados</h3>
+     <div class="card">
+          <h5 class="card-header">Featured</h5>
+          <div class="card-body">
+               <h5 class="card-title">Special title treatment</h5>
+               <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+               <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+     </div>
+
+     <div class="row mt-4">
+          <div class="col-12 text-right">
+               <button type="submit" class="btn btn-primary">Guardar Cotización</button>
+          </div>
+     </div>
+</div>
+
+
+{% endblock %}
