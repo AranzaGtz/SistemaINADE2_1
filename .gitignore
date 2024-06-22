@@ -1,15 +1,62 @@
+# Python
+*.pyc
+__pycache__/
+
+# Virtual environment
+.env/
+venv/
+env/
+
 # Django
 *.log
 *.pot
 *.pyc
-__pycache__/
-db.sqlite3
-media
-staticfiles
-.env
+*.so
+*.sqlite3
+*.pyo
+*.cover
+*.DS_Store
+*.pyd
+*.pyo
+*.coverage
+*.egg-info
+*.idea
+*.swp
+*.swo
+*.swn
+*.bak
+*.orig
+*.rej
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# mypy
+.mypy_cache/
 
 # Environments
+.env
 .venv
+env/
 venv/
 ENV/
-env/
+env.bak/
+venv.bak/
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+
+# Sentry
+.sentryclirc
+
+# Static files
+staticfiles/
+static/
+media/
+
+# IDEs
+.idea/
+.vscode/
+
