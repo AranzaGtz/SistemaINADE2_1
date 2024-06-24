@@ -43,8 +43,8 @@ urlpatterns = [
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
     path('cotizaciones/nueva/', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
     path('cotizaciones/<int:pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
-    path('cotizaciones/crear/', views_cotizaciones.crear_cotizacion, name='crear_cotizacion'),
-    
+    path('cotizaciones/<int:pk>/delete/', views_cotizaciones.cotizacion_delete,name='cotizacion_delete'),
+    path('cotizaciones/<int:pk>/edit/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit')
     
     # Define otras rutas según las vistas que hayas definido
 ]

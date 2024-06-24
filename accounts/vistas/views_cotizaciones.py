@@ -33,6 +33,7 @@ def cotizacion_form(request):
         'concepto_formset': concepto_formset,
     })
 
+# INTERFAZ DE DETALLES DE CADA COTIZACION
 def cotizacion_detalle(request, pk):
     cotizacion = get_object_or_404(Cotizacion, pk=pk)
     conceptos = cotizacion.conceptos.all()
@@ -44,10 +45,21 @@ def cotizacion_detalle(request, pk):
         'conceptos': conceptos,
     })
 
-def crear_cotizacion(request):
+# INTERFAZ PARA ELIMINAR COTIZACION
+def cotizacion_delete(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    if request.method == "POST":
+        cotizacion.delete()
+        return redirect('cotizaciones_list')  # Redirigir a la lista de cotizaciones después de la eliminación
+    return render(request, 'accounts/cotizaciones/eliminar_colitazion.html', {'cotizacion': cotizacion})
+
+# VISTA PARA EDITAR COTIZACION
+def cotizacion_edit(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    print(f"Fecha Solicitada: {cotizacion.fecha_solicitud}, Fecha Caducidad: {cotizacion.fecha_caducidad}")
     if request.method == 'POST':
-        cotizacion_form = CotizacionForm(request.POST)
-        concepto_formset = ConceptoFormSet(request.POST)
+        cotizacion_form = CotizacionForm(request.POST, instance=cotizacion)
+        concepto_formset = ConceptoFormSet(request.POST, instance=cotizacion)
         
         if cotizacion_form.is_valid() and concepto_formset.is_valid():
             cotizacion = cotizacion_form.save()
@@ -55,17 +67,20 @@ def crear_cotizacion(request):
             for concepto in conceptos:
                 concepto.cotizacion = cotizacion
                 concepto.save()
+            for concepto in concepto_formset.deleted_objects:
+                concepto.delete()
             cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in conceptos])
             cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
             cotizacion.total = cotizacion.subtotal + cotizacion.iva
             cotizacion.save()
-            return redirect('cotizacion_detalle', pk=cotizacion.pk)
+            return redirect('cotizacion_detalle', pk=cotizacion.id)
     else:
-        cotizacion_form = CotizacionForm()
-        concepto_formset = ConceptoFormSet()
-    
-    return render(request, 'accounts/cotizaciones/cotizaciones.html', {
+        cotizacion_form = CotizacionForm(instance=cotizacion)
+        concepto_formset = ConceptoFormSet(instance=cotizacion)
+
+    return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
+        'cotizacion': cotizacion,
+        'edit': True
     })
-

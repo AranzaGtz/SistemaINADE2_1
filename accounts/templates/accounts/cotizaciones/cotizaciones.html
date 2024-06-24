@@ -71,9 +71,9 @@
                         <td>{{ c.metodo_pago }}</td>
                         <td> NA </td>
                         <td>
-                            <a href="" class="btn btn-info btn-sm">Editar</a>
+                            <a href="{% url 'cotizacion_edit' c.id %}" class="btn btn-info btn-sm">Modificar</a>
                             <a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-info btn-sm">Detalles</a>
-                            <a href="" class="btn btn-danger btn-sm">Eliminar</a>
+                            <a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -85,4 +85,6 @@
 
 {% endblock %}
 <!-- Mensajes de alertas -->
-<script src="{% static 'js/alertas.js' %}"></script>
+{% block scripts %} 
+    <script src="{% static 'js/alertas.js' %}"></script>
+{% endblock %}

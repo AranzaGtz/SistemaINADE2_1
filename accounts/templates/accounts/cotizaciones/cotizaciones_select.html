@@ -52,37 +52,40 @@
     </div>
   </form>
 </div>
-
-<script>
-  function mostrarFormularioNuevoProspecto() {
-    var select = document.getElementById('persona-select');
-    var nuevoProspectoForm = document.getElementById('nuevo_prospecto_form');
-    if (select.value === 'nuevo') {
-      nuevoProspectoForm.style.display = 'block';
-      deshabilitarCampos(false);
-    } else {
-      nuevoProspectoForm.style.display = 'none';
-      deshabilitarCampos(true);
+{% endblock %}
+<!-- Mensajes de alertas -->
+{% block scripts %} 
+  <script src="{% static 'js/alertas.js' %}"></script>
+  <script>
+    function mostrarFormularioNuevoProspecto() {
+      var select = document.getElementById('persona-select');
+      var nuevoProspectoForm = document.getElementById('nuevo_prospecto_form');
+      if (select.value === 'nuevo') {
+        nuevoProspectoForm.style.display = 'block';
+        deshabilitarCampos(false);
+      } else {
+        nuevoProspectoForm.style.display = 'none';
+        deshabilitarCampos(true);
+      }
+    };
+  
+    function deshabilitarCampos(deshabilitar) {
+      var form = document.getElementById('nuevo_prospecto_form');
+      var inputs = form.querySelectorAll('input, select, textarea');
+      inputs.forEach(function(input) {
+        input.disabled = deshabilitar;
+      });
     }
-  };
-
-  function deshabilitarCampos(deshabilitar) {
-    var form = document.getElementById('nuevo_prospecto_form');
-    var inputs = form.querySelectorAll('input, select, textarea');
-    inputs.forEach(function(input) {
-      input.disabled = deshabilitar;
+  
+    document.getElementById('main-form').addEventListener('submit', function(event) {
+      var select = document.getElementById('persona-select');
+      if (select.value === '') {
+        alert('Por favor selecciona un prospecto o crea uno nuevo.');
+        event.preventDefault();
+      }
     });
-  }
-
-  document.getElementById('main-form').addEventListener('submit', function(event) {
-    var select = document.getElementById('persona-select');
-    if (select.value === '') {
-      alert('Por favor selecciona un prospecto o crea uno nuevo.');
-      event.preventDefault();
-    }
-  });
-
-  // Inicializar deshabilitando los campos
-  deshabilitarCampos(true);
-</script>
+  
+    // Inicializar deshabilitando los campos
+    deshabilitarCampos(true);
+  </script>
 {% endblock %}

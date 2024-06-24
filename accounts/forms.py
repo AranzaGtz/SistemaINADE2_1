@@ -112,15 +112,16 @@ class ConceptoForm(forms.ModelForm):
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales','rows': 3}),
             'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'})
         }
-ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1)
+ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
 
 #   FORMULARIO PARA COTIZACION
 class CotizacionForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
-        fields = ['fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales', 'persona']
+        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales', 'persona']
         widgets = {
-            'fecha_caducidad': forms.DateInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa fecha de caducidad', 'type': 'date'}),
+            'fecha_solicitud': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'fecha_caducidad': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'metodo_pago': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona Tipo de Moneda','required':'True'}),
             'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).','rows': 3}),

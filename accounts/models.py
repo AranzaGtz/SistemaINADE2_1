@@ -143,7 +143,7 @@ class Cliente(models.Model):
 
 # MODELO DE COTIZACION
 class Cotizacion(models.Model):
-    fecha_solicitud = models.DateField(auto_now_add=True)
+    fecha_solicitud = models.DateField()
     fecha_caducidad = models.DateField()
     tipo_moneda = [
         ('mxn', 'MXN - Moneda Nacional Mexicana'),
