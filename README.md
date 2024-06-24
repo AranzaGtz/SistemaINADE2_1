@@ -60,8 +60,5 @@ Este es un proyecto Django. Siga las siguientes instrucciones para configurarlo 
 
 Para acceder al proyecto, abra su navegador web y vaya a `http://127.0.0.1:8000/`.
 
-## Contribución
-
-Si desea contribuir, por favor haga un fork del repositorio y cree una nueva rama para sus contribuciones. Luego, puede crear un pull request para que sus cambios sean revisados y potencialmente fusionados.
 ---
 ¡Gracias por usar nuestro proyecto!
