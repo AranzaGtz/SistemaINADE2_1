@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from accounts.models import Cotizacion
+from accounts.models import Cotizacion, Concepto
 from accounts.forms import CotizacionForm, ConceptoFormSet
 
 # VISTA DE COTIZACIONES

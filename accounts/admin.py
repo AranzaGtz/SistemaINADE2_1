@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import Cliente, Concepto, Cotizacion, CustomUser, Direccion, Empresa, InformacionContacto, Metodo, Persona, Prospecto, Servicio, Titulo
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
@@ -24,4 +24,16 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username', 'email', 'first_name', 'last_name')
     ordering = ('username',)
 
+# Registrando todos los modelos en el admin
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Cliente)
+admin.site.register(Concepto)
+admin.site.register(Cotizacion)
+admin.site.register(Direccion)
+admin.site.register(Empresa)
+admin.site.register(InformacionContacto)
+admin.site.register(Metodo)
+admin.site.register(Persona)
+admin.site.register(Prospecto)
+admin.site.register(Servicio)
+admin.site.register(Titulo)

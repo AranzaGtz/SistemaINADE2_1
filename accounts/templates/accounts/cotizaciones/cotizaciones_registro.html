@@ -35,6 +35,7 @@
             </div>
             <!-- fechas -->
             <div class="row">
+                
                 <!-- FECHA SOLICITADA -->
                 <div class="col-md-6 mt-2">
                     <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Solicitada</label>
@@ -78,8 +79,23 @@
             {{ concepto_formset.management_form }}
             <div id="concepto_formset">
                 {% for form in concepto_formset %}
-                    <div class="concepto-form">
-                        {{ form.as_p }}
+                    <div class="concepto-form mt-4 bg-light pt-1 pb-4">
+                        <br><h5>Concepto {{ forloop.counter }}</h5><br>
+                        <!-- CANTIDAD DE SERVICIOS -->
+                        <div class="row ">
+                            
+                            <div class="col ">
+                                <label for="{{ form.cantidad_servicios.id_for_label }}">Cantidad de servicios</label>
+                                {{ form.cantidad_servicios }}<br>
+                                <label for="{{ form.precio.id_for_label }}">Precio</label>
+                                {{ form.precio }}
+                            </div>
+                            <div class="col">
+                                <br>
+                                <label for="{{ form.notas.id_for_label }}">Precio</label>
+                                {{ form.notas }}
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
@@ -91,20 +107,50 @@
     </form>
 </div>
 
-<div id="empty_form" style="display: none;">
+<div id="empty_form" style="display: none;" >
     <div class="concepto-form">
-        {{ concepto_formset.empty_form.as_p }}
+        <div class="concepto-form mt-4 bg-light pt-1 pb-4">
+            <br><h5>Concepto <span class="concepto-counter"></h5><br>
+            <!-- CANTIDAD DE SERVICIOS -->
+            <div class="row ">
+                
+                <div class="col ">
+                    <label for="{{ concepto_formset.empty_form.id_for_label }}">Cantidad de servicios</label>
+                    {{ concepto_formset.empty_form.cantidad_servicios }}<br>
+                    <label for="{{ concepto_formset.empty_form.precio.id_for_label }}">Precio</label>
+                    {{ concepto_formset.empty_form.precio }}
+                </div>
+                <div class="col">
+                    <br>
+                    <label for="{{ concepto_formset.empty_form.id_for_label }}">Precio</label>
+                    {{ concepto_formset.empty_form.notas }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
+    var conceptoCounter = {{ concepto_formset.total_form_count }};
+
     document.getElementById('add-concepto-form').onclick = function() {
-        var formIdx = $('#id_concepto_set-TOTAL_FORMS').val();
+        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
         var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
         $('#concepto_formset').append(formTemplate);
-        $('#id_concepto_set-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+
+        // Actualizar IDs y nombres de los campos en el nuevo formulario
+        $('#concepto_formset .concepto-form:last-child').find(':input').each(function() {
+            var name = $(this).attr('name').replace('__prefix__', formIdx);
+            var id = 'id_' + name;
+            $(this).attr({'name': name, 'id': id});
+        });
+
+        conceptoCounter++;
+        $('#concepto_formset .concepto-form:last-child').find('.concepto-counter').text(conceptoCounter);
+        $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
     }
 </script>
+
 
 {% endblock %}
