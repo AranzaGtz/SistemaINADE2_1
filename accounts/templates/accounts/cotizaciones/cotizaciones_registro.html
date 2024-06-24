@@ -39,12 +39,28 @@
                 <!-- FECHA SOLICITADA -->
                 <div class="col-md-6 mt-2">
                     <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Solicitada</label>
+                    {% if edit %}
+                        <input type="text" name="{{ cotizacion_form.fecha_solicitud.name }}" 
+                            id="{{ cotizacion_form.fecha_solicitud.id_for_label }}" 
+                            class="form-control" 
+                            value="{{ cotizacion_form.initial.fecha_solicitud|date:'d-m-Y' }}"
+                            onclick="this.type='date'" onblur="if(this.value==''){this.type='text'}">
+                    {% else %}
                     {{ cotizacion_form.fecha_caducidad }}
+                    {% endif %}
                 </div>
                 <!-- FECHA DE CADUCIDAD -->
                 <div class="col-md-6 mt-2">
                     <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
+                    {% if edit %}
+                        <input type="text" name="{{ cotizacion_form.fecha_caducidad.name }}" 
+                            id="{{ cotizacion_form.fecha_caducidad.id_for_label }}" 
+                            class="form-control" 
+                            value="{{ cotizacion_form.initial.fecha_caducidad|date:'d-m-Y' }}"
+                            onclick="this.type='date'" onblur="if(this.value==''){this.type='text'}">
+                    {% else %}
                     {{ cotizacion_form.fecha_caducidad }}
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
@@ -130,27 +146,50 @@
     </div>
 </div>
 
+{% endblock %}
+<!-- Mensajes de alertas -->
+{% block scripts %} 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
+    // Inicializa el contador de conceptos con el total actual de formularios
     var conceptoCounter = {{ concepto_formset.total_form_count }};
 
+    // Función que se ejecuta al hacer clic en el botón "Añadir Concepto"
     document.getElementById('add-concepto-form').onclick = function() {
+        // Obtiene el índice del próximo formulario
         var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+
+        // Clona la plantilla del formulario vacío y reemplaza los marcadores de posición con el índice del formulario
         var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
         $('#concepto_formset').append(formTemplate);
 
-        // Actualizar IDs y nombres de los campos en el nuevo formulario
+        // Actualiza los atributos 'name' e 'id' de los campos en el nuevo formulario
         $('#concepto_formset .concepto-form:last-child').find(':input').each(function() {
             var name = $(this).attr('name').replace('__prefix__', formIdx);
             var id = 'id_' + name;
             $(this).attr({'name': name, 'id': id});
         });
 
+        // Incrementa el contador de conceptos y actualiza el texto del contador en el nuevo formulario
         conceptoCounter++;
         $('#concepto_formset .concepto-form:last-child').find('.concepto-counter').text(conceptoCounter);
         $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
     }
 </script>
-
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var dateInputs = document.querySelectorAll('input[type="text"][data-toggle="date"]');
+        
+        dateInputs.forEach(function(input) {
+            input.addEventListener('click', function() {
+                this.type = 'date';
+            });
+            input.addEventListener('blur', function() {
+                if (this.value == '') {
+                    this.type = 'text';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
