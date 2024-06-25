@@ -54,8 +54,7 @@ def prospecto_create(request):
             
             prospecto = Prospecto.objects.create(persona=persona)
             
-            messages.success(request, 'Usuario registrado exitosamente!.')
-
+            messages.success(request, 'Usuario registrado!.')
             return redirect('prospecto_list')
         else:
             print("Direccion form errors:", direccion_form.errors)
@@ -105,6 +104,7 @@ def prospecto_update(request, pk):
         
         if prospecto_form.is_valid():
             prospecto_form.save()
+            messages.success(request, 'Usuario actualizado!.')
             return redirect('prospecto_list')
     else:
         prospecto_form = PersonaForm(instance=prospecto)
@@ -122,5 +122,5 @@ def prospecto_delete(request,pk):
     informacion_contacto = prospecto.persona.informacion_contactoinformacion_contacto
     informacion_contacto.delete()
     prospecto.delete()
-    messages.success(request, '¡Usuario eliminado exitosamente!.')
+    messages.success(request, '¡Usuario eliminado!.')
     return redirect('prospecto_list')

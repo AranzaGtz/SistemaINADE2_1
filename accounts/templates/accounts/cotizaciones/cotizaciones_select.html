@@ -1,7 +1,7 @@
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Elejir cliente para cotizacion{% endblock %}
-{% block header %}Elejir cliente para cotizacion{% endblock %}
+{% block title %}Registrar cotizacion{% endblock %}
+{% block header %}ERegistrar cotizacion{% endblock %}
 {% block content %}
 <!-- TITULO Y FORMULARIO -->
 <div class="container mt-4">
@@ -54,7 +54,6 @@
 </div>
 {% endblock %}
 <!-- Mensajes de alertas -->
-{% block scripts %} 
   <script src="{% static 'js/alertas.js' %}"></script>
   <script>
     function mostrarFormularioNuevoProspecto() {
@@ -88,4 +87,3 @@
     // Inicializar deshabilitando los campos
     deshabilitarCampos(true);
   </script>
-{% endblock %}
