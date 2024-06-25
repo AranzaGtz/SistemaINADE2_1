@@ -1,7 +1,7 @@
-from django.contrib import messages
 from django.shortcuts import redirect, render, get_object_or_404
 from accounts.forms import MetodoForm, ServicioForm
 from accounts.models import Metodo, Servicio
+from django.contrib import messages
 
 # VISTA PARA DIRIGIR A INTERFAZ DE SERVICIOS
 def servicios_list(request):
@@ -34,6 +34,7 @@ def servicio_create(request):
             servicio = servicio_form.save(commit=False)
             servicio.metodo_id = request.POST.get('metodo')
             servicio.save()
+            messages.success(request, 'Servicio registrado!.')
             return redirect('servicios_list') 
     else:
         metodo_form = MetodoForm()
@@ -52,6 +53,8 @@ def servicio_edit(request, pk):
         servicio_form = ServicioForm(request.POST, instance=servicio)
         if servicio_form.is_valid():
             servicio_form.save()
+            
+            messages.success(request, 'Servicio registrado!.')
             return redirect('servicios_list')
     else:
         servicio_form = ServicioForm(instance=servicio)
@@ -84,7 +87,7 @@ def servicio_update(request, pk):
         
         if servicio_form.is_valid():
             servicio_form.save()
-            messages.success(request, 'Servicio actualizado exitosamente!')
+            messages.success(request, 'Servicio actualizado!')
             return redirect('servicios_list')
     else:
         servicio_form = ServicioForm(instance=servicio)
@@ -110,7 +113,7 @@ def metodo_create(request):
         form = MetodoForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Metodo agregado exitosamente!.')
+            messages.success(request, 'Metodo agregado!.')
             return redirect('servicios_list')
     else:
         context = {
@@ -122,5 +125,5 @@ def metodo_create(request):
 def metodo_delete(request,pk):
     metodo = Metodo.objects.get(id = pk)
     metodo.delete()
-    messages.success(request, 'Metodo eliminado exitosamente!.')
+    messages.success(request, 'Metodo eliminado!.')
     return redirect('servicios_list')

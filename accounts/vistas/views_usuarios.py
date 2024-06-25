@@ -7,7 +7,7 @@ from django.contrib import messages
 def usuario_list(request):
     Lista_usuarios = CustomUser.objects.all()
     form = CustomUserCreationForm()
-    return render(request, "accounts/usuarios/dashboard_admin.html",{"usuarios": Lista_usuarios,'form':form})
+    return render(request, "accounts/usuarios/usuarios.html",{"usuarios": Lista_usuarios,'form':form})
 
 # VISTA PARA REGISTRAR UN USUARIO
 def usuario_create(request):
@@ -27,18 +27,18 @@ def usuario_create(request):
 
             user.save()  # Guarda el usuario en la base de datos.
             
-            messages.success(request, 'Usuario registrado exitosamente!.')
+            messages.success(request, 'Usuario registrado!.')
             
             return redirect("usuario_list")  # Redirige al usuario a login
     else:
         form = (CustomUserCreationForm())  # Si la solicitud no es POST, crea un formulario vacío.
-    return render(request,'accounts/usuarios/dashboard_admin.html',{'registro_form':form}) # Renderiza la plantilla con el formulario.
+    return render(request,'accounts/usuarios/usuarios.html',{'registro_form':form}) # Renderiza la plantilla con el formulario.
 
 # VISTA PARA BORRAR USUARIO
 def usuario_delete(request, username):
     usuario = CustomUser.objects.get(username = username)
     usuario.delete()
-    messages.success(request, '¡Usuario eliminado exitosamente!.')
+    messages.success(request, '¡Usuario eliminado!.')
     return redirect('usuario_list')
 
 # VISTA PARA IR EDITANDO USUARIO
@@ -46,7 +46,7 @@ def usuario_update(request,username):
     usuario = get_object_or_404(CustomUser, username = username)
     form = CustomUserChangeForm(instance=usuario)
     usuarios = CustomUser.objects.all()
-    return render(request, "accounts/usuarios/dashboard_admin.html", {"usuario":usuario,"usuarios": usuarios, "form":form, "edit": True})
+    return render(request, "accounts/usuarios/usuarios.html", {"usuario":usuario,"usuarios": usuarios, "form":form, "edit": True})
  
 # VISTA PARA EDITAR USUARIO
 def usuario_update2(request, username):
@@ -55,7 +55,7 @@ def usuario_update2(request, username):
         form  = CustomUserChangeForm(request.POST, instance=usuario)
         if form.is_valid():
             form.save()
-            messages.success(request, '¡Usuario actualizado exitosamente!.')
+            messages.success(request, '¡Usuario actualizado!.')
             return redirect("usuario_list")
     else: 
         form = CustomUserChangeForm(instance=usuario)

@@ -42,7 +42,7 @@ def empresa_update(request,pk):
             empresa = empresa_form.save(commit=False)
             empresa.direccion = direccion
             empresa.save()
-            messages.success(request, 'Empresa actualizada exitosamente!.')
+            messages.success(request, 'Empresa actualizada!.')
             return redirect("empresas_cont_list")
     else:
         empresa_form = EmpresaForm(instance=empresa)
@@ -59,7 +59,7 @@ def empresa_delete(request,pk):
     direccion = empresa.direccion
     direccion.delete()
     empresa.delete()
-    messages.success(request, 'Empresa eliminada exitosamente!.')
+    messages.success(request, 'Empresa eliminada!.')
     return redirect('empresas_cont_list')
 
 # VISTA EDITAR CONTACTOS
@@ -95,7 +95,7 @@ def contacto_update(request,pk):
             contacto = contacto_form.save(commit=False)
             contacto.informacion_contacto = informacion_contacto
             contacto.save()
-            messages.success(request, 'Contacto actualizado exitosamente!.')
+            messages.success(request, 'Contacto actualizado!.')
             return redirect("empresas_cont_list")
     else:
         contacto_form = ProspectoForm(instance=contacto)
@@ -112,5 +112,5 @@ def contacto_delete(request,pk):
     informacion_contacto = contacto.informacion_contacto
     informacion_contacto.delete()
     contacto.delete()
-    messages.success(request, 'Contacto eliminado exitosamente!.')
+    messages.success(request, 'Contacto eliminado!.')
     return redirect('empresas_cont_list')

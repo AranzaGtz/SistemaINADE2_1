@@ -3,19 +3,6 @@
 {% block title %}Prospecto{% endblock %}
 {% block header %}Prospecto{% endblock %}
 {% block content %}
-
-<!-- MENSAJES DE ALERTA -->
-{% if messages %}
-{% for message in messages %}
-    <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <strong>{{ message }}</strong>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-{% endfor %}
-{% endif %}
-
 <!-- FORMULARIO PARA PROSPECTO -->
 <div class="container mt-4">
     <h1 class="text-center">Nuevo prospecto</h1>

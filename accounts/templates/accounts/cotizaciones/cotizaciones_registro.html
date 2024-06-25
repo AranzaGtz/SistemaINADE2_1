@@ -1,30 +1,17 @@
+<!-- accounts/templates/accounts/cotizaciones/cotizaciones_registro.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
 {% block title %}Registrar Cotización{% endblock %}
 {% block header %}Registrar Cotización{% endblock %}
 {% block content %}
 
-<!-- MENSAJES DE ALERTA -->
-{% if messages %}
-{% for message in messages %}
-    <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <strong>{{ message }}</strong>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-{% endfor %}
-{% endif %}
-
-<!-- CONTENEDOR REGISTRO DE COTIZACION -->
 <div class="container mt-4">
     <h1 class="text-center">Registro de cotización</h1>
     <hr />
-    <!-- FORMULARIO DE CONCEPTOS -->
     <form method="post">
         {% csrf_token %}
+        
         <div class="form-group mt-4">
-            <!-- DATOS DE COTIZACION -->
             <h3>Datos para cotizar</h3>
 
             <div class="row">
@@ -35,32 +22,15 @@
             </div>
             <!-- fechas -->
             <div class="row">
-                
                 <!-- FECHA SOLICITADA -->
                 <div class="col-md-6 mt-2">
-                    <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Solicitada</label>
-                    {% if edit %}
-                        <input type="text" name="{{ cotizacion_form.fecha_solicitud.name }}" 
-                            id="{{ cotizacion_form.fecha_solicitud.id_for_label }}" 
-                            class="form-control" 
-                            value="{{ cotizacion_form.initial.fecha_solicitud|date:'d-m-Y' }}"
-                            onclick="this.type='date'" onblur="if(this.value==''){this.type='text'}">
-                    {% else %}
-                    {{ cotizacion_form.fecha_caducidad }}
-                    {% endif %}
+                    <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
+                    {{ cotizacion_form.fecha_solicitud }}
                 </div>
                 <!-- FECHA DE CADUCIDAD -->
                 <div class="col-md-6 mt-2">
                     <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
-                    {% if edit %}
-                        <input type="text" name="{{ cotizacion_form.fecha_caducidad.name }}" 
-                            id="{{ cotizacion_form.fecha_caducidad.id_for_label }}" 
-                            class="form-control" 
-                            value="{{ cotizacion_form.initial.fecha_caducidad|date:'d-m-Y' }}"
-                            onclick="this.type='date'" onblur="if(this.value==''){this.type='text'}">
-                    {% else %}
                     {{ cotizacion_form.fecha_caducidad }}
-                    {% endif %}
                 </div>
             </div>
             <div class="row">
@@ -90,28 +60,12 @@
                 </div>
             </div>
             <br>
-            <!-- FORMULARIO DE CONCEPTOS -->
             <h3>Agregar Conceptos</h3>
             {{ concepto_formset.management_form }}
             <div id="concepto_formset">
                 {% for form in concepto_formset %}
-                    <div class="concepto-form mt-4 bg-light pt-1 pb-4">
-                        <br><h5>Concepto {{ forloop.counter }}</h5><br>
-                        <!-- CANTIDAD DE SERVICIOS -->
-                        <div class="row ">
-                            
-                            <div class="col ">
-                                <label for="{{ form.cantidad_servicios.id_for_label }}">Cantidad de servicios</label>
-                                {{ form.cantidad_servicios }}<br>
-                                <label for="{{ form.precio.id_for_label }}">Precio</label>
-                                {{ form.precio }}
-                            </div>
-                            <div class="col">
-                                <br>
-                                <label for="{{ form.notas.id_for_label }}">Precio</label>
-                                {{ form.notas }}
-                            </div>
-                        </div>
+                    <div class="concepto-form">
+                        {{ form.as_p }}
                     </div>
                 {% endfor %}
             </div>
@@ -123,73 +77,27 @@
     </form>
 </div>
 
-<div id="empty_form" style="display: none;" >
+<div id="empty_form" style="display: none;">
     <div class="concepto-form">
-        <div class="concepto-form mt-4 bg-light pt-1 pb-4">
-            <br><h5>Concepto <span class="concepto-counter"></h5><br>
-            <!-- CANTIDAD DE SERVICIOS -->
-            <div class="row ">
-                
-                <div class="col ">
-                    <label for="{{ concepto_formset.empty_form.id_for_label }}">Cantidad de servicios</label>
-                    {{ concepto_formset.empty_form.cantidad_servicios }}<br>
-                    <label for="{{ concepto_formset.empty_form.precio.id_for_label }}">Precio</label>
-                    {{ concepto_formset.empty_form.precio }}
-                </div>
-                <div class="col">
-                    <br>
-                    <label for="{{ concepto_formset.empty_form.id_for_label }}">Precio</label>
-                    {{ concepto_formset.empty_form.notas }}
-                </div>
-            </div>
-        </div>
+        {{ concepto_formset.empty_form.as_p }}
     </div>
 </div>
 
-{% endblock %}
-<!-- Mensajes de alertas -->
-{% block scripts %} 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-    // Inicializa el contador de conceptos con el total actual de formularios
-    var conceptoCounter = {{ concepto_formset.total_form_count }};
-
-    // Función que se ejecuta al hacer clic en el botón "Añadir Concepto"
     document.getElementById('add-concepto-form').onclick = function() {
-        // Obtiene el índice del próximo formulario
         var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
-
-        // Clona la plantilla del formulario vacío y reemplaza los marcadores de posición con el índice del formulario
         var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
         $('#concepto_formset').append(formTemplate);
 
-        // Actualiza los atributos 'name' e 'id' de los campos en el nuevo formulario
+        // Actualizar IDs y nombres de los campos en el nuevo formulario
         $('#concepto_formset .concepto-form:last-child').find(':input').each(function() {
             var name = $(this).attr('name').replace('__prefix__', formIdx);
             var id = 'id_' + name;
             $(this).attr({'name': name, 'id': id});
         });
 
-        // Incrementa el contador de conceptos y actualiza el texto del contador en el nuevo formulario
-        conceptoCounter++;
-        $('#concepto_formset .concepto-form:last-child').find('.concepto-counter').text(conceptoCounter);
         $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
     }
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var dateInputs = document.querySelectorAll('input[type="text"][data-toggle="date"]');
-        
-        dateInputs.forEach(function(input) {
-            input.addEventListener('click', function() {
-                this.type = 'date';
-            });
-            input.addEventListener('blur', function() {
-                if (this.value == '') {
-                    this.type = 'text';
-                }
-            });
-        });
-    });
 </script>
 {% endblock %}

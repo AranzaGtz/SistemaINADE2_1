@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.models import Cotizacion, Concepto
 from accounts.forms import CotizacionForm, ConceptoFormSet
+from django.contrib import messages
 
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
@@ -12,22 +13,27 @@ def cotizacion_form(request):
     if request.method == 'POST':
         cotizacion_form = CotizacionForm(request.POST)
         concepto_formset = ConceptoFormSet(request.POST)
-
+        
         if cotizacion_form.is_valid() and concepto_formset.is_valid():
             cotizacion = cotizacion_form.save()
             conceptos = concepto_formset.save(commit=False)
             for concepto in conceptos:
                 concepto.cotizacion = cotizacion
                 concepto.save()
-            cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in conceptos])
+            cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
             cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
             cotizacion.total = cotizacion.subtotal + cotizacion.iva
             cotizacion.save()
-            return redirect('cotizacion_detalle', pk=cotizacion.pk)
+            messages.success(request, 'Cotización creada con éxito.')
+            return redirect('cotizacion_detalle', pk=cotizacion.id)
+        else:
+            print(cotizacion_form.errors)
+            print(concepto_formset.errors)
+            messages.error(request, 'Hubo un error en el formulario. Por favor, revisa los campos e intenta nuevamente.')
     else:
         cotizacion_form = CotizacionForm()
         concepto_formset = ConceptoFormSet()
-
+    
     return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
@@ -73,6 +79,7 @@ def cotizacion_edit(request, pk):
             cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
             cotizacion.total = cotizacion.subtotal + cotizacion.iva
             cotizacion.save()
+            messages.info(request,'Editando cotización.')
             return redirect('cotizacion_detalle', pk=cotizacion.id)
     else:
         cotizacion_form = CotizacionForm(instance=cotizacion)

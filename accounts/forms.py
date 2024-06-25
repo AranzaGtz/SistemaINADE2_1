@@ -3,19 +3,36 @@ from .models import Concepto, CustomUser, Metodo,Persona,Prospecto, Cliente, Emp
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
-
+#   FORMULARIO PARA CREAR USUARIO
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
-        
         model = CustomUser
-        
         fields = ('username', 'first_name', 'last_name', 'email', 'celular', 'rol')
+        widgets = {
+            'username': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Nombre de usuario',  
+                'required': 'True'
+            }),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre', 'required': 'False'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos', 'required': 'False'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}),
+            'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
+            'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
+        }
         
+#   FORMULARIO PARA CAMBIAR USUARIO
 class CustomUserChangeForm(forms.ModelForm):
     class Meta:
-        
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'celular', 'rol')
+        fields = ('first_name', 'last_name', 'email', 'celular', 'rol')
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre', 'required': 'False'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos', 'required': 'False'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}),
+            'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
+            'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
+        }
       
 #   FORMULARIO PARA INFROMACION DE CONTACTO
 class InformacionContactoForm(forms.ModelForm):
@@ -110,7 +127,7 @@ class ConceptoForm(forms.ModelForm):
         widgets = {
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales','rows': 3}),
-            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'})
+            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
         }
 ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
 
