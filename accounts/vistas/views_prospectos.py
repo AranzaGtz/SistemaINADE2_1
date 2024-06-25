@@ -11,7 +11,7 @@ from accounts.models import Persona, Prospecto, Titulo
 # VISTA PARA DIRIGIR A INTERFAZ DE PROSPECTOS
 def prospecto_list(request):
     prospectos = Prospecto.objects.all()
-    return render(request, "accounts/prospectos/dashboard_admin_prospectos.html",{'prospectos': prospectos})
+    return render(request, "accounts/prospectos/prospectos.html",{'prospectos': prospectos})
 
 # VISTA PARA REDIRIJIR A prospecto_create
 def prospecto_new(request):
@@ -69,7 +69,7 @@ def prospecto_create(request):
         persona_form = PersonaForm()
         prospecto_form = ProspectoForm()
 
-    return render(request, 'accounts/prospectos/dashboard_admin_prospectos.html', {
+    return render(request, 'accounts/prospectos/prospectos.html', {
         'direccion_form': direccion_form,
         'empresa_form': empresa_form,
         'contacto_form': contacto_form,
@@ -119,7 +119,7 @@ def prospecto_update(request, pk):
 # VISTA PARA ELIMINAR PROSPECTO
 def prospecto_delete(request,pk):
     prospecto = Prospecto.objects.get(id = pk)
-    informacion_contacto = prospecto.persona.informacion_contactoinformacion_contacto
+    informacion_contacto = prospecto.persona.informacion_contacto
     informacion_contacto.delete()
     prospecto.delete()
     messages.success(request, '¡Usuario eliminado!.')
