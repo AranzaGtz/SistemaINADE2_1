@@ -145,3 +145,18 @@ class CotizacionForm(forms.ModelForm):
             'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)','rows': 3}),
             'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente'}),
         }
+        
+#   FORMULARIO PARA CAMBIAR COTIZACION
+class CotizacionChangeForm(forms.ModelForm):
+    class Meta:
+        model = Cotizacion
+        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales', 'persona']
+        widgets = {
+            'fecha_solicitud': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Fecha en formato dd-mm-aaaa'}),
+            'fecha_caducidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Fecha en formato dd-mm-aaaa'}),
+            'metodo_pago': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona Tipo de Moneda','required':'True'}),
+            'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).','rows': 3}),
+            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)','rows': 3}),
+            'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente'}),
+        }

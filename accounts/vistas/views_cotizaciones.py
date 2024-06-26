@@ -2,6 +2,11 @@ from django.shortcuts import get_object_or_404, render, redirect
 from accounts.models import Cotizacion, Concepto
 from accounts.forms import CotizacionForm, ConceptoFormSet
 from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from weasyprint import HTML #AQUI SALE WARNING: No se ha podido resolver la importación "weasyprint".
+from django.template.loader import render_to_string  # Asegúrate de importar render_to_string
+import tempfile
 
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
@@ -75,6 +80,7 @@ def cotizacion_edit(request, pk):
                 concepto.save()
             for concepto in concepto_formset.deleted_objects:
                 concepto.delete()
+            
             cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in conceptos])
             cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
             cotizacion.total = cotizacion.subtotal + cotizacion.iva
@@ -91,3 +97,26 @@ def cotizacion_edit(request, pk):
         'cotizacion': cotizacion,
         'edit': True
     })
+    
+# VISTA PARA GENERAR ARCHIVO PDF
+def cotizacion_pdf(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    conceptos = cotizacion.conceptos.all()
+    for concepto in conceptos:
+        concepto.subtotal = concepto.cantidad_servicios * concepto.precio
+    # Construir la URL absoluta del archivo de la imagen
+    logo_url = request.build_absolute_uri('/static/img/logo.png')
+
+    context = {
+        'cotizacion': cotizacion,
+        'conceptos': conceptos,
+        'logo_url': logo_url,  # Agregar la URL de la imagen al contexto
+    }
+
+    html_string = render_to_string('accounts/cotizaciones/cotizacion_platilla.html', context)
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())  # Asegurarse de que las URLs sean absolutas
+    pdf = html.write_pdf()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="cotizacion_{cotizacion.id_personalizado}.pdf"'
+    return response

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Cotización {{ cotizacion.id_personalizado }}</title>
+     <style>
+          .uppercase {
+               text-transform: uppercase;
+          }
+
+          @page {
+               margin: 10mm;
+               /* Ajusta los márgenes a 20mm por todos lados */
+               size: auto;
+
+               @bottom-center {
+                    content: "Página " counter(page) " de " counter(pages)" | De los Charros 4786-6, Fracc. José Sandoval, Tijuana, BC, México, C.P. 22105 | (664) 104 51 44 | www.inade.mx |";
+                    font-size: 12px;
+                    color: #666;
+               }
+          }
+
+          body {
+               font-family: Arial, sans-serif;
+               font-size: 15px;
+          }
+
+          table {
+               width: 100%;
+               border-collapse: collapse;
+               margin-top: 20px;
+          }
+
+          th,
+          td {
+               border-bottom: 1px solid #ddd;
+               padding: 8px;
+               text-align: left;
+               vertical-align: top; /* Alinea el contenido en la parte superior */
+          }
+
+          th {
+               background-color: #f2f2f2;
+               text-align: initial;
+          }
+
+          .row {
+               display: flex;
+               flex-direction: row;
+          }
+
+          .col {
+               display: flex;
+               flex-direction: column;
+          }
+
+          .center {
+               justify-content: center;
+          }
+
+          .end {
+               justify-content: end;
+          }
+
+          .start {
+               justify-content: start;
+          }
+
+          .sb {
+               justify-content: space-between;
+          }
+
+          .sa {
+               justify-content: space-around;
+          }
+
+          .text-end {
+               text-align: end;
+          }
+
+          .text-center {
+               text-align: center;
+          }
+
+          .w-10 {
+               width: 10%;
+          }
+
+          .w-20 {
+               width: 20%;
+          }
+
+          .w-30 {
+               width: 30%;
+          }
+
+          .w-40 {
+               width: 40%;
+          }
+
+          .w-m {
+               width: 50%;
+          }
+
+          .w-100 {
+               width: 100%;
+          }
+
+          .logo {
+               width: 160px;
+          }
+
+          .m-1 {
+               margin: 5px;
+          }
+
+          .mt-10 {
+               margin-top: 10px;
+          }
+     </style>
+</head>
+
+<body>
+     <div class="row sb">
+          <img class="logo" src="{{ logo_url }}" alt="Logo">
+          <h4 class="text-center">Ingeniería y Administración Estratégica,<br> S.A de C.V.</h4>
+          <p class="text-end">
+               <strong>Cotización {{ cotizacion.id_personalizado}}</strong><br>
+               Versión 1.0<br>
+               Emisión: 06/06/2014
+          </p>
+     </div>
+
+     <h3 class="text-center">COTIZACIÓN DE SERVICIOS</h3><br>
+
+     <div class="row sb">
+          <div class="w-m">
+               <p class="m-1"><strong>Atención a: {{ cotizacion.persona.titulo.abreviatura }} {{cotizacion.persona.nombre }} {{cotizacion.persona.apellidos }}</strong></p>
+               <p class="m-1">{{ cotizacion.persona.empresa.nombre_empresa }}</p>
+               <p class="m-1">{{ cotizacion.persona.empresa.direccion }}</p>
+          </div>
+          <div class="w-m">
+               <p class="text-end m-1">Número de cotización:</p>
+               <p class="text-end m-1">Fecha de elaboración:</p>
+          </div>
+
+     </div>
+
+     <p>Gracias por la oportunidad de presentar nuestra propuesta. Por favor revise que se cumple con sus
+          requerimientos; en caso contrario, comuníquese con nosotros.</p>
+
+     <table>
+          <thead>
+               <tr>
+                    <th class="w-30">Concepto</th>
+                    <th class="w-30">Metodo</th>
+                    <th >Cant.</th>
+                    <th class="w-20">Precio Unitario</th>
+                    <th class="w-20">Total</th>
+               </tr>
+          </thead>
+          <tbody>
+               {% for concepto in conceptos %}
+               <tr>
+                    <td ><strong>{{ concepto.servicio.nombre_servicio }}</strong> <br> {{ concepto.notas }}</td>
+                    <td >{{ concepto.servicio.metodo }}</td>
+                    <td >{{ concepto.cantidad_servicios }}</td>
+                    <td class="text-end">$ {{ concepto.precio }}</td>
+                    <td class="text-end">$ {{ concepto.subtotal }}</td>
+               </tr>
+               {% endfor %}
+          </tbody>
+     </table>
+
+     <div class="row end mt-10">
+          <div class="col">
+               <p class="m-1"><strong>Subtotal:</strong></p>
+               <p class="m-1"><strong>IVA ({{ cotizacion.tasa_iva }}%):</strong></p>
+               <p class="m-1"><strong>Total(<b class="uppercase">{{ cotizacion.metodo_pago}}</b>) :</strong> </p>
+          </div>
+          <div class="col">
+               <p class="m-1">$</p>
+               <p class="m-1">$</p>
+               <p class="m-1">$</p>
+          </div>
+          <div class="col">
+               <p class="m-1 text-end"> {{ cotizacion.subtotal }}</p>
+               <p class="m-1 text-end"> {{ cotizacion.iva }}</p>
+               <p class="m-1 text-end"> {{ cotizacion.total }}</p>
+          </div>
+     </div>
+</body>
+
+</html>
