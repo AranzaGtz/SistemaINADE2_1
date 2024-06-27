@@ -127,7 +127,7 @@
           <img class="logo" src="{{ logo_url }}" alt="Logo">
           <h4 class="text-center">Ingeniería y Administración Estratégica,<br> S.A de C.V.</h4>
           <p class="text-end">
-               <strong>Cotización {{ cotizacion.id_personalizado}}</strong><br>
+               <strong>Cotización </strong><br>
                Versión 1.0<br>
                Emisión: 06/06/2014
           </p>
@@ -142,8 +142,8 @@
                <p class="m-1">{{ cotizacion.persona.empresa.direccion }}</p>
           </div>
           <div class="w-m">
-               <p class="text-end m-1">Número de cotización:</p>
-               <p class="text-end m-1">Fecha de elaboración:</p>
+               <p class="text-end m-1">Número de cotización: {{ cotizacion.id_personalizado}}</p>
+               <p class="text-end m-1">Fecha de elaboración: {{ current_date }}</p>
           </div>
 
      </div>

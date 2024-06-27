@@ -123,13 +123,16 @@ class ServicioForm(forms.ModelForm):
 class ConceptoForm(forms.ModelForm):
     class Meta:
         model = Concepto
-        fields = ['cantidad_servicios', 'precio', 'notas', 'servicio']
+        fields = ['servicio','cantidad_servicios', 'precio',  'notas']
         widgets = {
+            'servicio': forms.Select(attrs={'class':'form-control'}),
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
-            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales','rows': 3}),
             'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales','rows': 3}),
         }
+
 ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
+ConceptoChangeFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=0, can_delete=True)
 
 #   FORMULARIO PARA COTIZACION
 class CotizacionForm(forms.ModelForm):

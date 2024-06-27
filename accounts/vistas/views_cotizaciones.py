@@ -1,10 +1,12 @@
+from datetime import datetime
+from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.models import Cotizacion, Concepto
-from accounts.forms import CotizacionForm, ConceptoFormSet
+from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, ConceptoChangeFormSet
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from weasyprint import HTML #AQUI SALE WARNING: No se ha podido resolver la importación "weasyprint".
+from weasyprint import HTML # type: ignore #AQUI SALE WARNING: No se ha podido resolver la importación "weasyprint".
 from django.template.loader import render_to_string  # Asegúrate de importar render_to_string
 import tempfile
 
@@ -66,13 +68,16 @@ def cotizacion_delete(request, pk):
 
 # VISTA PARA EDITAR COTIZACION
 def cotizacion_edit(request, pk):
-    cotizacion = get_object_or_404(Cotizacion, id=pk)
-    print(f"Fecha Solicitada: {cotizacion.fecha_solicitud}, Fecha Caducidad: {cotizacion.fecha_caducidad}")
-    if request.method == 'POST':
-        cotizacion_form = CotizacionForm(request.POST, instance=cotizacion)
-        concepto_formset = ConceptoFormSet(request.POST, instance=cotizacion)
-        
-        if cotizacion_form.is_valid() and concepto_formset.is_valid():
+    cotizacion = get_object_or_404(Cotizacion, id=pk) # Obtiene una instancia del modelo de cotizacion desde pk, si no encuentra devuelve error 404
+    # print(f"Fecha Solicitada: {cotizacion.fecha_solicitud}, Fecha Caducidad: {cotizacion.fecha_caducidad}")
+    if request.method == 'POST': # Si el formulario a sido enviado
+        # Crear instancias de los formularios CotizacionChangeForm y ConceptoChangeFormSet, pre-poblados con los datos enviados en la solicitud POST.
+        cotizacion_form = CotizacionChangeForm(request.POST, instance=cotizacion)
+        concepto_formset = ConceptoChangeFormSet(request.POST, instance=cotizacion)
+        # request.post contiene los datos enviados, instance = cotizacion vincula los formularios a la existente de cotizacion
+
+        if cotizacion_form.is_valid() and concepto_formset.is_valid(): # verifica que los formularios sean validos
+            # 
             cotizacion = cotizacion_form.save()
             conceptos = concepto_formset.save(commit=False)
             for concepto in conceptos:
@@ -86,30 +91,84 @@ def cotizacion_edit(request, pk):
             cotizacion.total = cotizacion.subtotal + cotizacion.iva
             cotizacion.save()
             messages.info(request,'Editando cotización.')
+            # Redirigir al usuario a la vista de detalles de la cotización después de guardar los cambios.
             return redirect('cotizacion_detalle', pk=cotizacion.id)
     else:
-        cotizacion_form = CotizacionForm(instance=cotizacion)
-        concepto_formset = ConceptoFormSet(instance=cotizacion)
-
-    return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
+        # Inicializar los formularios con los datos actuales de la cotización y sus conceptos cuando la solicitud no es POST (es decir, en GET).
+        cotizacion_form = CotizacionChangeForm(instance=cotizacion)
+        concepto_formset = ConceptoChangeFormSet(instance=cotizacion)
+    # cotizaciones_editar.html con los formularios de cotización y conceptos.
+    return render(request, 'accounts/cotizaciones/cotizaciones_editar.html', {
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
         'cotizacion': cotizacion,
         'edit': True
     })
-    
+   
+# VISTA PARA DUPLICAR COTIZACION
+def cotizacion_duplicar(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    conceptos = cotizacion.conceptos.all()
+
+    if request.method == 'POST':
+        cotizacion_form = CotizacionForm(request.POST)
+        concepto_formset = modelformset_factory(Concepto, form=ConceptoForm, extra=0)
+        formset = concepto_formset(request.POST, queryset=conceptos)
+
+        if cotizacion_form.is_valid() and formset.is_valid():
+            nueva_cotizacion = cotizacion_form.save(commit=False)
+            nueva_cotizacion.id = None  # Esto asegurará que se cree una nueva instancia
+
+            # Generar un nuevo id_personalizado único
+            nueva_cotizacion.id_personalizado = generate_new_id_personalizado()
+
+            nueva_cotizacion.save()
+
+            for form in formset:
+                nuevo_concepto = form.save(commit=False)
+                nuevo_concepto.id = None  # Crear una nueva instancia del concepto
+                nuevo_concepto.cotizacion = nueva_cotizacion
+                nuevo_concepto.save()
+
+            # Calcular y actualizar los valores de subtotal, IVA y total
+            nueva_cotizacion.subtotal = nueva_cotizacion.calculate_subtotal()
+            nueva_cotizacion.iva = nueva_cotizacion.calculate_iva()
+            nueva_cotizacion.total = nueva_cotizacion.calculate_total()
+            nueva_cotizacion.save()
+
+            return redirect('cotizacion_detalle', pk=nueva_cotizacion.id)
+    else:
+        cotizacion_form = CotizacionForm(instance=cotizacion)
+        concepto_formset = modelformset_factory(Concepto, form=ConceptoForm, extra=0)
+        formset = concepto_formset(queryset=conceptos)
+
+    return render(request, 'accounts/cotizaciones/cotizacion_duplicar.html', {
+        'cotizacion_form': cotizacion_form,
+        'concepto_formset': formset
+    })
+
+def generate_new_id_personalizado():
+    last_cotizacion = Cotizacion.objects.order_by('id').last()
+    if not last_cotizacion:
+        return '0001'
+    last_id = last_cotizacion.id_personalizado
+    new_id = int(last_id) + 1
+    return str(new_id).zfill(4)
+
 # VISTA PARA GENERAR ARCHIVO PDF
 def cotizacion_pdf(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     conceptos = cotizacion.conceptos.all()
+    
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
     # Construir la URL absoluta del archivo de la imagen
     logo_url = request.build_absolute_uri('/static/img/logo.png')
-
+    current_date = datetime.now().strftime("%Y/%m/%d")
     context = {
         'cotizacion': cotizacion,
         'conceptos': conceptos,
+        'current_date': current_date,
         'logo_url': logo_url,  # Agregar la URL de la imagen al contexto
     }
 
