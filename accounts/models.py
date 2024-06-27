@@ -154,26 +154,33 @@ class Cotizacion(models.Model):
     notas = models.TextField(blank=True, null=True)
     correos_adicionales = models.TextField(blank=True, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    iva = models.DecimalField(max_digits=10,decimal_places=2, null=True)
+    iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    persona = models.ForeignKey(Persona, on_delete=models.PROTECT,blank=True, null=True)
-    id_personalizado = models.CharField(max_length=20, unique=True)
+    persona = models.ForeignKey('Persona', on_delete=models.PROTECT, blank=True, null=True)
+    id_personalizado = models.CharField(max_length=4, unique=True, default='0001')
+    
+    def calculate_subtotal(self):
+        return sum(concepto.cantidad_servicios * concepto.precio for concepto in self.conceptos.all())
+
+    def calculate_iva(self):
+        return self.subtotal * (self.tasa_iva / 100)
+
+    def calculate_total(self):
+        return self.subtotal + self.iva
     
     def save(self, *args, **kwargs):
         if not self.id_personalizado:
-            today = date.today()
-            year_str = today.strftime('%y')
-            month_str = today.strftime('%m')
-            day_str = today.strftime('%d')
-            today_str = f"{year_str}{month_str}{day_str}"
-            last_cotizacion = Cotizacion.objects.filter(id_personalizado__startswith=today_str).order_by('id_personalizado').last()
-            if last_cotizacion:
-                last_count = int(last_cotizacion.id_personalizado[-2:])
-                new_count = last_count + 1
-            else:
-                new_count = 1
-            self.id_personalizado = f"{today_str}-{new_count:02d}"
-        super().save(*args, **kwargs)
+            self.id_personalizado = self.generate_new_id_personalizado()
+        super(Cotizacion, self).save(*args, **kwargs)
+
+    def generate_new_id_personalizado(self):
+        last_cotizacion = Cotizacion.objects.order_by('id').last()
+        if not last_cotizacion:
+            return '0001'
+        last_id = last_cotizacion.id_personalizado
+        new_id = int(last_id) + 1
+        return str(new_id).zfill(4)
+
         
     def __str__(self):
         return self.id_personalizado

@@ -12,16 +12,11 @@
     <div class="form-group mt-4">
         <!-- BOTONES DE ACCIÓN -->
         <div class="text-center mb-4">
-            <a href="" class="btn btn-secondary mx-1">Duplicar</a> 
-           
-            <a href="" class="btn btn-primary mx-1">Editar</a>
-            
-            <a href="" class="btn btn-danger mx-1">Borrar</a>
-            
+            <a href="{% url 'cotizacion_duplicar' cotizacion.id%}" class="btn btn-secondary mx-1">Duplicar</a> 
+            <a href="{% url 'cotizacion_edit' cotizacion.id%}" class="btn btn-primary mx-1">Editar</a>
+            <a href="{% url 'cotizacion_delete' cotizacion.id %}" class="btn btn-danger mx-1">Borrar</a>
             <a href="" class="btn btn-warning mx-1">Actualizar estado</a>
-            
             <a href="{% url 'cotizacion_pdf' cotizacion.id%}" class="btn btn-info mx-1">Ver PDF</a>
-            
         </div>
         <!-- DATOS DE COTIZACION -->
         <div class="col mx-auto">

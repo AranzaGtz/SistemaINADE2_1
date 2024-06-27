@@ -1,0 +1,114 @@
+<!-- cotizaciones_editar.html -->
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Modificar Cotización{% endblock %}
+{% block header %}Modificar Cotización{% endblock %}
+{% block content %}
+<div class="container mt-4">
+     <h1 class="text-center">Modificar de cotización</h1>
+     <hr />
+     <form method="post">
+          {% csrf_token %}
+          <div class="alert alert-info mb-4">
+               <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
+               Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
+           </div>
+          <div class="form-group mt-4">
+               <h3>Datos para cotizar</h3>
+               <div class="row">
+                    <div class="col-md-12 mt-2">
+                         <label for="{{ cotizacion_form.persona.id_for_label }}">Cliente</label>
+                         {{ cotizacion_form.persona }}
+                    </div>
+               </div>
+               <div class="row">
+                    <!-- FECHA SOLICITADA -->
+                    <div class="col-md-6 mt-2">
+                         <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
+                         {{ cotizacion_form.fecha_solicitud }}
+                    </div>
+                    <!-- FECHA DE CADUCIDAD -->
+                    <div class="col-md-6 mt-2">
+                         <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
+                         {{ cotizacion_form.fecha_caducidad }}
+                    </div>
+               </div>
+               <!-- fechas -->
+               <div class="mt-2 text-end" style="text-align: right;">
+                    <span class="text-info">Por favor, ingresa las fechas en el formato correcto (por ejemplo: 2024-07-28).</span>
+                </div>
+               <div class="row">
+                    <!-- TIPO DE MONEDA O METODO DE PAGO -->
+                    <div class="col-md-6 mt-2">
+                         <label for="{{ cotizacion_form.metodo_pago.id_for_label }}">Denominación</label>
+                         {{ cotizacion_form.metodo_pago }}
+                    </div>
+                    <!-- TASA DE IVA ACTUAL -->
+                    <div class="col-md-6 mt-2">
+                         <label for="{{ cotizacion_form.tasa_iva.id_for_label }}">Tasa del IVA actual</label>
+                         {{ cotizacion_form.tasa_iva }}
+                    </div>
+               </div>
+               <div class="row mt-2">
+                    <!-- NOTAS DE LA COTIZACION -->
+                    <div class="col-12">
+                         <label for="{{ cotizacion_form.notas.id_for_label }}">Notas</label>
+                         {{ cotizacion_form.notas }}
+                    </div>
+               </div>
+               <div class="row mt-2">
+                    <!-- CORREOS ADICIONALES -->
+                    <div class="col-12">
+                         <label for="{{ cotizacion_form.correos_adicionales.id_for_label }}">Correos Adicionales</label>
+                         {{ cotizacion_form.correos_adicionales }}
+                    </div>
+               </div>
+               <br>
+               <h3>Agregar Conceptos</h3>
+               <div class="mt-2 text-end" style="text-align: right;">
+                    <span class="text-info">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deceas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
+                </div>
+               {{ concepto_formset.management_form }}
+               <div id="concepto_formset">
+                    {% for form in concepto_formset %}
+                    <div class="concepto-form">
+                         <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
+                         {{ form.as_p }}
+                    </div>
+                    {% endfor %}
+               </div>
+               <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir Concepto</button>
+          </div>
+          <div class="form-group text-right mt-4">
+               <input type="submit" class="btn btn-success" value="Guardar Cotización" />
+          </div>
+     </form>
+</div>
+
+<div id="empty_form" style="display: none;">
+     <div class="concepto-form">
+         <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
+         {{ concepto_formset.empty_form.as_p }}
+     </div>
+ </div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+     document.getElementById('add-concepto-form').onclick = function() {
+         var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+         var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
+         formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);  // Reemplaza el marcador de posición con el contador
+ 
+         $('#concepto_formset').append(formTemplate);
+ 
+         // Actualizar IDs y nombres de los campos en el nuevo formulario
+         $('#concepto_formset .concepto-form:last-child').find(':input').each(function() {
+             var name = $(this).attr('name').replace('__prefix__', formIdx);
+             var id = 'id_' + name;
+             $(this).attr({'name': name, 'id': id});
+         });
+ 
+         $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+     }
+ </script>
+{% endblock %}

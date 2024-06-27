@@ -1,29 +1,25 @@
-<!-- accounts/templates/accounts/cotizaciones/cotizaciones_registro.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Registrar Cotización{% endblock %}
-{% block header %}Registrar Cotización{% endblock %}
+{% block title %}Duplicar Cotización{% endblock %}
+{% block header %}Duplicar Cotización{% endblock %}
 {% block content %}
-
 <div class="container mt-4">
-    <h1 class="text-center">Registro de cotización</h1>
+    <h1 class="text-center">Duplicar Cotización</h1>
     <hr />
     <form method="post">
         {% csrf_token %}
-        
+        <div class="alert alert-info mb-4">
+            <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
+            Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
+        </div>
         <div class="form-group mt-4">
             <h3>Datos para cotizar</h3>
-            <div class="alert alert-info mb-4">
-                <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
-                Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
-            </div>
             <div class="row">
                 <div class="col-md-12 mt-2">
                     <label for="{{ cotizacion_form.persona.id_for_label }}">Cliente</label>
                     {{ cotizacion_form.persona }}
                 </div>
             </div>
-            <!-- fechas -->
             <div class="row">
                 <!-- FECHA SOLICITADA -->
                 <div class="col-md-6 mt-2">
@@ -36,6 +32,7 @@
                     {{ cotizacion_form.fecha_caducidad }}
                 </div>
             </div>
+            <!-- fechas -->
             <div class="mt-2 text-end" style="text-align: right;">
                 <span class="text-info">Por favor, ingresa las fechas en el formato correcto (por ejemplo: 2024-07-28).</span>
             </div>
@@ -65,20 +62,18 @@
                     {{ cotizacion_form.correos_adicionales }}
                 </div>
             </div>
-
             <br>
-
             <h3>Agregar Conceptos</h3>
             <div class="mt-2 text-end" style="text-align: right;">
-                <span class="text-info">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deceas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
+                <span class="text-info">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deseas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
             </div>
             {{ concepto_formset.management_form }}
             <div id="concepto_formset">
                 {% for form in concepto_formset %}
-                    <div class="concepto-form">
-                        <h5 class="mt-3">Concepto 1</h5>
-                        {{ form.as_p }}
-                    </div>
+                <div class="concepto-form">
+                    <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
+                    {{ form.as_p }}
+                </div>
                 {% endfor %}
             </div>
             <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir Concepto</button>
