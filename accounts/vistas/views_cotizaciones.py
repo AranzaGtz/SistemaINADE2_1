@@ -191,7 +191,7 @@ def cotizacion_pdf(request, pk):
     response['Content-Disposition'] = f'inline; filename="cotizacion_{cotizacion.id_personalizado}.pdf"'
     return response
 
-
+# VISTA PARA MODIFICAR NUESTRA INFORMACION DE FORMATO
 def terminos_avisos(request):
     formato = get_object_or_404(Formato, pk=1)
     if request.method == 'POST':
