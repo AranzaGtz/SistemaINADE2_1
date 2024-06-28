@@ -1,0 +1,89 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Terminos y Avisos de privacidad{% endblock %}
+{% block header %}Terminos y Avisos de privacidad{% endblock %}
+{% block content %}
+
+<!-- CONTENEDOR COTIZACIONES -->
+<div class="container mt-4">
+     <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
+     <div class="row">
+          <div class="col">
+               <h1 class="text-center">Terminos y Avisos de privacidad</h1>
+               <hr />
+          </div>
+     </div>
+     <div class="col">
+          <div class="alert alert-info mb-4">
+               <p>
+               <h4>¡Atención!</h4>
+               Por favor, ingrese su texto utilizando las etiquetas que se muestran en la seccion de abajo. Si tiene algún problema, no dude en
+               contactarnos.
+               </p>
+          </div>
+          <form method="post">
+               {% csrf_token %}
+               {{ form.as_p }}
+               <button type="submit" class="btn btn-primary mb-3">Guardar</button>
+          </form>
+          <div class="alert-info mb-4 p-5">
+               <h4>Guía Básica para Usar Etiquetas HTML en tus Términos y Avisos</h4><br>
+               ¡Hola! Si necesitas agregar formato a tu texto para los términos y condiciones, puedes usar algunas
+               etiquetas HTML básicas. Aquí te explicamos cómo hacerlo de manera sencilla.
+               <ol>
+                    <li><strong>Negritas </strong></li>
+                    Para resaltar texto en negritas, usa la etiqueta <strong>'&lt;strong&gt;'</strong>. Cualquier texto
+                    entre <strong>'&lt;strong&gt;'</strong> y <strong>'&lt;/strong&gt;'</strong> se verá en negritas.
+                    <br>Ejemplo:
+                    <code>&lt;strong&gt; <strong>Este texto se verá en negritas</strong> &lt;/strong&gt;</code>
+
+                    <strong>
+                         <li>Cursiva</li>
+                    </strong>
+                    Para poner texto en cursiva, usa la etiqueta <strong>'&lt;em&gt;'</strong>. El texto entre
+                    <strong>'&lt;em&gt;'</strong> y <strong>'&lt;/em&gt;'</strong> se verá en cursiva. <br>
+                    Ejemplo: <code>&lt;em&gt; <em>Este texto se verá en cursiva</em> &lt;/em&gt;</code>
+
+                    <strong>
+                         <li>Subrayado</li>
+                    </strong>
+                    Para subrayar texto, usa la etiqueta <strong>'&lt;u&gt;'</strong>. El texto entre
+                    <strong>'&lt;u&gt;'</strong> y <strong>'&lt;u&gt;'</strong> estará subrayado. <br>
+                    Ejemplo: <code> &lt;u&gt; <u>Este texto estará subrayado</u> &lt;/u&gt;</code>
+
+                    <strong>
+                         <li>Saltos de línea</li>
+                    </strong>
+                    Para comenzar un nuevo párrafo, usa la etiqueta <strong>'&lt;br&gt;'</strong>. Esto insertará un
+                    salto de línea. <br>
+                    Ejemplo: <br>
+                    <code>
+                         Este es el primer párrafo.&lt;br&gt;<br>
+                         Este es el segundo párrafo después del salto de línea.
+                    </code>
+
+                    <strong>
+                         <li>Viñeta</li>
+                    </strong>
+                    Para crear listas con viñetas, usa las etiquetas <strong>'&lt;ul&gt;'</strong> y
+                    <strong>'&lt;li&gt;'</strong>. La etiqueta <strong>'&lt;ul&gt;'</strong> inicia una lista no
+                    ordenada (con viñetas) y cada elemento de la lista va entre <strong>'&lt;li&gt;'</strong> y
+                    <strong>'&lt;/li&gt;'</strong>. <br>
+                    Ejemplo: <br>
+                    <code>&lt;ul&gt;<ul>
+                              <li>&lt;li&gt; Primer ítem de la lista &lt;/li&gt;</li>
+                              <li>&lt;li&gt; Segundo ítem de la lista &lt;/li&gt;</li>
+                              <li>&lt;li&gt; Tercer ítem de la lista &lt;/li&gt; </li>
+                         </ul> &lt;/ul&gt;</code>
+
+                    <li><strong>Comentarios dentro del texto </strong></li>
+                    Para comentar el texto puesto que alomejor necesitan aclarar el porque de alguna seccion del texto puede usarse lo siguiente <strong>'&lt;!-- Comentario aquí --&gt;'</strong>, esto solo es para el campo para ingresar texto, no aparecera en el documento PDF generado. 
+               </ol>
+               </p>
+
+          </div>
+     </div>
+
+</div>
+
+{% endblock %}

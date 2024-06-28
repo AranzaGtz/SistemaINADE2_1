@@ -15,11 +15,17 @@
                /* Ajusta los márgenes a 20mm por todos lados */
                size: auto;
 
+               /* AQUI PIE DE PAGUINA AUTOMATICO CON LOS VALORES DE PIE DE PAGUINA: PAGUINA DE PAGUINAS / DIRECCION / TELEFONO / PAGUINA WEB */
                @bottom-center {
-                    content: "Página " counter(page) " de " counter(pages)" | De los Charros 4786-6, Fracc. José Sandoval, Tijuana, BC, México, C.P. 22105 | (664) 104 51 44 | www.inade.mx |";
+                    content: "Página " counter(page) " de " counter(pages)" | {{ org.direccion }} | {{ org.telefono }} | {{ org.pagina_web }} |";
                     font-size: 12px;
                     color: #666;
                }
+          }
+
+          /* Estilos CSS para manejar saltos de página */
+          .page-break {
+               page-break-before: always;
           }
 
           body {
@@ -38,7 +44,8 @@
                border-bottom: 1px solid #ddd;
                padding: 8px;
                text-align: left;
-               vertical-align: top; /* Alinea el contenido en la parte superior */
+               vertical-align: top;
+               /* Alinea el contenido en la parte superior */
           }
 
           th {
@@ -119,17 +126,35 @@
           .mt-10 {
                margin-top: 10px;
           }
+
+          .signature-container {
+               margin-top: 50px;
+               text-align: center;
+          }
+
+          .signature-line {
+               margin: 0 auto;
+               margin-top: 100px;
+               border-top: 1px solid #000;
+               width: 300px;
+          }
+
+          .signature-name {
+               margin-top: 5px;
+               font-size: 12px;
+               color: #555;
+          }
      </style>
 </head>
 
 <body>
      <div class="row sb">
           <img class="logo" src="{{ logo_url }}" alt="Logo">
-          <h4 class="text-center">Ingeniería y Administración Estratégica,<br> S.A de C.V.</h4>
+          <h4 class="text-center">{{ org }}</h4>
           <p class="text-end">
-               <strong>Cotización </strong><br>
-               Versión 1.0<br>
-               Emisión: 06/06/2014
+               <strong>{{ org_form.nombre_formato }}</strong><br>
+               Versión {{ org_form.version }}<br>
+               Emisión: {{ org_form.emision|date:"d/m/Y" }}
           </p>
      </div>
 
@@ -137,7 +162,8 @@
 
      <div class="row sb">
           <div class="w-m">
-               <p class="m-1"><strong>Atención a: {{ cotizacion.persona.titulo.abreviatura }} {{cotizacion.persona.nombre }} {{cotizacion.persona.apellidos }}</strong></p>
+               <p class="m-1"><strong>Atención a: {{ cotizacion.persona.titulo.abreviatura }}
+                         {{cotizacion.persona.nombre }} {{cotizacion.persona.apellidos }}</strong></p>
                <p class="m-1">{{ cotizacion.persona.empresa.nombre_empresa }}</p>
                <p class="m-1">{{ cotizacion.persona.empresa.direccion }}</p>
           </div>
@@ -156,7 +182,7 @@
                <tr>
                     <th class="w-30">Concepto</th>
                     <th class="w-30">Metodo</th>
-                    <th >Cant.</th>
+                    <th>Cant.</th>
                     <th class="w-20">Precio Unitario</th>
                     <th class="w-20">Total</th>
                </tr>
@@ -164,9 +190,9 @@
           <tbody>
                {% for concepto in conceptos %}
                <tr>
-                    <td ><strong>{{ concepto.servicio.nombre_servicio }}</strong> <br> {{ concepto.notas }}</td>
-                    <td >{{ concepto.servicio.metodo }}</td>
-                    <td >{{ concepto.cantidad_servicios }}</td>
+                    <td><strong>{{ concepto.servicio.nombre_servicio }}</strong> <br> {{ concepto.notas }}</td>
+                    <td>{{ concepto.servicio.metodo }}</td>
+                    <td>{{ concepto.cantidad_servicios }}</td>
                     <td class="text-end">$ {{ concepto.precio }}</td>
                     <td class="text-end">$ {{ concepto.subtotal }}</td>
                </tr>
@@ -190,7 +216,36 @@
                <p class="m-1 text-end"> {{ cotizacion.iva }}</p>
                <p class="m-1 text-end"> {{ cotizacion.total }}</p>
           </div>
+
      </div>
+
+     <!-- Otro salto de página -->
+     <div class="page-break"></div>
+
+     <p>
+          {{ org_form.terminos|safe }}
+     </p>
+
+     <p>
+          {{ org_form.avisos|safe }}
+     </p>
+     <br>
+     <p>En caso de acptación favor de enviar si cotización firmada.</p>
+
+     <p>Elaboró: {{user.first_name|default:'Error en Usuario' }} {{user.last_name|default:'Error en Usuario' }}</p>
+
+     <p>Vigencia hasta {{ cotizacion.fecha_caducidad|date:"d/m/Y" }}</p>
+
+     <br><br>
+
+     <div class="signature-container">
+          <div class="signature-line"></div>
+          <div class="signature-name">Firma del cliente ( {{ cotizacion.persona.nombre }} {{ cotizacion.persona.apellidos }} )</div>
+      </div>
+
+
+
+
 </body>
 
 </html>

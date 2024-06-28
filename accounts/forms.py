@@ -1,5 +1,5 @@
 from django import forms
-from .models import Concepto, CustomUser, Metodo,Persona,Prospecto, Cliente, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion
+from .models import Concepto, CustomUser, Formato, Metodo,Persona,Prospecto, Cliente, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -162,4 +162,13 @@ class CotizacionChangeForm(forms.ModelForm):
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).','rows': 3}),
             'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)','rows': 3}),
             'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente'}),
+        }
+        
+class TerminosForm(forms.ModelForm):
+    class Meta:
+        model = Formato
+        fields = ['terminos', 'avisos']
+        widgets = {
+            'terminos': forms.Textarea(attrs={'class': 'form-control'}),
+            'avisos': forms.Textarea(attrs={'class': 'form-control'}),
         }
