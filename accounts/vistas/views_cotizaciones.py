@@ -1,8 +1,8 @@
 from datetime import datetime
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
-from accounts.models import Cotizacion, Concepto
-from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, ConceptoChangeFormSet
+from accounts.models import Cotizacion, Concepto, Organizacion, Formato, CustomUser
+from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, ConceptoChangeFormSet, TerminosForm
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -159,6 +159,14 @@ def generate_new_id_personalizado():
 def cotizacion_pdf(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     conceptos = cotizacion.conceptos.all()
+    ogr = get_object_or_404(Organizacion,id=1)
+    formato = get_object_or_404(Formato, id=1)
+    # Verifica si el usuario está autenticado
+    if request.user.is_authenticated:
+        username = request.user.username
+        user = get_object_or_404(CustomUser, username=username)
+    # Ahora puedes trabajar con el objeto 'user'
+
     
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
@@ -166,6 +174,9 @@ def cotizacion_pdf(request, pk):
     logo_url = request.build_absolute_uri('/static/img/logo.png')
     current_date = datetime.now().strftime("%Y/%m/%d")
     context = {
+        'org':ogr,
+        'org_form':formato,
+        'user': user,
         'cotizacion': cotizacion,
         'conceptos': conceptos,
         'current_date': current_date,
@@ -179,3 +190,15 @@ def cotizacion_pdf(request, pk):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="cotizacion_{cotizacion.id_personalizado}.pdf"'
     return response
+
+
+def terminos_avisos(request):
+    formato = get_object_or_404(Formato, pk=1)
+    if request.method == 'POST':
+        form = TerminosForm(request.POST, instance=formato)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  # Redirige a la vista deseada después de guardar
+    else:
+        form = TerminosForm(instance=formato)
+    return render(request, 'accounts/cotizaciones/terminos.html', {'form': form})

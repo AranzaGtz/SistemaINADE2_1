@@ -1,9 +1,8 @@
-from datetime import date
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
 # Opcional: Agregar señales para manejar el cálculo del subtotal, IVA y total automáticamente cuando se guarden los objetos.
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
+
 
 # En accounts/models.py, define el modelo de usuario personalizado que tenga campos adicionales para los diferentes roles.
 
@@ -82,7 +81,7 @@ class Direccion(models.Model):
     estado = models.CharField(max_length=100, null=False, blank=False)
     
     def __str__(self):
-        return f"{self.calle} {self.numero}, {self.colonia}, {self.ciudad}, {self.estado} {self.codigo}"
+        return f"{self.calle}, No.{self.numero}, Col. {self.colonia}, {self.ciudad}, {self.estado}, C.P. {self.codigo}"
 
 # MODELO PARA EMPRESA
 class Empresa(models.Model):
@@ -213,4 +212,28 @@ class Concepto(models.Model):
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
     
+#----------------------------------------------------
+# MODELO PARA MI ORGANIZACIÓN
+#----------------------------------------------------
 
+# MODELO PARA ORGANIZACION
+class Organizacion(models.Model):
+    nombre = models.CharField(max_length=255)
+    direccion = models.CharField(max_length=255)
+    telefono = models.CharField(max_length=20)
+    pagina_web = models.URLField()
+    
+    def __str__(self):
+        return self.nombre
+
+# MODELO PARA FORMATO
+class Formato(models.Model):
+    organizacion = models.ForeignKey(Organizacion, related_name='formatos', on_delete=models.CASCADE)
+    nombre_formato = models.CharField(max_length=255)
+    version = models.CharField(max_length=50)
+    emision = models.DateField(default=timezone.now)
+    terminos = models.TextField(blank=True)  # Campo para términos
+    avisos = models.TextField(blank=True)    # Campo para avisos
+    
+    def __str__(self):
+        return f'{self.nombre_formato} - {self.version}'
