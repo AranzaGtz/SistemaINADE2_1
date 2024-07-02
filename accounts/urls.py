@@ -1,5 +1,5 @@
 from django.urls import path
-from accounts.vistas import views_usuarios, views_prospectos, views_empresas_contactos, views_autenticacion, views_home, views_cotizaciones, views_servicios
+from accounts.vistas import views_usuarios, views_prospectos, views_empresas_contactos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos
 
 urlpatterns = [
     path('', views_autenticacion.dashboard, name='dashboard'),
@@ -48,7 +48,12 @@ urlpatterns = [
     path('cotizacion/<int:pk>/pdf/',views_cotizaciones.cotizacion_pdf,name='cotizacion_pdf'),
     path('cotizaciones/<int:pk>/duplicar/',views_cotizaciones.cotizacion_duplicar,name='cotizacion_duplicar'),
     
-    path('terminos/',views_cotizaciones.terminos_avisos, name='terminos_avisos')
+    path('terminos/',views_cotizaciones.terminos_avisos, name='terminos_avisos'),
+    
+    path('enviar_correo/', views_correos.enviar_correo, name='enviar_correo'),
+    path('cotizacion/<int:pk>/seleccionar_correos/', views_correos.seleccionar_correos, name='seleccionar_correos'),
+    path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
+    path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
     # Define otras rutas según las vistas que hayas definido
 ]
 

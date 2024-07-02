@@ -72,26 +72,26 @@ def dashboard(request):
         elif rol == "coordinador":
             # Interfaz para el coordinador
             print("Usuario es Coordinador")
-            return render(request, "accounts/dashboard_coordinator.html")
+            return render(request, "accounts/otros/dashboard_coordinator.html")
 
         elif rol == "muestras":
             # Interfaz para el usuario de muestras
             print("Usuario es de Muestras")
-            return render(request, "accounts/dashboard_samples.html")
+            return render(request, "accounts/otros/dashboard_samples.html")
 
         elif rol == "informes":
             # Interfaz para el usuario de informes
             print("Usuario es de Informes")
-            return render(request, "accounts/dashboard_reports.html")
+            return render(request, "accounts/otros/dashboard_reports.html")
 
         elif rol == "calidad":
             # Interfaz para el usuario de calidad
             print("Usuario es de Calidad")
-            return render(request, "accounts/dashboard_quality.html")
+            return render(request, "accounts/otros/dashboard_quality.html")
 
         else:
 
-            return render(request, "accounts/dashboard_default.html")
+            return render(request, "accounts/otros/dashboard_default.html")
 
     # Redirigir a la página de inicio de sesión si el usuario no está autenticado
     print("Usuario no autenticado")

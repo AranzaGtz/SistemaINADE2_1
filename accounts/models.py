@@ -127,6 +127,7 @@ class Persona(models.Model):
 
     def __str__(self):
         return f"{self.empresa.nombre_empresa} | {self.nombre} {self.apellidos}"
+    
 
 # MODELO PARA PROSPECTO
 class Prospecto(models.Model):
@@ -155,7 +156,7 @@ class Cotizacion(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    persona = models.ForeignKey('Persona', on_delete=models.PROTECT, blank=True, null=True)
+    persona = models.ForeignKey(Persona, on_delete=models.PROTECT, blank=True, null=True)
     id_personalizado = models.CharField(max_length=4, unique=True, default='0001')
     
     def calculate_subtotal(self):

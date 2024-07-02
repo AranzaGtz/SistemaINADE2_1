@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.models import Cotizacion, Concepto, Organizacion, Formato, CustomUser
@@ -9,6 +10,8 @@ from django.shortcuts import render, get_object_or_404
 from weasyprint import HTML # type: ignore #AQUI SALE WARNING: No se ha podido resolver la importación "weasyprint".
 from django.template.loader import render_to_string  # Asegúrate de importar render_to_string
 import tempfile
+import uuid
+from django.db import IntegrityError, transaction
 
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
@@ -22,17 +25,26 @@ def cotizacion_form(request):
         concepto_formset = ConceptoFormSet(request.POST)
         
         if cotizacion_form.is_valid() and concepto_formset.is_valid():
-            cotizacion = cotizacion_form.save()
-            conceptos = concepto_formset.save(commit=False)
-            for concepto in conceptos:
-                concepto.cotizacion = cotizacion
-                concepto.save()
-            cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
-            cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
-            cotizacion.total = cotizacion.subtotal + cotizacion.iva
-            cotizacion.save()
-            messages.success(request, 'Cotización creada con éxito.')
-            return redirect('cotizacion_detalle', pk=cotizacion.id)
+            try:
+                with transaction.atomic():  # Usar una transacción atómica para asegurar la atomicidad
+                    cotizacion = cotizacion_form.save(commit=False)
+                    cotizacion.id_personalizado = generate_new_id_personalizado()
+                    cotizacion.save()
+                    
+                    conceptos = concepto_formset.save(commit=False)
+                    for concepto in conceptos:
+                        concepto.cotizacion = cotizacion
+                        concepto.save()
+                    
+                    cotizacion.subtotal = sum([c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
+                    cotizacion.iva = cotizacion.subtotal * (cotizacion.tasa_iva / 100)
+                    cotizacion.total = cotizacion.subtotal + cotizacion.iva
+                    cotizacion.save()
+                    
+                    messages.success(request, 'Cotización creada con éxito.')
+                    return redirect('cotizacion_detalle', pk=cotizacion.id)
+            except IntegrityError:
+                messages.error(request, 'Hubo un error al crear la cotización. Inténtalo de nuevo.')
         else:
             print(cotizacion_form.errors)
             print(concepto_formset.errors)
@@ -52,7 +64,8 @@ def cotizacion_detalle(request, pk):
     conceptos = cotizacion.conceptos.all()
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
-    
+
+    cotizacion_persona=cotizacion.persona.id
     return render(request, 'accounts/cotizaciones/cotizacion_detalle.html', {
         'cotizacion': cotizacion,
         'conceptos': conceptos,
@@ -148,7 +161,7 @@ def cotizacion_duplicar(request, pk):
     })
 
 def generate_new_id_personalizado():
-    last_cotizacion = Cotizacion.objects.order_by('id').last()
+    last_cotizacion = Cotizacion.objects.order_by('id_personalizado').last()
     if not last_cotizacion:
         return '0001'
     last_id = last_cotizacion.id_personalizado

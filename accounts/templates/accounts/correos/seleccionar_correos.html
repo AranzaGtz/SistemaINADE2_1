@@ -1,0 +1,45 @@
+<!-- accounts/templates/accounts/correos/seleccionar_correos.html -->
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Seleccionar Correos{% endblock %}
+{% block header %}Seleccionar Correos{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+     <h1 class="text-center">Seleccionar Correos para Enviar Cotización {{ cotizacion.id_personalizado }}</h1>
+     <hr />
+     <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+               <h3>Selecciona los correos a los que deseas enviar la cotización:</h3>
+               {% if cliente_correo %}
+               <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="cliente" id="cliente" value="cliente">
+                    <label class="form-check-label" for="cliente">
+                         <strong>Cliente:</strong> {{ cliente_correo }}
+                    </label>
+               </div>
+               {% endif %}
+               {% if usuario_correo %}
+               <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="usuario" id="usuario" value="usuario">
+                    <label class="form-check-label" for="usuario">
+                         <strong>Tu correo:</strong> {{ usuario_correo }}
+                    </label>
+               </div>
+               {% endif %}
+               {% for correo in correos_adicionales %}
+               <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="{{ correo }}" id="{{ correo }}"
+                         value="{{ correo }}">
+                    <label class="form-check-label" for="{{ correo }}">
+                         <strong>Adicional:</strong> {{ correo }}
+                    </label>
+               </div>
+               {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Enviar Cotización</button>
+     </form>
+</div>
+
+{% endblock %}
