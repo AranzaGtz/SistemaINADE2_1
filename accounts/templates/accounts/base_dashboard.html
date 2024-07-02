@@ -3,118 +3,111 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/estilosdashboard.css' %}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-    <div class="wrapper">
-        <!-- BARRA DE ENCABEZADO -->
-        <header class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+
+    <!-- BARRA DE ENCABEZADO -->
+    <header class="">
+        <nav class="navbar bg-body-tertiary fixed-top">
             <div class="container-fluid">
-                <div class="navbar-brand">
-                    <a href="#"><img class="icon_nav" src="{% static 'img/menu1.png' %}" style="width: 30px;" alt="Descripción de la imagen"></a>
-                </div>
-                <div class="d-flex align-items-center ms-auto">
-                    <img class="icon me-3" src="{% static 'img/notificacion.png' %}" alt="Notificaciones" style="width: 30px; margin-right: 15px;" alt="Descripción de la imagen">
-                    <img class="icon me-3" src="{% static 'img/sobre.png' %}" alt="Mensajes" style="width: 30px;" alt="Descripción de la imagen">
-                    <span class="navbar-text titulousuario" style="margin-left: 30px; margin-right: 30px;">Hello, {{user.username|default:'Guest' }}</span>
+                <a class="navbar-brand " href="#"><img src="{% static 'img/gotalogo.png' %}" alt="Logo"
+                        style="max-height: 40px;" class="mr-2"> INADE Laboratorio Ambiental</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"> <img src="{% static 'img/menu.png' %}" alt=""> </span>
+                </button>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
+                    aria-labelledby="offcanvasNavbarLabel">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Hola!, {{ user.username|default:'Guest' }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'cotizaciones_list' %}">Cotizaciones</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'servicios_list' %}">Servicios y Métodos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'empresas_cont_list' %}">Empresas y Contactos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'terminos_avisos' %}">Términos y Avisos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'prospecto_list' %}">Prospectos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'usuario_list' %}">Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Salir de sesión</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </header>
-        <!-- BARRA DE NAVEGACION -->
-        <nav id="sidebar" class="sidebar bg-dark text-white p-3 sidebar-sticky" style="z-index:6;">
-            <h4 class="text-center">Menú</h4>
-            <ul class="nav flex-column">
-
-                <!-- Opción para cerrar el menú -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link text-white close-menu">Regresar</a>
-                </li>
-
-                <!-- Opción para abrir home -->
-                <li class="nav-item">
-                    <a href="{% url 'home' %}" class="nav-link text-white">Home</a>
-                </li>
-
-                <!-- Opción para abrir cotizaciones -->
-                <li class="nav-item has-submenu">
-                    <a href="{% url 'cotizaciones_list' %}" class="nav-link text-white">Cotizaciones</a>
-                    <ul class="submenu">
-                        <li class="nav-item"><a href="{% url 'servicios_list' %}" class="nav-link text-white">Servicios y Metodos</a></li>
-                        <li class="nav-item"><a href="{% url 'empresas_cont_list' %}" class="nav-link text-white">Empresas y contactos</a></li>
-                        <li class="nav-item"><a href="{% url 'terminos_avisos' %}" class="nav-link text-white">Terminos y avisos</a></li>
-                    </ul>
-                </li>
-                <!-- Opción para abrir cotizaciones -->
-                <li class="nav-item has-submenu">
-                    <a href="" class="nav-link text-white">Contactos de empresas</a>
-                    <ul class="submenu">
-                        <li class="nav-item"><a href="{% url 'prospecto_list' %}"
-                                class="nav-link text-white">Prospectos</a></li>
-                        <li class="nav-item"><a href=""
-                                class="nav-link text-white">Clientes</a></li>
-                    </ul>
-                </li>
-
-                <!-- Opción para abrir Usuario -->
-                <li class="nav-item">
-                    <a href="{% url 'usuario_list' %}" class="nav-link text-white">Usuarios</a>
-                </li>
-
-                <!-- Opción para cerrar sesión -->
-                <li class="nav-item">
-                    <a href="{% url 'logout' %}" class="nav-link text-white">Salir de sesión</a>
-                </li>
-            </ul>
         </nav>
+    </header>
+
+    
+
+    <div class="content" style="margin-top: 80px;">
+        
         <!-- Alertas -->
         {% include 'accounts/_alerts.html' %}
-
-        <div class="content">
-            <!-- CONTENIDO VARIANTE -->
-            <main class="container mt-4">
-                {% block content %}
-                {% endblock %}
-            </main>
-        </div>
-
+        <!-- CONTENIDO VARIANTE -->
+        <main class="container mt-4" style="min-height: 80vh;">
+            {% block content %}
+            {% endblock %}
+        </main>
     </div>
+
     <!-- PIE DE PAGINA -->
-    <footer class="bg-dark text-white py-4 mt-auto" style="width: 100%; padding: 50px;margin-top: auto;">
+    <footer class="bg-light text-dark py-4 mt-auto">
         <div class="container">
-            <hr class="border-light">
+            <hr class="border-dark">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
                     <p class="mb-0">
-                        <a href="https://www.inade.mx/" class="text-white">&copy; 2024 INADE Servicios Ambientales</a>
+                        <a href="https://www.inade.mx/" class="text-dark">&copy; 2024 INADE Servicios Ambientales</a>
                         <br>
                         Ingeniería y Administración Estratégica, S.A. de C.V.
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-right">
-                    <a href="" class="text-white mx-2">
-                        <img src="{% static 'img/whatsapp.png' %}" alt="WhatsApp" style="width: 30px; height: 30px;" alt="Descripción de la imagen">
+                    <a href="https://wa.me/your-whatsapp-number" class="text-dark mx-2">
+                        <img src="{% static 'img/whatsapp.png' %}" alt="WhatsApp" style="width: 30px; height: 30px;">
                     </a>
                     <a href="https://www.facebook.com/p/Ingenier%C3%ADa-y-Administraci%C3%B3n-Estrat%C3%A9gica-SA-de-CV-100067820710003/"
-                        class="text-white mx-2">
-                        <img src="{% static 'img/facebook.png' %}" alt="Facebook" style="width: 30px; height: 30px;" alt="Descripción de la imagen">
+                        class="text-dark mx-2">
+                        <img src="{% static 'img/facebook.png' %}" alt="Facebook" style="width: 30px; height: 30px;">
                     </a>
-                    <a href="" class="text-white mx-2">
-                        <img src="{% static 'img/gmail.png' %}" alt="Gmail" style="width: 30px; height: 30px;" alt="Descripción de la imagen">
+                    <a href="mailto:your-email@example.com" class="text-dark mx-2">
+                        <img src="{% static 'img/gmail.png' %}" alt="Gmail" style="width: 30px; height: 30px;">
                     </a>
                 </div>
             </div>
         </div>
     </footer>
 
+
     <!-- Scripts -->
-    <script src="{% static 'js/menu.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var alertList = document.querySelectorAll('.alert');
@@ -135,7 +128,7 @@
             });
         });
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     {% block extra_js %}{% endblock %}
 </body>
 

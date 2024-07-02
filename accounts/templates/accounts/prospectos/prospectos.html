@@ -5,57 +5,55 @@
 {% block content %}
 
 <!-- CONTENEDOR DE PROSPECTO -->
-<div class="container mt-4">
-    <!-- SECCION DE TITULO ENCABEZANDO DIV -->
-    <div class="row">
-        <div class="col">
-            <h1 class="text-center">Prospectos</h1>
-            <hr />
-        </div>
+<!-- SECCION DE TITULO ENCABEZANDO DIV -->
+<div class="row">
+    <div class="col">
+        <h1 class="text-center">Prospectos</h1>
+        <hr class="featurette-divider">
     </div>
-    
-    <div class="row mb-3">
-        <div class="col text-right">
-            <a href="{% url 'prospecto_new' %}" class="btn btn-primary">Nuevo</a>
-        </div>
-    </div>
+</div>
 
-    <!-- TABLA -->
-    <div class="row">
-        <div class="col" style="position: relative; z-index: 1;">
-            <table class="table table-hover table-light table-bordered" >
-                <!-- ENCABEZADO DE TABLA -->
-                <thead class="thead-dark">
-                    <tr>
-                        <th>#</th>
-                        <th colspan="3">Prospecto</th>
-                        <th>Empresa</th>
-                        <th>Correo</th>
-                        <th colspan="4">Opciones</th>
-                    </tr>
-                </thead>
-    
-                <!-- CUERPO DE TABLA -->
-                <tbody>
-                    {% for p in prospectos %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ p.persona.titulo }}</td>
-                        <td>{{ p.persona.nombre }}</td>
-                        <td>{{ p.persona.apellidos }}</td>
-                        <td>{{ p.persona.empresa.nombre_empresa }}</td>
-                        <td>{{ p.persona.informacion_contacto.correo_electronico }}</td>
-                        <td>
-                            <a href="{% url 'prospecto_edit' p.id %}" class="btn btn-info btn-sm">Editar</a>
-                            <button class="btn btn-secondary btn-sm">Cotizar</button>
-                            <button class="btn btn-secondary btn-sm">Cotizaciones</button>
-                            <a href="{% url 'prospecto_delete' p.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<div class="row mb-3">
+    <div class="col text-right">
+        <a href="{% url 'prospecto_new' %}" class="btn btn-primary">Nuevo</a>
+    </div>
+</div>
+
+<!-- TABLA -->
+<div class="row">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover" >
+            <!-- ENCABEZADO DE TABLA -->
+            <thead class="thead-light">
+                <tr>
+                    <th>#</th>
+                    <th colspan="3">Prospecto</th>
+                    <th>Empresa</th>
+                    <th>Correo</th>
+                    <th colspan="4">Opciones</th>
+                </tr>
+            </thead>
+
+            <!-- CUERPO DE TABLA -->
+            <tbody>
+                {% for p in prospectos %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ p.persona.titulo }}</td>
+                    <td>{{ p.persona.nombre }}</td>
+                    <td>{{ p.persona.apellidos }}</td>
+                    <td>{{ p.persona.empresa.nombre_empresa }}</td>
+                    <td>{{ p.persona.informacion_contacto.correo_electronico }}</td>
+                    <td>
+                        <a href="{% url 'prospecto_edit' p.id %}" class="btn btn-info btn-sm">Editar</a>
+                        <button class="btn btn-secondary btn-sm">Cotizar</button>
+                        <button class="btn btn-secondary btn-sm">Cotizaciones</button>
+                        <a href="{% url 'prospecto_delete' p.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 

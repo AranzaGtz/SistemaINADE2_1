@@ -18,10 +18,10 @@
 
     <!-- TABLA -->
     <div class="row">
-        <div class="col" style="position: relative; z-index: 1;">
-            <table class="table table-hover table-light table-bordered" >
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" >
                 <!-- ENCABEZADO DE TABLA -->
-                <thead class="thead-dark">
+                <thead class="thead-light">
                     <tr>
                         <th>#</th>
                         <th>Empresa</th>
@@ -43,11 +43,8 @@
                         <td>{{ e.direccion }}</td>
                         <td>{{ e.moneda }}</td>
                         <td>{{ e.condiciones_pago }}</td>
-
-                        <td>
-                            <a href="{% url 'empresa_edit' e.id %}" class="btn btn-info btn-sm">Editar</a>
-                            <a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
+                        <td><a href="{% url 'empresa_edit' e.id %}" class="btn btn-info btn-sm">Editar</a></td>
+                        <td><a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -68,10 +65,10 @@
 
     <!-- TABLA -->
     <div class="row">
-        <div class="col" style="position: relative; z-index: 1;">
-            <table class="table table-hover table-light table-bordered" >
+        <div class="table-responsive" >
+            <table class="table table-bordered table-hover" >
                 <!-- ENCABEZADO DE TABLA -->
-                <thead class="thead-dark">
+                <thead class="thead-light">
                     <tr>
                         <th>#</th>
                         <th>Titulo</th>
@@ -87,16 +84,12 @@
                     {% for c in contactos %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
+                        <td>{{ c.titulo }}</td>
                         <td>{{ c.nombre }}</td>
                         <td>{{ c.apellidos }}</td>
-                        <td>{{ c.titulo }}</td>
                         <td>{{ c.informacion_contacto }}</td>
-                        <td>{{ c.condiciones_pago }}</td>
-
-                        <td>
-                            <a href="{% url 'contacto_edit' c.id %}" class="btn btn-info btn-sm">Editar</a>
-                            <a href="{% url 'contacto_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
+                        <td><a href="{% url 'contacto_edit' c.id %}" class="btn btn-info btn-sm">Editar</a></td>
+                        <td><a href="{% url 'contacto_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
