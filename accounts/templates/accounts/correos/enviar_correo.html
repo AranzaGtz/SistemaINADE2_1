@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enviar Correo de Confirmación</title>
+</head>
+<body>
+    <h1>Enviar Correo de confirmación</h1>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Enviar Correo</button>
+    </form>
+</body>
+</html>
