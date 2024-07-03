@@ -15,14 +15,14 @@
 
 <div class="row mb-3">
     <div class="col text-right">
-        <a href="{% url 'prospecto_new' %}" class="btn btn-primary">Nuevo</a>
+        <a href="{% url 'prospecto_new' %}" class="btn btn-primary">Agregar Prospecto</a>
     </div>
 </div>
 
 <!-- TABLA -->
 <div class="row">
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover" >
+    <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+        <table class="table table-hover" >
             <!-- ENCABEZADO DE TABLA -->
             <thead class="thead-light">
                 <tr>
@@ -44,12 +44,10 @@
                     <td>{{ p.persona.apellidos }}</td>
                     <td>{{ p.persona.empresa.nombre_empresa }}</td>
                     <td>{{ p.persona.informacion_contacto.correo_electronico }}</td>
-                    <td>
-                        <a href="{% url 'prospecto_edit' p.id %}" class="btn btn-info btn-sm">Editar</a>
-                        <button class="btn btn-secondary btn-sm">Cotizar</button>
-                        <button class="btn btn-secondary btn-sm">Cotizaciones</button>
-                        <a href="{% url 'prospecto_delete' p.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
+                    <td><a href="{% url 'prospecto_edit' p.id %}" class="btn btn-primary btn-sm">Editar</a></td>
+                    <td><button class="btn btn-secondary btn-sm">Cotizar</button></td>
+                    <td><button class="btn btn-secondary btn-sm">Cotizaciones</button></td>
+                    <td> <a href="{% url 'prospecto_delete' p.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

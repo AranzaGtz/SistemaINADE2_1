@@ -5,7 +5,6 @@
 {% block content %}
 
 <!-- CONTENEDOR COTIZACIONES -->
-<div class="container mt-4">
     <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
     <div class="row">
         <div class="col">
@@ -21,10 +20,10 @@
     <!-- TABLA -->
     <div class="row">
         <div class="col">
-            <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
-                <table class="table table-hover table-light table-bordered">
+            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                <table class="table table-hover">
                     <!-- ENCABEZADO DE TABLA -->
-                    <thead class="thead-dark">
+                    <thead class="thead-light">
                         <tr>
                             <th>Cotizacion</th>
                             <th>Empresa</th>
@@ -44,11 +43,11 @@
                             <td>{{ c.persona.empresa.nombre_empresa }}</td>
                             <td>{{ c.persona.nombre }} </td>
                             <td>{{ c.persona.apellidos }}</td>
-                            <td>{{ c.fecha_solicitud }}</td>
-                            <td>{{ c.fecha_caducidad }}</td>
+                            <td>{{ c.fecha_solicitud|date:"d/m/Y"  }}</td>
+                            <td>{{ c.fecha_caducidad|date:"d/m/Y"  }}</td>
                             <td>{{ c.metodo_pago }}</td>
                             <td> NA </td>
-                            <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-info btn-sm">Detalles</a>
+                            <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a>
                             </td>
                             <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
                             </td>
@@ -59,10 +58,4 @@
             </div>
         </div>
     </div>
-</div>
-
-{% endblock %}
-<!-- Mensajes de alertas -->
-{% block scripts %}
-<script src="{% static 'js/alertas.js' %}"></script>
 {% endblock %}

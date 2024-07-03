@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "agutierrezr.emmet-keybindings"
+        "agutierrezr.emmet-keybindings",
+        "pkief.material-icon-theme"
     ]
 }

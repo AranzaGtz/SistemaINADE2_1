@@ -6,107 +6,114 @@
 
 <!-- CONTENEDOR SERVICIOS -->
 <div class="container mt-4">
-    <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
+    <!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
     <div class="row">
         <div class="col">
             <h1 class="text-center">Servicios</h1>
-            <hr />
+            <hr class="featurette-divider">
         </div>
     </div>
 
-    <!-- BOTON NUEVO -->
+    <!-- BOTÓN NUEVO -->
     <div class="row mb-3">
         <div class="col text-right">
-            <a href="{% url 'servicio_new' %}" class="btn btn-success">Nuevo Servicio</a>
+            <a href="{% url 'servicio_new' %}" class="btn btn-primary">Agregar Servicio</a>
         </div>
     </div>
 
-    <!-- TABLA -->
-    <div class="row">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <!-- ENCABEZADO DE TABLA -->
-                <thead class="thead-light">
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Metodo</th>
-                        <th>Descripcion</th>
-                        <th>Precio sugerido</th>
-
-                        <th colspan="2" class="col-md-1">Opciones</th>
-                    </tr>
-                </thead>
-                <!-- CUERPO DE TABLA -->
-                <tbody>
-                    {% for s in servicios %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ s.nombre_servicio }}</td>
-                        <td>{{ s.metodo.metodo }}</td>
-                        <td>{{ s.descripcion }}</td>
-                        <td>{{ s.precio_sugerido }}</td>
-                        <td>
-                            <a href="{% url 'servicio_edit' s.id %}" class="btn btn-info btn-sm">Editar</a>
-
-                        </td>
-                        <td>
-                            <a href="{% url 'servicio_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
+    <!-- TABLA DE SERVICIOS -->
     <div class="row">
         <div class="col">
-            <h1 class="text-center">Metodos</h1>
-            <hr />
-
+            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                <table class="table table-hover">
+                    <!-- ENCABEZADO DE TABLA -->
+                    <thead class="thead-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Método</th>
+                            <th>Descripción</th>
+                            <th>Precio sugerido</th>
+                            <th colspan="2" class="col-md-1">Opciones</th>
+                        </tr>
+                    </thead>
+                    <!-- CUERPO DE TABLA -->
+                    <tbody>
+                        {% for s in servicios %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ s.nombre_servicio }}</td>
+                            <td>{{ s.metodo.metodo }}</td>
+                            <td>{{ s.descripcion }}</td>
+                            <td>{{ s.precio_sugerido }}</td>
+                            <td>
+                                <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
+                            </td>
+                            <td>
+                                <a href="{% url 'servicio_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <!-- BOTON NUEVO -->
-    <div class="row mb-3">
-        <h3>Crear nuevo método</h3>
-        <form action="{% url 'metodo_create' %}" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ metodos_form.as_p }}
-            </div>
 
-            <div class="col text-right">
-                <input type="submit" class="btn btn-success" value="Registrar método" />
-            </div>
-        </form>
+    <hr class="featurette-divider">
 
+    <!-- SECCIÓN DE MÉTODOS -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Métodos</h1>
+            <hr class="featurette-divider">
+        </div>
     </div>
 
-    <div class="row">
-        <!-- SECCIÓN DE LISTADO DE MÉTODOS -->
-        <h2>Lista de métodos</h2>
-        <div class="table-responsive">
+    <!-- FORMULARIO PARA CREAR NUEVO MÉTODO -->
+    <div class="row mb-3">
+        <div class="col-md-6 offset-md-3">
+            <h3>Crear nuevo método</h3>
+            <form action="{% url 'metodo_create' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ metodos_form.as_p }}
+                </div>
+                <div class="text-right">
+                    <input type="submit" class="btn btn-success" value="Registrar método" />
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <table class="table table-bordered table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="col-md-1">#</th>
-                        <th>Métodos</th>
-                        <th colspan="1" class="col-md-1">Opciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in metodos %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ m.metodo }}</td>
-                        <td><a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <hr class="featurette-divider">
+
+    <!-- TABLA DE MÉTODOS -->
+    <div class="row">
+        <div class="col">
+            <h2>Lista de métodos</h2>
+            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-md-1">#</th>
+                            <th>Métodos</th>
+                            <th class="col-md-1">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in metodos %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ m.metodo }}</td>
+                            <td>
+                                <a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -114,14 +121,4 @@
 
 {% endblock %}
 
-<!-- Mensajes de alertas -->
-<script src="{% static 'js/alertas.js' %}"></script>
-<!-- Incluye Bootstrap CSS -->
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Incluye jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-<!-- Incluye tu archivo JS personalizado -->
-<script src="{% static 'js/alertas.js' %}"></script>
