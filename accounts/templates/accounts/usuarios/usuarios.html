@@ -83,8 +83,8 @@
 
     <!-- SECCION DE LISTADO DE USUARIOS -->
     <div class="col-lg-9 col-md-7">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+            <table class="table table-hover" >
                 <thead class="thead-light">
                     <tr>
                         <th >Username</th>
@@ -105,7 +105,7 @@
                         <td>{{ c.last_name }}</td>
                         <td>{{ c.celular }}</td>
                         <td>{{ c.rol }}</td>
-                        <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-info btn-sm">Editar</a></td>
+                        <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
                         <td><a href="{% url 'usuario_delete' c.username %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                     </tr>
                     {% endfor %}

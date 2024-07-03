@@ -6,6 +6,10 @@
 {% block content %}
 
 <div class="container mt-4">
+     <div class="alert alert-warning alert-dismissible fade show " role="alert">
+          <strong>¡Atención!</strong> Estas apunto de mandar correos, elije a los destinatarios.
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">&times;</button>
+     </div>
      <h1 class="text-center">Seleccionar Correos para Enviar Cotización {{ cotizacion.id_personalizado }}</h1>
      <hr />
      <form method="post">
