@@ -1,0 +1,27 @@
+<!-- templates/accounts/clientes/editar_cliente.html -->
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Editar Cliente{% endblock %}
+{% block header %}Editar Cliente{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <h1 class="text-center">Editar Cliente</h1>
+        <hr class="featurette-divider">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <form method="post">
+            {% csrf_token %}
+            {{ persona_form.as_p }}
+            {{ contacto_form.as_p }}
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -17,6 +17,14 @@
         <a href="{% url 'prospecto_new' %}" class="btn btn-primary mx-1">Nuevo Prospecto</a>
         <a href="{% url 'cotizacion_form' %}" class="btn btn-primary mx-1">Nueva Cotización</a>
     </div>
+    <!-- CAMPO DE BÚSQUEDA -->
+    <div class="row mb-4">
+        <div class="col text-right">
+            <form method="get" action="{% url 'cotizaciones_list' %}">
+                <input type="text" name="search" class="form-control" placeholder="Buscar cotizaciones..." value="{{ request.GET.search }}">
+            </form>
+        </div>
+    </div>
     <!-- TABLA -->
     <div class="row">
         <div class="col">

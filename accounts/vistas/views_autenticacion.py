@@ -2,6 +2,10 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
+from django.views.generic import FormView
 
 from accounts.models import CustomUser
 
@@ -106,3 +110,20 @@ def mostrar_CustomUser(request):
         request, "accounts/usuarios/dashboard_admin.html", {"custom_Users": custom_Users}
     )
 
+# VISTA PARA CAMBIAR CONTRASEÑA
+def recuperacion_pssw(request):
+    return render(request, "accounts/autenticacion/recuperacion_pssw.html")
+
+#vista personalizada CustomPasswordResetView
+class CustomPasswordResetView(FormView):
+    template_name = 'accounts/autenticacion/password_reset.html'
+    form_class = PasswordResetForm
+    success_url = reverse_lazy('password_reset_done')
+
+    def form_valid(self, form):
+        form.save(
+            request=self.request,
+            use_https=self.request.is_secure(),
+            email_template_name='accounts/autenticacion/password_reset_email.html'
+        )
+        return super().form_valid(form)

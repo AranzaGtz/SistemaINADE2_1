@@ -124,6 +124,7 @@ class Persona(models.Model):
     titulo = models.ForeignKey(Titulo, on_delete=models.SET_NULL, null=True, blank=True)  # null=True
     informacion_contacto = models.ForeignKey(InformacionContacto, on_delete=models.SET_NULL, null=True, blank=True)  # null=True
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    activo = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.empresa.nombre_empresa} | {self.nombre} {self.apellidos}"
@@ -131,7 +132,7 @@ class Persona(models.Model):
 
 # MODELO PARA PROSPECTO
 class Prospecto(models.Model):
-    persona = models.OneToOneField(Persona, on_delete=models.CASCADE, related_name='prospecto')
+    persona = models.ForeignKey(Persona, on_delete=models.CASCADE, related_name='prospecto')
 
 # MODELO PARA CLIENTE
 class Cliente(models.Model):

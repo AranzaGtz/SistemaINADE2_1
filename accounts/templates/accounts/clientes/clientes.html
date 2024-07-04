@@ -1,0 +1,62 @@
+<!-- templates/accounts/clientes/clientes.html -->
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Clientes{% endblock %}
+{% block header %}Clientes{% endblock %}
+{% block content %}
+
+<div class="row">
+     <div class="col">
+          <h1 class="text-center">Clientes</h1>
+          <hr class="featurette-divider">
+     </div>
+</div>
+
+<div class="row mb-3 justify-content-end">
+     <div class="col-auto">
+         <form method="get" action="{% url 'lista_clientes' %}" class="form-inline">
+             <div class="input-group">
+                 <input type="text" name="search" class="form-control" placeholder="Buscar personas..." value="{{ request.GET.search }}">
+                 <div class="input-group-append">
+                     <button type="submit" class="btn btn-primary">Buscar</button>
+                 </div>
+             </div>
+         </form>
+     </div>
+ </div>
+
+<div class="row">
+     <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+          <table class="table table-hover">
+               <thead class="thead-light">
+                    <tr>
+                         <th>#</th>
+                         <th>Título</th>
+                         <th>Nombre</th>
+                         <th>Apellidos</th>
+                         <th>Empresa</th>
+                         <th>Correo</th>
+                         <th colspan="4">Opciones</th>
+                    </tr>
+               </thead>
+               <tbody>
+                    {% for persona in personas %}
+                    <tr>
+                         <td>{{ forloop.counter }}</td>
+                         <td>{{ persona.titulo }}</td>
+                         <td>{{ persona.nombre }}</td>
+                         <td>{{ persona.apellidos }}</td>
+                         <td>{{ persona.empresa.nombre_empresa }}</td>
+                         <td>{{ persona.informacion_contacto.correo_electronico }}</td>
+                         <td><a href="{% url 'cliente_edit' persona.id %}" class="btn btn-primary btn-sm">Editar</a></td>
+                         <td><a href="{% url 'cotizacion_form_con_cliente' persona.id persona.empresa.moneda %}" class="btn btn-success btn-sm">Cotizar</a></td>
+                         <td><a href="{% url 'cotizaciones_list' %}?prospecto_id={{ persona.id }}" class="btn btn-secondary btn-sm">Cotizaciones</a></td>
+                         <td><a href="{% url 'cliente_delete' persona.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    </tr>
+                    {% endfor %}
+               </tbody>
+          </table>
+     </div>
+</div>
+
+{% endblock %}

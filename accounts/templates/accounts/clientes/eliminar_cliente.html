@@ -1,0 +1,21 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Eliminar Cliente{% endblock %}
+{% block header %}Eliminar Cliente{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+     <h1 class="text-center">¿Estás seguro que deseas eliminar a {{ cliente.nombre }} {{ cliente.apellidos }}?</h1>
+     <hr />
+     <div class="alert alert-danger alert-dismissible fade show " role="alert">
+          <strong>¡Atención!</strong> Este es un mensaje de alerta importante.
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">&times;</button>
+     </div>
+     <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+          <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">Cancelar</a>
+     </form>
+</div>
+
+{% endblock %}
