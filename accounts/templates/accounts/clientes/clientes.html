@@ -14,20 +14,16 @@
 
 <div class="row mb-3 justify-content-end">
      <div class="col-auto">
-         <form method="get" action="{% url 'lista_clientes' %}" class="form-inline">
-             <div class="input-group">
-                 <input type="text" name="search" class="form-control" placeholder="Buscar personas..." value="{{ request.GET.search }}">
-                 <div class="input-group-append">
-                     <button type="submit" class="btn btn-primary">Buscar</button>
-                 </div>
-             </div>
-         </form>
+         <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'clientesTable')" placeholder="Buscar clientes...">
      </div>
- </div>
-
+     <div class="col-auto">
+          <a href="" class="btn btn-primary">Agregar Cliente</a>
+     </div>
+</div>
+ 
 <div class="row">
      <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-          <table class="table table-hover">
+          <table id="clientesTable" class="table table-hover">
                <thead class="thead-light">
                     <tr>
                          <th>#</th>

@@ -1,4 +1,3 @@
-import calendar
 from datetime import datetime
 from django.db import IntegrityError
 from django.forms import modelformset_factory
@@ -10,61 +9,13 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from weasyprint import HTML # type: ignore #AQUI SALE WARNING: No se ha podido resolver la importación "weasyprint".
 from django.template.loader import render_to_string  # Asegúrate de importar render_to_string
-import tempfile
-import uuid
 from django.db import IntegrityError, transaction
-from django.db.models import Q
 
 
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
-    search_query = request.GET.get('search', '')
-    prospecto_id = request.GET.get('prospecto_id')
-    date = request.GET.get('date')
-    month = request.GET.get('month')
-    year = request.GET.get('year')
-    
     # Inicializar la consulta de cotizaciones
     cotizaciones = Cotizacion.objects.all()
-    
-    # Filtrar por términos de búsqueda generales
-    if search_query:
-        cotizaciones = cotizaciones.filter(
-            Q(id_personalizado__icontains=search_query) |
-            Q(persona__empresa__nombre_empresa__icontains=search_query) |
-            Q(persona__nombre__icontains=search_query) |
-            Q(persona__apellidos__icontains=search_query) |
-            Q(metodo_pago__icontains=search_query)
-        )
-
-    # Filtrar por prospecto_id
-    if prospecto_id:
-        cotizaciones = cotizaciones.filter(persona_id=prospecto_id)
-
-    # Filtrar por fecha específica
-    if date:
-        try:
-            date_obj = datetime.strptime(date, '%d/%m/%Y')
-            cotizaciones = cotizaciones.filter(fecha_solicitud=date_obj)
-        except ValueError:
-            pass
-
-    # Filtrar por mes
-    if month:
-        try:
-            month_number = list(calendar.month_name).index(month.capitalize())
-            cotizaciones = cotizaciones.filter(fecha_solicitud__month=month_number)
-        except ValueError:
-            pass
-
-    # Filtrar por año
-    if year:
-        try:
-            year_number = int(year)
-            cotizaciones = cotizaciones.filter(fecha_solicitud__year=year_number)
-        except ValueError:
-            pass
-    
     return render(request, "accounts/cotizaciones/cotizaciones.html", {'cotizaciones': cotizaciones})
 
 # AGREGAR NUEVA COTIZACION

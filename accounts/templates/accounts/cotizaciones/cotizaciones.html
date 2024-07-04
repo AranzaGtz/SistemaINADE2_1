@@ -4,66 +4,62 @@
 {% block header %}Cotizaciones{% endblock %}
 {% block content %}
 
-<!-- CONTENEDOR COTIZACIONES -->
-    <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
-    <div class="row">
-        <div class="col">
-            <h1 class="text-center">Cotizaciones</h1>
-            <hr />
-        </div>
+<!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
+<div class="row">
+    <div class="col">
+        <h1 class="text-center">Cotizaciones</h1>
+        <hr />
     </div>
-    <!-- BOTONES DE ACCIÓN -->
-    <div class="text-center mb-4">
+</div>
+
+<div class="row mb-3 justify-content-end">
+    <div class="col-auto">
+        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'cotizacionesTable')" placeholder="Buscar clientes...">
+    </div>
+    <div class="col-auto">
         <a href="{% url 'prospecto_new' %}" class="btn btn-primary mx-1">Nuevo Prospecto</a>
         <a href="{% url 'cotizacion_form' %}" class="btn btn-primary mx-1">Nueva Cotización</a>
     </div>
-    <!-- CAMPO DE BÚSQUEDA -->
-    <div class="row mb-4">
-        <div class="col text-right">
-            <form method="get" action="{% url 'cotizaciones_list' %}">
-                <input type="text" name="search" class="form-control" placeholder="Buscar cotizaciones..." value="{{ request.GET.search }}">
-            </form>
+</div>
+<!-- TABLA -->
+<div class="row">
+    <div class="col">
+        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+            <table id="cotizacionesTable" class="table table-hover">
+                <!-- ENCABEZADO DE TABLA -->
+                <thead class="thead-light">
+                    <tr>
+                        <th>Cotizacion</th>
+                        <th>Empresa</th>
+                        <th colspan="2">Contacto</th>
+                        <th>Solicitud</th>
+                        <th>Expiración</th>
+                        <th>Moneda</th>
+                        <th>Estado</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+                <!-- CUERPO DE TABLA -->
+                <tbody>
+                    {% for c in cotizaciones %}
+                    <tr>
+                        <td>{{ c.id_personalizado }}</td>
+                        <td>{{ c.persona.empresa.nombre_empresa }}</td>
+                        <td>{{ c.persona.nombre }} </td>
+                        <td>{{ c.persona.apellidos }}</td>
+                        <td>{{ c.fecha_solicitud|date:"d/m/Y"  }}</td>
+                        <td>{{ c.fecha_caducidad|date:"d/m/Y"  }}</td>
+                        <td>{{ c.metodo_pago }}</td>
+                        <td> NA </td>
+                        <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a>
+                        </td>
+                        <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-    <!-- TABLA -->
-    <div class="row">
-        <div class="col">
-            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-                <table class="table table-hover">
-                    <!-- ENCABEZADO DE TABLA -->
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Cotizacion</th>
-                            <th>Empresa</th>
-                            <th colspan="2">Contacto</th>
-                            <th>Solicitud</th>
-                            <th>Expiración</th>
-                            <th>Moneda</th>
-                            <th>Estado</th>
-                            <th colspan="2">Opciones</th>
-                        </tr>
-                    </thead>
-                    <!-- CUERPO DE TABLA -->
-                    <tbody>
-                        {% for c in cotizaciones %}
-                        <tr>
-                            <td>{{ c.id_personalizado }}</td>
-                            <td>{{ c.persona.empresa.nombre_empresa }}</td>
-                            <td>{{ c.persona.nombre }} </td>
-                            <td>{{ c.persona.apellidos }}</td>
-                            <td>{{ c.fecha_solicitud|date:"d/m/Y"  }}</td>
-                            <td>{{ c.fecha_caducidad|date:"d/m/Y"  }}</td>
-                            <td>{{ c.metodo_pago }}</td>
-                            <td> NA </td>
-                            <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a>
-                            </td>
-                            <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+</div>
 {% endblock %}
