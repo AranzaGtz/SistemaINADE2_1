@@ -1,11 +1,19 @@
 from django.urls import path
-from accounts.vistas import views_usuarios, views_prospectos, views_empresas_contactos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos
+from accounts.vistas import views_clientes, views_usuarios, views_prospectos, views_empresas_contactos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos
+from django.contrib.auth import views as auth_views
+from accounts.vistas.views_autenticacion import CustomPasswordResetView
+
 
 urlpatterns = [
     path('', views_autenticacion.dashboard, name='dashboard'),
     path('login/', views_autenticacion.login_view, name='login'),
     path('logout/', views_autenticacion.logout_view, name='logout'),
     path('mostrar_CustomUser/', views_autenticacion.mostrar_CustomUser,name='mostrar_CustomUser'),
+    
+    path('password_reset/', CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/autenticacion/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/autenticacion/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/autenticacion/password_reset_complete.html'), name='password_reset_complete'),
     
     path('home/', views_home.home, name='home'),
     
@@ -21,6 +29,11 @@ urlpatterns = [
     path('prospecto/<int:pk>/edit/',views_prospectos.prospecto_edit,name='prospecto_edit'),
     path('prospecto/<int:pk>/update/',views_prospectos.prospecto_update,name='prospecto_update'),
     path('prospecto/<int:pk>/delete/',views_prospectos.prospecto_delete, name='prospecto_delete'),
+    path('prospectos/<persona_id>/<str:moneda>/new_cotizacion/',views_prospectos.cotizacion_form_con_cliente,name='cotizacion_form_con_cliente'),
+    
+    path('clientes/', views_clientes.lista_clientes, name='lista_clientes'),
+    path('clientes/eliminar/<int:pk>/', views_clientes.cliente_delete, name='cliente_delete'),
+     path('clientes/editar/<int:pk>/', views_clientes.cliente_edit, name='cliente_edit'),
     
     path('empresas-contactos/',views_empresas_contactos.empresa_cont_list, name='empresas_cont_list'),
     path('empresas/<int:pk>/edit/',views_empresas_contactos.empresa_edit, name='empresa_edit'),
@@ -54,6 +67,7 @@ urlpatterns = [
     path('cotizacion/<int:pk>/seleccionar_correos/', views_correos.seleccionar_correos, name='seleccionar_correos'),
     path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
+
     # Define otras rutas según las vistas que hayas definido
 ]
 

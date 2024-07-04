@@ -3,15 +3,30 @@
 from django.db import IntegrityError, transaction
 from django.forms import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
-from accounts.forms import DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm, PersonaForm
+from accounts.forms import ConceptoFormSet, CotizacionForm, DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm, PersonaForm
 from django.contrib import messages
 from accounts.models import Persona, Prospecto, Titulo
-
+from django.db.models import Q
 
 # VISTA PARA DIRIGIR A INTERFAZ DE PROSPECTOS
+
 def prospecto_list(request):
+    search_query = request.GET.get('search', '')
+    
+    # Inicializar la consulta de prospectos
     prospectos = Prospecto.objects.all()
-    return render(request, "accounts/prospectos/prospectos.html",{'prospectos': prospectos})
+    
+    # Filtrar por términos de búsqueda
+    if search_query:
+        prospectos = prospectos.filter(
+            Q(persona__titulo__icontains=search_query) |
+            Q(persona__nombre__icontains=search_query) |
+            Q(persona__apellidos__icontains=search_query) |
+            Q(persona__empresa__nombre_empresa__icontains=search_query) |
+            Q(persona__informacion_contacto__correo_electronico__icontains=search_query)
+        )
+    
+    return render(request, "accounts/prospectos/prospectos.html", {'prospectos': prospectos})
 
 # VISTA PARA REDIRIJIR A prospecto_create
 def prospecto_new(request):
@@ -114,7 +129,6 @@ def prospecto_update(request, pk):
         "prospecto_form": prospecto_form,
         "edit": True
     })
-
     
 # VISTA PARA ELIMINAR PROSPECTO
 def prospecto_delete(request,pk):
@@ -124,3 +138,14 @@ def prospecto_delete(request,pk):
     prospecto.delete()
     messages.success(request, '¡Usuario eliminado!.')
     return redirect('prospecto_list')
+
+# AGREGAR NUEVA COTIZACION DESDE PROSPECTOS
+def cotizacion_form_con_cliente(request,persona_id, moneda):
+    persona = get_object_or_404(Persona, id=persona_id)
+    cotizacion_form = CotizacionForm(initial={'persona': persona, 'metodo_pago': moneda})
+    concepto_formset = ConceptoFormSet()
+    
+    return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
+        'cotizacion_form': cotizacion_form,
+        'concepto_formset': concepto_formset,
+    })
