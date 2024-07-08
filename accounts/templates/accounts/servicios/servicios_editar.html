@@ -11,7 +11,7 @@
     <hr />
     <!-- FORMULARIO -->
     <div class="d-flex justify-content-center">
-        <form action="{% url 'servicio_update' servicio.id %}" method="post" class="col-md-7" id="servicioForm">
+        <form action="{% url 'servicio_edit' servicio.id %}" method="post" class="col-md-7" id="servicioForm">
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-12">

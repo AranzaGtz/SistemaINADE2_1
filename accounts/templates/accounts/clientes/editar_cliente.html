@@ -17,7 +17,8 @@
         <form method="post">
             {% csrf_token %}
             {{ persona_form.as_p }}
-            {{ contacto_form.as_p }}
+            
+            <!-- {{ contacto_form.as_p }} -->
             <button type="submit" class="btn btn-primary">Guardar cambios</button>
             <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">Cancelar</a>
         </form>

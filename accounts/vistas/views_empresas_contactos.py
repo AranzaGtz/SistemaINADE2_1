@@ -1,15 +1,53 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm
-from accounts.models import Empresa, Persona, Prospecto, Titulo
+from accounts.models import Direccion, Empresa, Persona, Prospecto, Titulo
 from django.contrib import messages
 
 # VISTA MOSTRAR EMPRESAS
 def empresa_cont_list(request):
     empresas = Empresa.objects.all()
     contactos = Persona.objects.all()
-    return render(request, "accounts/empresas/dashboard_admin_empresas_contactos.html",
-        {"empresas": empresas,
-        'contactos':contactos})
+    empresa_form = EmpresaForm()
+    context={
+        'empresas':empresas,
+        'contactos':contactos,
+        'empresa_form':empresa_form,
+    }
+    return render(request, "accounts/empresas/empresas.html",context)
+
+# VISTA CREAR EMPRESA
+def empresa_new(request):
+    empresa_form = EmpresaForm()
+    context = {
+        'empresa_form': empresa_form
+    }
+    return render(request, "accounts/empresas/empresa_crear.html", context)
+
+# VISTA CREAR EMPRESA EN MODAL
+def empresa_create(request):
+    if request.method == 'POST':
+        form = EmpresaForm(request.POST)
+        if form.is_valid():
+            # Crear o actualizar la dirección
+            direccion, created = Direccion.objects.update_or_create(
+                calle=form.cleaned_data['calle'],
+                numero=form.cleaned_data['numero'],
+                colonia=form.cleaned_data['colonia'],
+                ciudad=form.cleaned_data['ciudad'],
+                codigo=form.cleaned_data['codigo'],
+                estado=form.cleaned_data['estado'],
+            )
+            
+            # Crear o actualizar la empresa
+            empresa = form.save(commit=False)
+            empresa.direccion = direccion
+            empresa.save()
+
+            return redirect('empresas_cont_list')
+    else:
+        form = EmpresaForm()
+
+    return render(request, 'accounts/empresas/empresas.html', {'form': form})
 
 # VISTA EDITAR EMPRESAS
 def empresa_edit(request, pk):

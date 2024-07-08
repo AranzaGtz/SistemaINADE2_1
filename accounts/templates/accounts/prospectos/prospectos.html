@@ -13,20 +13,19 @@
     </div>
 </div>
 
-
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
         <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'prospectosTable')" placeholder="Buscar prospectos...">
     </div>
     <div class="col-auto">
-        <a href="{% url 'prospecto_new' %}" class="btn btn-primary">Agregar Prospecto</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProspectoModal"> Añadir Prospecto </button>
     </div>
 </div>
 
 <!-- TABLA -->
 <div class="row">
     <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-        <table  id="prospectosTable"  class="table table-hover" >
+        <table id="prospectosTable" class="table table-hover">
             <!-- ENCABEZADO DE TABLA -->
             <thead class="thead-light">
                 <tr>
@@ -48,15 +47,58 @@
                     <td>{{ p.persona.apellidos }}</td>
                     <td>{{ p.persona.empresa.nombre_empresa }}</td>
                     <td>{{ p.persona.informacion_contacto.correo_electronico }}</td>
-                    <td><a href="{% url 'prospecto_edit' p.id %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <td><a href="{% url 'cotizacion_form_con_cliente' p.persona.id p.persona.empresa.moneda %}" class="btn btn-success btn-sm">Cambiar estado</a></td>
+                    <td><a href="{% url 'cliente_edit' p.persona.id %}" class="btn btn-primary btn-sm">Editar</a></td>
+                    <!-- <td><a href="{% url 'cotizacion_form_con_cliente' p.persona.id p.persona.empresa.moneda %}" class="btn btn-success btn-sm">Cambiar estado</a></td> -->
                     <td><a href="{% url 'prospecto_delete' p.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <p>Numero de prospectos: {{prospectos.count}}</p>
+    </div>
+</div>
+
+<!-- Modal para crear un nuevo prospecto -->
+<div class="modal fade" id="createProspectoModal" tabindex="-1" aria-labelledby="createProspectoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createProspectoLabel">Crear Nuevo Prospecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'prospecto_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    
+                    {{ persona_form.as_p }}
+
+                    <p>
+                        Crear empresa:
+                        <input type="checkbox" id="crear_empresa_checkbox" name="crear_empresa_checkbox" placeholder="Crear empresa">
+                    </p>
+
+                    <div class="mb-3" id="select_empresa_div">
+                        <label for="empresaSelect" class="form-label">Empresa:</label>
+                        <select class="form-select" id="empresaSelect" name="empresa">
+                            <option value="">Selecciona una empresa o crea una nueva</option>
+                            {% for empresa in empresas %}
+                            <option value="{{ empresa.id }}">{{ empresa.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="form_empresa_div" style="display: none;">
+                        {{ empresa_form.as_p }}
+                        {{ direccion_form.as_p }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear Prospecto</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 {% endblock %}
-

@@ -1,10 +1,10 @@
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
-# Opcional: Agregar señales para manejar el cálculo del subtotal, IVA y total automáticamente cuando se guarden los objetos.
 
-
-# En accounts/models.py, define el modelo de usuario personalizado que tenga campos adicionales para los diferentes roles.
+#----------------------------------------------------
+# MODELO PARA CLIENTES
+#----------------------------------------------------
 
 # MODELO PARA USUARIOS ADMINISTRADORES
 class CustomUserManager(BaseUserManager):
@@ -44,7 +44,7 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-# MODELO PARA CLIENTES 
+# MODELO PARA USUARIOS NORMALES
 class CustomUser(AbstractUser):
     
     # username = models.CharField(max_length=150, unique=True)
@@ -69,6 +69,10 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+#----------------------------------------------------
+# MODELO PARA EMPRESAS
+#----------------------------------------------------
 
 # MODELO PARA DIRECCION
 class Direccion(models.Model):
@@ -95,6 +99,10 @@ class Empresa(models.Model):
     ]
     moneda = models.CharField(max_length=10, choices=tipo_moneda, blank=True, null=True)
     condiciones_pago = models.CharField(max_length=200, null=False, blank=True, default='15')
+
+#----------------------------------------------------
+# MODELO PARA CLIENTES
+#----------------------------------------------------
 
 # MODELO DE TITULOS
 class Titulo(models.Model):
@@ -129,14 +137,9 @@ class Persona(models.Model):
     def __str__(self):
         return f"{self.empresa.nombre_empresa} | {self.nombre} {self.apellidos}"
     
-
 # MODELO PARA PROSPECTO
 class Prospecto(models.Model):
     persona = models.ForeignKey(Persona, on_delete=models.CASCADE, related_name='prospecto')
-
-# MODELO PARA CLIENTE
-class Cliente(models.Model):
-    persona = models.OneToOneField(Persona, on_delete=models.CASCADE, related_name='cliente')
 
 #----------------------------------------------------
 # MODELO PARA COTIZACIONES

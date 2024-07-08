@@ -5,7 +5,13 @@
 {% block content %}
 
 <div class="container mt-4">
+     
+     {% if dp %}
+     <h1 class="text-center">¿Estás seguro que deseas eliminar a {{ prospecto.persona.nombre }} {{ prospecto.persona.apellidos }}?</h1>
+     {% else %}
      <h1 class="text-center">¿Estás seguro que deseas eliminar a {{ cliente.nombre }} {{ cliente.apellidos }}?</h1>
+     {% endif %}
+     
      <hr />
      <div class="alert alert-danger alert-dismissible fade show " role="alert">
           <strong>¡Atención!</strong> Este es un mensaje de alerta importante.
@@ -14,7 +20,11 @@
      <form method="post">
           {% csrf_token %}
           <button type="submit" class="btn btn-danger">Eliminar</button>
+          {% if dp %}
+          <a href="{% url 'prospecto_list' %}" class="btn btn-secondary">Cancelar</a>
+          {% else %}
           <a href="{% url 'lista_clientes' %}" class="btn btn-secondary">Cancelar</a>
+          {% endif %}
      </form>
 </div>
 
