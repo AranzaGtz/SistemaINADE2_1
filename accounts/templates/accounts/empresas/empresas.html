@@ -19,8 +19,9 @@
     <div class="col-auto">
         <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'empresasTable')" placeholder="Buscar empresas...">
     </div>
+    
     <div class="col-auto">
-        <a href="{% url 'servicio_new' %}" class="btn btn-primary">Agregar Empresa</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmpresaModal"> Añadir Empresa </button>
     </div>
 </div>
 
@@ -51,14 +52,37 @@
                     <td>{{ e.direccion }}</td>
                     <td>{{ e.moneda }}</td>
                     <td>{{ e.condiciones_pago }}</td>
-                    <td><a href="{% url 'empresa_edit' e.id %}" class="btn btn-info btn-sm">Editar</a></td>
+                    <td><a href="{% url 'empresa_edit' e.id %}" class="btn btn-primary btn-sm">Editar</a></td>
                     <td><a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <p>Número de empresas: {{empresas.count}}</p>
     <hr class="featurette-divider">
+</div>
+
+<!-- Modal para crear una nueva empresa -->
+<div class="modal fade" id="createEmpresaModal" tabindex="-1" aria-labelledby="createEmpresaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createEmpresaLabel">Crear Nueva Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'empresa_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ empresa_form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear Empresa</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

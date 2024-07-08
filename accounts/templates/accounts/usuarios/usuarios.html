@@ -1,17 +1,20 @@
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Usuarios del sistema{% endblock %}
-{% block header %}Usuarios del sistema{% endblock %}
+{% block title %}Usuarios{% endblock %}
+{% block header %}Usuarios{% endblock %}
 {% block content %}
-<h1 class="text-center">Usuarios del sistema</h1>
-
+<!-- TITULO -->
+<h1 class="text-center">Usuarios del Sistema</h1>
 <hr class="featurette-divider">
+
 <div class="row">
+    <!-- ENTRADA DE BUSQUEDA -->
     <div class="row mb-3 justify-content-end">
         <div class="col-auto">
             <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'usuariosTable')" placeholder="Buscar usuarios...">
         </div>
     </div>
+    
     <!-- FORMULARIO -->
     <div class="col-lg-3 col-md-5 mb-2">
         <div class="card shadow-sm">

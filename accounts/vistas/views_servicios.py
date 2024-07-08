@@ -8,21 +8,10 @@ def servicios_list(request):
     context = {
         'servicios' : Servicio.objects.all(),
         'metodos' : Metodo.objects.all(),
-        'metodos_form' : MetodoForm()
+        'metodo_form' : MetodoForm(),
+        'servicio_form': ServicioForm()
     }
     return render(request,'accounts/servicios/servicios.html',context)
-
-# VISTA PARA CREAR UN SERVICIO
-def servicio_new(request):
-    metodo_form = MetodoForm()
-    servicio_form = ServicioForm()
-    lista_metodos = Metodo.objects.all()
-    context = {
-        'metodo_form': metodo_form, 
-        'servicio_form': servicio_form, 
-        'metodos': lista_metodos
-        }
-    return render(request, "accounts/servicios/servicios_crear.html", context)
 
 # VISTA PARA CREAR UN SERVICIO
 def servicio_create(request):

@@ -156,8 +156,69 @@
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+      <!-- Bootstrap JS (incluye Popper) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <!--    Script para Model cliente registrar -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkbox = document.getElementById('crear_empresa_checkbox');
+            const selectEmpresaDiv = document.getElementById('select_empresa_div');
+            const formEmpresaDiv = document.getElementById('form_empresa_div');
+            const empresaFormFields = formEmpresaDiv.querySelectorAll('input, select, textarea');
+    
+            checkbox.addEventListener('change', function() {
+                if (checkbox.checked) {
+                    selectEmpresaDiv.style.display = 'none';
+                    formEmpresaDiv.style.display = 'block';
+                    empresaFormFields.forEach(field => {
+                        field.removeAttribute('disabled');
+                    });
+                } else {
+                    selectEmpresaDiv.style.display = 'block';
+                    formEmpresaDiv.style.display = 'none';
+                    empresaFormFields.forEach(field => {
+                        field.setAttribute('disabled', 'disabled');
+                    });
+                }
+            });
+    
+            // Inicialmente deshabilitar los campos del formulario de empresa
+            empresaFormFields.forEach(field => {
+                field.setAttribute('disabled', 'disabled');
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const crearMetodoCheckbox = document.getElementById('crear_metodo_checkbox');
+            const selectMetodoDiv = document.getElementById('select_metodo_div');
+            const formMetodoDiv = document.getElementById('form_metodo_div');
+            const metodoFormFields = formMetodoDiv.querySelectorAll('input, select, textarea');
+            const selectMetodoFields = selectMetodoDiv.querySelectorAll('select');
+    
+            crearMetodoCheckbox.addEventListener('change', function() {
+                if (crearMetodoCheckbox.checked) {
+                    selectMetodoDiv.style.display = 'none';
+                    formMetodoDiv.style.display = 'block';
+                    metodoFormFields.forEach(field => {
+                        field.removeAttribute('disabled');
+                    });
+                } else {
+                    selectMetodoDiv.style.display = 'block';
+                    formMetodoDiv.style.display = 'none';
+                    metodoFormFields.forEach(field => {
+                        field.setAttribute('disabled', 'disabled');
+                    });
+                }
+            });
+    
+            // Inicialmente deshabilitar los campos del formulario de metodo
+            metodoFormFields.forEach(field => {
+                field.setAttribute('disabled', 'disabled');
+            });
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 

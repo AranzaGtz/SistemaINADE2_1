@@ -15,19 +15,20 @@
 <!-- BOTÓN NUEVO -->
 <div class="row mb-3">
     <div class="col text-right">
-        
+
     </div>
 </div>
 
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'serviciosTable')" placeholder="Buscar servicios...">
+        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'serviciosTable')"
+            placeholder="Buscar servicios...">
     </div>
     <div class="col-auto">
-        <a href="{% url 'servicio_new' %}" class="btn btn-primary">Agregar Servicio</a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#createServicioModal">Añadir Servicio</button>
     </div>
 </div>
-
 
 <!-- TABLA DE SERVICIOS -->
 <div class="row">
@@ -58,7 +59,7 @@
                             <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
                         </td>
                         <td>
-                            <a href="{% url 'servicio_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            <a href="{% url 'cliente_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -78,22 +79,14 @@
     </div>
 </div>
 
-<!-- FORMULARIO PARA CREAR NUEVO MÉTODO -->
-<div class="row mb-3">
-    <div class="col-md-6 offset-md-3">
-        <h3>Crear nuevo método</h3>
-        <form action="{% url 'metodo_create' %}" method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ metodos_form.as_p }}
-            </div>
-            <div class="text-right">
-                <input type="submit" class="btn btn-success" value="Registrar método" />
-            </div>
-        </form>
+<div class="row mb-3 justify-content-end">
+    <div class="col-auto">
+        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'metodosTable')"
+            placeholder="Buscar metodos...">
     </div>
-    <div class="col-md-6 offset-md-3 mt-3">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'metodoTable')" placeholder="Buscar método...">
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMetodoModal">Añadir
+            Metodo</button>
     </div>
 </div>
 
@@ -128,6 +121,79 @@
     </div>
 </div>
 
+<!-- Modal para crear un nuevo servicio -->
+<div class="modal fade" id="createServicioModal" tabindex="-1" aria-labelledby="createServicioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createServicioLabel">Crear Nuevo Metodo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'servicio_create' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>
+                        Crear empresa:
+                        <input type="checkbox" id="crear_metodo_checkbox" name="crear_metodo_checkbox" placeholder="Crear metodo">
+                    </p>
+
+                    <div class="mb-3" id="select_metodo_div">
+                        <label for="metodoSelect" class="form-label">Metodo:</label>
+                        <select class="form-select" id="metodoSelect" name="metodo">
+                            <option value="">Selecciona un metodo</option>
+                            {% for metodo in metodos %}
+                            <option value="{{ metodo.id }}">{{ metodo.metodo }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="mt-2 text-end" style="text-align: right;">
+                            <span class="text-info">Por favor, selecciona una norma o segu¡miento de calidad.</span>
+                        </div>
+                    </div>
+                    <div id="form_metodo_div" style="display: none;">
+                        {{ metodo_form.as_p }}
+                        <div class="mt-2 text-end" style="text-align: right;">
+                            <span class="text-info">Por favor, ingresa la norma o segu¡miento de calidad.</span>
+                        </div>
+                    </div>
+                    <h2>Servicio</h2>
+                    {{ servicio_form.as_p }}
+                </div>
+                <!-- BOTONES ACEPTAR CANDELAR-->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Añadir Servicio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear un nuevo metodo -->
+<div class="modal fade" id="createMetodoModal" tabindex="-1" aria-labelledby="createMetodoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createMetodoLabel">Crear Nuevo Metodo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'metodo_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ metodos_form.as_p }}
+                        <div class="mt-2 text-end" style="text-align: right;">
+                            <span class="text-info">Por favor, ingresa la norma o segu¡miento de calidad.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Añadir Metodo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
-
-
