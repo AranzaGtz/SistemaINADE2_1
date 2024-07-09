@@ -15,13 +15,6 @@ def empresa_cont_list(request):
     }
     return render(request, "accounts/empresas/empresas.html",context)
 
-# VISTA CREAR EMPRESA
-def empresa_new(request):
-    empresa_form = EmpresaForm()
-    context = {
-        'empresa_form': empresa_form
-    }
-    return render(request, "accounts/empresas/empresa_crear.html", context)
 
 # VISTA CREAR EMPRESA EN MODAL
 def empresa_create(request):

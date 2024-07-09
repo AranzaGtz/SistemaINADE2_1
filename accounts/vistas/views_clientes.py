@@ -92,7 +92,7 @@ def cliente_create(request):
 
 # VISTA PARA EDITAR CLIENTE
 def cliente_edit(request, pk):
-    persona = get_object_or_404(Persona, pk=pk)
+    persona = get_object_or_404(Persona, id=pk)
     informacion_contacto = persona.informacion_contacto
 
     if request.method == 'POST':

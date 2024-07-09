@@ -14,11 +14,15 @@
 
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'cotizacionesTable')" placeholder="Buscar clientes...">
+        <input type="text" id="searchInput" class="form-control"
+            onkeyup="filterTable('searchInput', 'cotizacionesTable')" placeholder="Buscar cotizaciones...">
     </div>
+
     <div class="col-auto">
-        <a href="{% url 'prospecto_new' %}" class="btn btn-primary mx-1">Nuevo Prospecto</a>
-        <a href="{% url 'cotizacion_form' %}" class="btn btn-primary mx-1">Nueva Cotización</a>
+        <!-- <a href="{% url 'cotizacion_form' %}" class="btn btn-primary mx-1">Nueva Cotización</a> -->
+        <!-- Botón para abrir el modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            data-bs-target="#createCotizacionModal">Añadir Cotización</button>
     </div>
 </div>
 <!-- TABLA -->
@@ -47,8 +51,8 @@
                         <td>{{ c.persona.empresa.nombre_empresa }}</td>
                         <td>{{ c.persona.nombre }} </td>
                         <td>{{ c.persona.apellidos }}</td>
-                        <td>{{ c.fecha_solicitud|date:"d/m/Y"  }}</td>
-                        <td>{{ c.fecha_caducidad|date:"d/m/Y"  }}</td>
+                        <td>{{ c.fecha_solicitud|date:"d/m/Y" }}</td>
+                        <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
                         <td>{{ c.metodo_pago }}</td>
                         <td> NA </td>
                         <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a>
@@ -59,7 +63,337 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <p>Numero de prospectos: {{cotizaciones.count}}</p>
         </div>
     </div>
 </div>
+
+<!-- Modal para crear una nueva cotización -->
+<div class="modal fade" id="createCotizacionModal" tabindex="-1" aria-labelledby="createCotizacionLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCotizacionLabel">Registro de cotización</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'cotizacion_form' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group mt-4">
+                        <div class="alert alert-info mb-4">
+                            <strong>Por favor, complete todos los campos requeridos con la información
+                                correcta.</strong><br>
+                            Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar
+                            una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en
+                            contactarnos.
+                        </div>
+
+                        <h4>Clientes prospecto</h4>
+                        <div class="row mt-2 center text-center  mt-2">
+                            <div class="col-md-12 ">
+                                <p id="cliente-datos" class="alert-primary mt-2"></p>
+                            </div>
+                        </div>
+                        <div class="col-auto text-end mt-2" style="text-align: right;">
+                            <span class="text-info mr-2">Si no existe el cliente prospecto, puede crearlo desde el
+                                boton.</span>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#createProspectoModal"> Añadir Prospecto </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mt-2">
+                                <label for="{{ cotizacion_form.persona.id_for_label }}">Cliente</label>
+                                {{ cotizacion_form.persona }}
+                            </div>
+                        </div>
+
+                        <!-- fechas -->
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
+                                {{ cotizacion_form.fecha_solicitud }}
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
+                                {{ cotizacion_form.fecha_caducidad }}
+                            </div>
+                        </div>
+                        <div class="mt-2 text-end" style="text-align: right;">
+                            <span class="text-info">Por favor, ingresa las fechas en el formato correcto (por ejemplo:
+                                28-07-2024).</span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mt-2">
+                                <label for="{{ cotizacion_form.metodo_pago.id_for_label }}">Denominación</label>
+                                {{ cotizacion_form.metodo_pago }}
+                            </div>
+                            <div class="col-md-6 mt-2">
+                                <label for="{{ cotizacion_form.tasa_iva.id_for_label }}">Tasa del IVA actual</label>
+                                {{ cotizacion_form.tasa_iva }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <label for="{{ cotizacion_form.notas.id_for_label }}">Notas</label>
+                                {{ cotizacion_form.notas }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <label for="{{ cotizacion_form.correos_adicionales.id_for_label }}">Correos
+                                    Adicionales</label>
+                                {{ cotizacion_form.correos_adicionales }}
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <h4>Agregar Conceptos</h4>
+                        <div class="mt-2 text-end" style="text-align: right;">
+                            <span class="text-info">Por favor, ingresa los conceptos necesarios ingresando la
+                                información solicitada. <br> Si has creado un concepto que no deceas, marca la casilla
+                                de eliminar para no tomar en cuenta ese concepto.</span>
+                        </div>
+                        {{ concepto_formset.management_form }}
+                        <div id="concepto_formset">
+                            {% for form in concepto_formset %}
+
+                            <div class="col concepto-form">
+                                <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
+                                <div class="col-md-12 mt-2">
+                                    <label for="{{ form.servicio.id_for_label }}">Servicio:</label>
+                                    {{form.servicio}}
+                                </div>
+                                <div class="col-md-12 center text-center">
+                                    <p id="servicio-datos-0" class="alert-primary mt-2"></p>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="{{ form.cantidad.id_for_label }}">Cantidad de servicios:</label>
+                                    {{form.cantidad_servicios}}
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="{{ form.servicio.id_for_label }}">Precio de servicio:</label>
+                                    {{form.precio}}
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label for="{{ form.servicio.id_for_label }}">Notas del servicio:</label>
+                                    {{form.notas}}
+                                </div>
+                            </div>
+
+                            {% endfor %}
+                        </div>
+                        <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir
+                            Concepto</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar Cotización</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Perdazo para modal de cotizacion -->
+<div id="empty_form" style="display: none;">
+    <div class="concepto-form">
+        <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
+        <div class="col-md-12 mt-2">
+            <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Servicio:</label>
+            {{concepto_formset.empty_form.servicio}}
+        </div>
+        <div class="col-md-12 center text-center">
+            <p id="servicio-datos-__prefix__" class="alert-primary mt-2"></p>
+        </div>
+        <div class="col-md-12 mt-2">
+            <label for="{{ concepto_formset.empty_form.cantidad.id_for_label }}">Cantidad de servicios:</label>
+            {{concepto_formset.empty_form.cantidad_servicios}}
+        </div>
+        <div class="col-md-12 mt-2">
+            <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Precio de servicio:</label>
+            {{concepto_formset.empty_form.precio}}
+        </div>
+        <div class="col-md-12 mt-2">
+            <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Notas del servicio:</label>
+            {{concepto_formset.empty_form.notas}}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear un nuevo prospecto -->
+<div class="modal fade" id="createProspectoModal" tabindex="-1" aria-labelledby="createProspectoLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createProspectoLabel">Crear Nuevo Prospecto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'cotizaciones_prospecto_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+
+                    {{ persona_form.as_p }}
+
+                    <p>
+                        Crear empresa:
+                        <input type="checkbox" id="crear_empresa_checkbox" name="crear_empresa_checkbox"
+                            placeholder="Crear empresa">
+                    </p>
+
+                    <div class="mb-3" id="select_empresa_div">
+                        <label for="empresaSelect" class="form-label">Empresa:</label>
+                        <select class="form-select" id="empresaSelect" name="empresa">
+                            <option value="">Selecciona una empresa o crea una nueva</option>
+                            {% for empresa in empresas %}
+                            <option value="{{ empresa.id }}">{{ empresa.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="form_empresa_div" style="display: none;">
+                        {{ empresa_form.as_p }}
+                        {{ direccion_form.as_p }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear Prospecto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    document.getElementById('add-concepto-form').onclick = function () {
+        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+        var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
+        formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);  // Reemplaza el marcador de posición con el contador
+
+        $('#concepto_formset').append(formTemplate);
+
+        // Actualizar IDs y nombres de los campos en el nuevo formulario
+        $('#concepto_formset .concepto-form:last-child').find(':input').each(function () {
+            var name = $(this).attr('name').replace('__prefix__', formIdx);
+            var id = 'id_' + name;
+            $(this).attr({ 'name': name, 'id': id });
+        });
+
+        $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const clienteSelect = document.querySelector('#id_persona');
+        const clienteDatos = document.getElementById('cliente-datos');
+
+        clienteSelect.addEventListener('change', function () {
+            const clienteId = this.value;
+            if (clienteId) {
+                fetch(`/obtener_datos_cliente/${clienteId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.error) {
+                            clienteDatos.innerHTML = `<h5>Cliente <strong> ${data.empresa}</strong></h5>
+                                                    RFC:<code> ${data.rfc}</code><br> 
+                                                    <strong>Representante: </strong>${data.nombre}<br>  
+                                                    <strong>Informacion de contacto: </strong> ${data.correo} / ${data.moneda}`;
+                        } else {
+                            clienteDatos.textContent = 'Datos del cliente no disponibles.';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        clienteDatos.textContent = 'Error al obtener los datos del cliente.';
+                    });
+            } else {
+                clienteDatos.textContent = '';
+            }
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('add-concepto-form').onclick = function () {
+        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+        var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
+        formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
+    
+        $('#concepto_formset').append(formTemplate);
+    
+        $('#concepto_formset .concepto-form:last-child').find(':input').each(function () {
+            var name = $(this).attr('name').replace('__prefix__', formIdx);
+            var id = 'id_' + name;
+            $(this).attr({ 'name': name, 'id': id });
+        });
+    
+        $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+    
+        // Añadir evento de cambio al nuevo selector de servicio
+        var newServiceSelect = document.querySelector(`#id_conceptos-${formIdx}-servicio`);
+        var newServiceData = document.getElementById(`servicio-datos-${formIdx}`);
+    
+        newServiceSelect.addEventListener('change', function () {
+            obtenerDatosServicio(this.value, newServiceData);
+        });
+    
+        // Inicializar con el valor seleccionado si ya tiene un valor
+        if (newServiceSelect.value) {
+            obtenerDatosServicio(newServiceSelect.value, newServiceData);
+        }
+    }
+    
+    function obtenerDatosServicio(servicioId, outputElement) {
+        if (servicioId) {
+            fetch(`/obtener_datos_servicio/${servicioId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        outputElement.innerHTML = `
+                            <strong>Servicio:</strong> ${data.nombre}<br>
+                            <strong>Método: </strong><code>${data.metodo}</code><br>
+                            <strong>Descripción:</strong> ${data.descripcion}<br>
+                            <strong>Precio sugerido:</strong> ${data.precio}<br>
+                        `;
+                    } else {
+                        outputElement.innerHTML = 'Datos del servicio no disponibles.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    outputElement.innerHTML = 'Error al obtener los datos del servicio.';
+                });
+        } else {
+            outputElement.innerHTML = '';
+        }
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        // Inicializar los selects existentes en el formset
+        document.querySelectorAll('.concepto-form').forEach((formDiv, index) => {
+            const servicioSelect = formDiv.querySelector('select[name$="servicio"]');
+            const servicioDatos = document.getElementById(`servicio-datos-${index}`);
+    
+            if (servicioSelect) {
+                servicioSelect.addEventListener('change', function () {
+                    obtenerDatosServicio(this.value, servicioDatos);
+                });
+    
+                if (servicioSelect.value) {
+                    obtenerDatosServicio(servicioSelect.value, servicioDatos);
+                }
+            }
+        });
+    });
+    
+</script>
+
+
 {% endblock %}

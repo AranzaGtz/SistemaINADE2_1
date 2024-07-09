@@ -6,39 +6,36 @@
 {% block header %}Editar Servicio{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="text-center">Editar servicio</h1>
-    <hr />
-    <!-- FORMULARIO -->
-    <div class="d-flex justify-content-center">
-        <form action="{% url 'servicio_edit' servicio.id %}" method="post" class="col-md-7" id="servicioForm">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Método</h2>
-                    <div class="form-group">
-                        <label for="metodo_select">Método:</label>
-                        <select id="metodo_select" class="form-control" name="metodo">
-                            <option value="" selected>Seleccione un método</option>
-                            {% for metodo in metodos %}
-                            <option value="{{ metodo.id }}" {% if servicio.metodo.id == metodo.id %}selected{% endif %}>{{ metodo.metodo }}</option>
-                            {% endfor %}
-                            <option value="nuevo">Crear nuevo método</option>
-                        </select>
-                    </div>
-                    <div id="nuevo_metodo_form" style="display: none;">
-                        {{ metodo_form.as_p }}
-                    </div>
-                    <h2>Servicio</h2>
-                    {{ servicio_form.as_p }}
+<h1 class="text-center">Editar Servicio</h1>
+<hr />
+<!-- FORMULARIO -->
+<div class="d-flex justify-content-center">
+    <form action="" method="post" class="col-md-7" id="servicioForm">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Método</h2>
+                <div class="form-group">
+                    <label for="metodo_select">Método:</label>
+                    <select id="metodo_select" class="form-control" name="metodo">
+                        <option value="">Seleccione un método</option>
+                        {% for metodo in metodos %}
+                        <option value="{{ metodo.id }}" {% if metodo.id == servicio.metodo.id %}selected{% endif %}>
+                            {{ metodo.metodo }}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
-            </div>
 
-            <div class="form-group text-right">
-                <input type="submit" class="btn btn-success" value="Registrar">
-                <input type="button" class="btn btn-danger" value="Cancelar" onclick="location.href='{% url 'servicios_list' %}'">
+                <h2>Servicio</h2>
+                {{ servicio_form.as_p }}
             </div>
-        </form>
-    </div>
+        </div>
+
+        <div class="form-group text-right">
+            <input type="submit" class="btn btn-success" value="Registrar">
+            <a href="{% url 'servicios_list' %}" class="btn btn-danger">Cancelar</a>
+        </div>
+    </form>
 </div>
 {% endblock %}
