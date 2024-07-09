@@ -27,10 +27,10 @@ urlpatterns = [
     #   ---     INTERFAZ USUARIOS       ---
     
     path('usuarios/',views_usuarios.usuario_list,name='usuario_list'),
-    path('usuarios/new/',views_usuarios.usuario_create,name='usuario_create'),
-    path('usuario/<username>/delete/',views_usuarios.usuario_delete,name='usuario_delete'),
-    path('usuario/<username>/edit/', views_usuarios.usuario_update, name='usuario_edit'),
-    path('usuario/<username>/edit2/',views_usuarios.usuario_update2, name='usuario_edit2'),
+    path('usuarios/nuevo/',views_usuarios.usuario_create,name='usuario_create'),
+    path('usuarios/eliminar/<username>/',views_usuarios.usuario_delete,name='usuario_delete'),
+    path('usuarios/editar/<username>/', views_usuarios.usuario_update, name='usuario_edit'),
+    path('usuarios/editar/<username>/',views_usuarios.usuario_update2, name='usuario_edit2'),
     
     #   ---     INTERFAZ CLIENTES       ---
 
@@ -43,22 +43,21 @@ urlpatterns = [
     #   ---     INTERFAZ PROSPECTOS       ---
     
     path('prospectos/',views_prospectos.prospecto_list, name='prospecto_list'),
-    path('prospecto/nuevo/',views_prospectos.prospecto_create, name='prospecto_create'),
-    path('prospecto/<int:pk>/delete/',views_prospectos.prospecto_delete, name='prospecto_delete'),
-    path('prospectos/<persona_id>/<str:moneda>/new_cotizacion/',views_prospectos.cotizacion_form_con_cliente,name='cotizacion_form_con_cliente'),
+    path('prospectos/nuevo/',views_prospectos.prospecto_create, name='prospecto_create'),
+    path('prospectos/eliminar/<int:pk>/',views_prospectos.prospecto_delete, name='prospecto_delete'),
+    path('prospectos/cotizacion/nueva/<persona_id>/<str:moneda>/',views_prospectos.cotizacion_form_con_cliente,name='cotizacion_form_con_cliente'),
     
     #   ---     INTERFAZ EMPRESAS       ---
     
     path('empresas-contactos/',views_empresas_contactos.empresa_cont_list, name='empresas_cont_list'),
     path('empresa/nueva/', views_empresas_contactos.empresa_create, name='empresa_create'),
-    path('empresas/<int:pk>/edit/',views_empresas_contactos.empresa_edit, name='empresa_edit'),
-    path('empresas/<int:pk>/update',views_empresas_contactos.empresa_update,name='empresa_update'),
-    path('empresas/<int:pk>/delete/',views_empresas_contactos.empresa_delete, name='empresa_delete'),
-    path('empresa/new/', views_empresas_contactos.empresa_new, name = 'empresa_new'),
+    path('empresas/editar/<int:pk>/',views_empresas_contactos.empresa_edit, name='empresa_edit'),
+    path('empresas/actualizar<int:pk>/',views_empresas_contactos.empresa_update,name='empresa_update'),
+    path('empresas/eliminar/<int:pk>/',views_empresas_contactos.empresa_delete, name='empresa_delete'),
     
-    path('contacto/<int:pk>/edit/',views_empresas_contactos.contacto_edit,name='contacto_edit'),
-    path('contacto/<int:pk>/update/',views_empresas_contactos.contacto_update,name='contacto_update'),
-    path('contacto/<int:pk>/delete/',views_empresas_contactos.contacto_delete, name='contacto_delete'),
+    path('contacto/editar/<int:pk>/',views_empresas_contactos.contacto_edit,name='contacto_edit'),
+    path('contacto/actualizar/<int:pk>/',views_empresas_contactos.contacto_update,name='contacto_update'),
+    path('contacto/eliminar/<int:pk>/',views_empresas_contactos.contacto_delete, name='contacto_delete'),
     
     #   ---     INTERFAZ METODOS       ---
     
@@ -69,17 +68,20 @@ urlpatterns = [
     
     path('servicios/',views_servicios.servicios_list,name='servicios_list'),
     path('servicios/nuevo/', views_servicios.servicio_create, name='servicio_create'),
-    path('servicios/<int:pk>/edit/',views_servicios.servicio_edit,name='servicio_edit'),
-    path('servicios/<int:pk>/update/', views_servicios.servicio_update, name='servicio_update'),
-    path('servicios/<int:pk>/delete/',views_servicios.servicio_delete,name='servicio_delete'),
+    path('servicios/edit/<int:pk>/',views_servicios.servicio_edit,name='servicio_edit'),
+    path('servicios/delete/<int:pk>/',views_servicios.servicio_delete,name='servicio_delete'),
     
     #   ---     INTERFAZ COTIZACIONES       ---
     
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
+    path('obtener_datos_cliente/<int:cliente_id>/', views_cotizaciones.obtener_datos_cliente, name='obtener_datos_cliente'),
+     path('obtener_datos_servicio/<int:servicio_id>/', views_cotizaciones.obtener_datos_servicio, name='obtener_datos_servicio'),
     path('cotizaciones/nueva/', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
+    path('cotizaciones/cliente/nueva', views_cotizaciones.cotizaciones_prospecto_create, name='cotizaciones_prospecto_create'),
+    path('cotizaciones/editar/<int:pk>/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit'),
     path('cotizaciones/<int:pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
     path('cotizaciones/<int:pk>/delete/', views_cotizaciones.cotizacion_delete,name='cotizacion_delete'),
-    path('cotizaciones/<int:pk>/edit/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit'),
+
     path('cotizacion/<int:pk>/pdf/',views_cotizaciones.cotizacion_pdf,name='cotizacion_pdf'),
     path('cotizaciones/<int:pk>/duplicar/',views_cotizaciones.cotizacion_duplicar,name='cotizacion_duplicar'),
     

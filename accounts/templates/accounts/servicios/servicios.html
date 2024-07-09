@@ -59,7 +59,7 @@
                             <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
                         </td>
                         <td>
-                            <a href="{% url 'cliente_delete' s.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">Eliminar</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -181,7 +181,7 @@
                 <div class="modal-body">
                     {% csrf_token %}
                     <div class="form-group">
-                        {{ metodos_form.as_p }}
+                        {{ metodo_form.as_p }}
                         <div class="mt-2 text-end" style="text-align: right;">
                             <span class="text-info">Por favor, ingresa la norma o segu¡miento de calidad.</span>
                         </div>
@@ -195,5 +195,40 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para confirmar eliminación de servicio -->
+<!-- Modal para confirmar eliminación de servicio -->
+<div class="modal fade" id="deleteServicioModal" tabindex="-1" aria-labelledby="deleteServicioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteServicioLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar este servicio?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteServicioForm" method="post" action="{% url 'servicio_delete' 0 %}">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var deleteServicioModal = document.getElementById('deleteServicioModal');
+        deleteServicioModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var servicioId = button.getAttribute('data-servicio-id');
+            var form = document.getElementById('deleteServicioForm');
+            var action = form.getAttribute('action').replace('0', servicioId);
+            form.setAttribute('action', action);
+        });
+    });
+</script>
 
 {% endblock %}

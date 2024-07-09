@@ -2,10 +2,10 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
-from accounts.models import Cotizacion, Concepto, Organizacion, Formato, CustomUser
-from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, ConceptoChangeFormSet, TerminosForm
+from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Organizacion, Formato, CustomUser, Persona, Prospecto, Servicio, Titulo
+from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, ConceptoChangeFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm, TerminosForm
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from weasyprint import HTML # type: ignore #AQUI SALE WARNING: No se ha podido resolver la importación "weasyprint".
 from django.template.loader import render_to_string  # Asegúrate de importar render_to_string
@@ -16,7 +16,43 @@ from django.db import IntegrityError, transaction
 def cotizaciones_list(request):
     # Inicializar la consulta de cotizaciones
     cotizaciones = Cotizacion.objects.all()
-    return render(request, "accounts/cotizaciones/cotizaciones.html", {'cotizaciones': cotizaciones})
+    cotizacion_form = CotizacionForm()
+    concepto_formset = ConceptoFormSet()
+    
+    # Inicializar formularios para crear prospectos
+    titulos = Titulo.objects.all()
+    empresas = Empresa.objects.all()
+    persona_form = PersonaForm()
+    empresa_form = EmpresaForm()
+    prospecto_from = ProspectoForm()
+    
+    context = {
+        'cotizaciones': cotizaciones,
+        'cotizacion_form': cotizacion_form,
+        'concepto_formset': concepto_formset,
+        'titulos': titulos,
+        'empresas':empresas,
+        'persona_form': persona_form,
+        'empresa_form': empresa_form,
+        'prospecto_form': prospecto_from
+    }
+    return render(request, "accounts/cotizaciones/cotizaciones.html", context)
+
+def obtener_datos_cliente(request, cliente_id):
+    persona = Persona.objects.filter(id=cliente_id).select_related('informacion_contacto', 'empresa').first()
+    if persona:
+        data = {
+            'nombre': persona.nombre,
+            'correo': persona.informacion_contacto.correo_electronico if persona.informacion_contacto else 'No disponible',
+            'telefono': persona.informacion_contacto.celular,
+            'rfc': persona.empresa.rfc,
+            'empresa': persona.empresa.nombre_empresa if persona.empresa else 'No disponible',
+            
+            # Agrega otros campos que necesites
+        }
+        return JsonResponse(data)
+    else:
+        return JsonResponse({'error': 'Cliente no encontrado'}, status=404)
 
 # AGREGAR NUEVA COTIZACION
 def cotizacion_form(request):
@@ -57,6 +93,85 @@ def cotizacion_form(request):
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
     })
+
+# VISTA PARA CREAR CLIENTES DESDE MODAL
+def cotizaciones_prospecto_create(request):
+    if request.method == 'POST':
+        persona_form = PersonaForm(request.POST)
+        empresa_form = EmpresaForm(request.POST) if 'crear_empresa_checkbox' in request.POST else None
+        direccion_form = DireccionForm(request.POST) if 'crear_empresa_checkbox' in request.POST else None
+
+        if persona_form.is_valid():
+            # Guardar la información de contacto primero
+            informacion_contacto = InformacionContacto(
+                correo_electronico=persona_form.cleaned_data['correo_electronico'],
+                telefono=persona_form.cleaned_data['telefono'],
+                celular=persona_form.cleaned_data['celular'],
+                fax=persona_form.cleaned_data['fax']
+            )
+            informacion_contacto.save()
+
+            # Comprobar si se seleccionó una empresa existente o se necesita crear una nueva
+            if 'crear_empresa_checkbox' in request.POST:
+                if empresa_form and empresa_form.is_valid() and direccion_form and direccion_form.is_valid():
+                    direccion = direccion_form.save()
+                    empresa = empresa_form.save(commit=False)
+                    empresa.direccion = direccion
+                    empresa.save()
+                else:
+                    messages.error(request, 'Por favor, corrige los errores en el formulario de empresa.')
+                    return render(request, 'accounts/prospectos/prospectos.html', {
+                        'persona_form': persona_form,
+                        'empresa_form': empresa_form,
+                        'direccion_form': direccion_form,
+                        'empresas': Empresa.objects.all(),
+                        'titulos': Titulo.objects.all()
+                    })
+            elif 'empresa' in request.POST and request.POST['empresa']:
+                empresa = Empresa.objects.get(id=request.POST['empresa'])
+            else:
+                messages.error(request, 'Por favor, selecciona o crea una empresa.')
+                return render(request, 'accounts/prospectos/prospectos.html', {
+                    'persona_form': persona_form,
+                    'empresa_form': empresa_form,
+                    'empresas': Empresa.objects.all(),
+                    'titulos': Titulo.objects.all()
+                })
+
+            # Crear el cliente
+            persona = persona_form.save(commit=False)
+            persona.empresa = empresa
+            persona.informacion_contacto = informacion_contacto
+            persona.save()
+            
+            # Crear el prospecto
+            prospecto = Prospecto(persona=persona)
+            prospecto.save()
+
+            messages.success(request, 'Prospecto creado.')
+            cotizacion_form = CotizacionForm(initial={'persona': persona, 'metodo_pago': prospecto.persona.empresa.moneda})
+            concepto_formset = ConceptoFormSet()
+            return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
+                'cotizacion_form': cotizacion_form,
+                'concepto_formset': concepto_formset,
+            })
+            
+        else:
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+    else:
+        persona_form = PersonaForm()
+        empresa_form = EmpresaForm()
+        direccion_form = DireccionForm()
+
+    titulos = Titulo.objects.all()
+    context = {
+        'persona_form': persona_form,
+        'empresa_form': empresa_form,
+        'direccion_form': direccion_form,
+        'empresas': Empresa.objects.all(),
+        'titulos': titulos,
+    }
+    return render(request, 'accounts/prospectos/prospectos.html', context)
 
 # INTERFAZ DE DETALLES DE CADA COTIZACION
 def cotizacion_detalle(request, pk):
@@ -215,3 +330,17 @@ def terminos_avisos(request):
     else:
         form = TerminosForm(instance=formato)
     return render(request, 'accounts/cotizaciones/terminos.html', {'form': form})
+
+def obtener_datos_servicio(request, servicio_id):
+    servicio = Servicio.objects.filter(id=servicio_id).first()
+    if servicio:
+        data = {
+            'nombre': servicio.nombre_servicio,
+            'descripcion': servicio.descripcion,
+            'precio': servicio.precio_sugerido,
+            'metodo': servicio.metodo.metodo if servicio.metodo else 'No disponible',  # Asegúrate de manejar relaciones nulas
+            # Agrega otros campos que necesites
+        }
+        return JsonResponse(data)
+    else:
+        return JsonResponse({'error': 'Servicio no encontrado'}, status=404)

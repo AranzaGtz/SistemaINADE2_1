@@ -189,36 +189,7 @@
             });
         });
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const crearMetodoCheckbox = document.getElementById('crear_metodo_checkbox');
-            const selectMetodoDiv = document.getElementById('select_metodo_div');
-            const formMetodoDiv = document.getElementById('form_metodo_div');
-            const metodoFormFields = formMetodoDiv.querySelectorAll('input, select, textarea');
-            const selectMetodoFields = selectMetodoDiv.querySelectorAll('select');
-    
-            crearMetodoCheckbox.addEventListener('change', function() {
-                if (crearMetodoCheckbox.checked) {
-                    selectMetodoDiv.style.display = 'none';
-                    formMetodoDiv.style.display = 'block';
-                    metodoFormFields.forEach(field => {
-                        field.removeAttribute('disabled');
-                    });
-                } else {
-                    selectMetodoDiv.style.display = 'block';
-                    formMetodoDiv.style.display = 'none';
-                    metodoFormFields.forEach(field => {
-                        field.setAttribute('disabled', 'disabled');
-                    });
-                }
-            });
-    
-            // Inicialmente deshabilitar los campos del formulario de metodo
-            metodoFormFields.forEach(field => {
-                field.setAttribute('disabled', 'disabled');
-            });
-        });
-    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 
