@@ -1,3 +1,5 @@
+# views_usuarios.py
+
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
 from accounts.models import CustomUser
@@ -34,30 +36,42 @@ def usuario_create(request):
         form = (CustomUserCreationForm())  # Si la solicitud no es POST, crea un formulario vacío.
     return render(request,'accounts/usuarios/usuarios.html',{'registro_form':form}) # Renderiza la plantilla con el formulario.
 
-# VISTA PARA BORRAR USUARIO
-def usuario_delete(request, username):
-    usuario = CustomUser.objects.get(username = username)
-    usuario.delete()
-    messages.success(request, '¡Usuario eliminado!.')
-    return redirect('usuario_list')
-
 # VISTA PARA IR EDITANDO USUARIO
 def usuario_update(request,username):
+    # Obtiene usuario por su username o muestra un 404 si no se encuentra
     usuario = get_object_or_404(CustomUser, username = username)
-    form = CustomUserChangeForm(instance=usuario)
-    usuarios = CustomUser.objects.all()
-    return render(request, "accounts/usuarios/usuarios.html", {"usuario":usuario,"usuarios": usuarios, "form":form, "edit": True})
+    
+    if request.method == 'POST':
+        # Crea un formulario con los datos enviados y la instancia de usuario
+        usuario_form = CustomUserChangeForm(request.POST, instance=usuario)
+        if usuario_form.is_valid():
+            # Guarda la usuario
+            usuario_form.save()
+            # Muestra un mensaje de éxito y redirige a la lista de usuarios
+            messages.success(request, 'Usuario actualizado con éxito')
+            return redirect('usuario_list')
+    else:
+
+        # Si no es un POST, inicializa el formulario con los datos actuales del usuario
+        usuario_form = CustomUserChangeForm(instance=usuario)
+
+    # Contexto que se pasa a la plantilla
+    context = {
+        'persona_form': usuario_form,
+        'persona': usuario,
+    }
+    
+    # Renderiza la plantilla de edición de usuario con el contexto
+    return render(request, 'accounts/usuarios/editar_usuario.html', context)
  
-# VISTA PARA EDITAR USUARIO
-def usuario_update2(request, username):
-    usuario = get_object_or_404(CustomUser, username = username)
+# VISTA PARA ELIMINAR usuario
+def usuario_delete(request, username):
+    usuario = get_object_or_404(CustomUser, username=username)
     if request.method == "POST":
-        form  = CustomUserChangeForm(request.POST, instance=usuario)
-        if form.is_valid():
-            form.save()
-            messages.success(request, '¡Usuario actualizado!.')
-            return redirect("usuario_list")
-    else: 
-        form = CustomUserChangeForm(instance=usuario)
-    return redirect(request, "usuario_list", {"usuario": usuario,"form": form,"edit":True})
+        usuario.delete()
+        messages.success(request, 'Usuario Eliminado!.')
+        # Redirigir a la lista de cotizaciones después de la eliminación
+        return redirect('usuario_list')
+    return render(request, 'accounts/usuarios/eliminar_usuario.html', {'usuario': usuario})
+
 

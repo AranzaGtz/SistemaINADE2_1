@@ -7,120 +7,78 @@
 <h1 class="text-center">Usuarios del Sistema</h1>
 <hr class="featurette-divider">
 
-<div class="row">
-    <!-- ENTRADA DE BUSQUEDA -->
-    <div class="row mb-3 justify-content-end">
-        <div class="col-auto">
-            <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'usuariosTable')" placeholder="Buscar usuarios...">
-        </div>
+<!-- ENTRADA DE BUSQUEDA -->
+<div class="row mb-3 justify-content-end">
+    <div class="col-auto">
+        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'usuariosTable')"
+            placeholder="Buscar usuarios...">
     </div>
-    
-    <!-- FORMULARIO -->
-    <div class="col-lg-3 col-md-5 mb-2">
-        <div class="card shadow-sm">
-            <div class="card-header bg-ligth text-dark">
-                <strong><h5 class="card-title text-center">{% if edit %}Editar usuario{% else %}Crear nuevo usuario{% endif %}</h5></strong>
-            </div>
-            <div class="card-body">
-                <form action="{% if edit %}{% url 'usuario_edit2' usuario.username %}{% else %}{% url 'usuario_create' %}{% endif %}" method="POST">
-                    {% csrf_token %}
-
-                    {% if edit %}
-                    <input type="hidden" name="username" value="{{ usuario.username }}">
-                    {% endif %}
-                    
-                    <div class="row m-0">
-                        <div class="col-md-12 p-1">
-                            <div class="form-group">
-                                <label for="id_username">Nombre de usuario</label>
-                                <input type="text" name="username" class="form-control" maxlength="150" id="id_username" value="{{ usuario.username|default_if_none:'' }}" {% if edit %}readonly{% endif %} autocomplete="username" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_first_name">Nombre</label>
-                        <input type="text" name="first_name" class="form-control" maxlength="150" id="id_first_name" value="{{ usuario.first_name|default_if_none:'' }}" autocomplete="given-name" />
-                        <label for="id_last_name">Apellidos</label>
-                        <input type="text" name="last_name" class="form-control" maxlength="150" id="id_last_name" value="{{ usuario.last_name|default_if_none:'' }}" autocomplete="family-name" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_email">Correo</label>
-                        <input type="email" name="email" class="form-control" maxlength="254" id="id_email" value="{{ usuario.email|default_if_none:'' }}" autocomplete="email" />
-                        <label for="id_celular">Celular</label>
-                        <input type="text" name="celular" class="form-control" maxlength="15" id="id_celular" value="{{ usuario.celular|default_if_none:'' }}" autocomplete="tel" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_rol">Rol</label>
-                        <select class="form-control" name="rol" id="id_rol" autocomplete="role">
-                            <option value="" selected="">Elije rol</option>
-                            <option value="admin" {% if usuario.rol == "admin" %}selected{% endif %}>Administrador</option>
-                            <option value="coordinador" {% if usuario.rol == "coordinador" %}selected{% endif %}>Coordinador</option>
-                            <option value="muestras" {% if usuario.rol == "muestras" %}selected{% endif %}>Muestras</option>
-                            <option value="informes" {% if usuario.rol == "informes" %}selected{% endif %}>Informes</option>
-                            <option value="laboratorio" {% if usuario.rol == "laboratorio" %}selected{% endif %}>Laboratorio</option>
-                            <option value="calidad" {% if usuario.rol == "calidad" %}selected{% endif %}>Calidad</option>
-                        </select>
-                    </div>
-
-                    {% if not edit %}
-                    <div class="row m-0">
-                        <div class="col-md-6 p-1">
-                            <div class="form-group">
-                                <label for="id_password1">Contraseña</label>
-                                <input type="password" name="password1" class="form-control" autocomplete="new-password" required="" id="id_password1" />
-                            </div>
-                        </div>
-                        <div class="col-md-6 p-1">
-                            <div class="form-group">
-                                <label for="id_password2">Verifique</label>
-                                <input type="password" name="password2" class="form-control" autocomplete="new-password" required="" id="id_password2" />
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="form-group text-right">
-                        <input type="submit" class="btn btn-success" value="{% if edit %}Actualizar Usuario{% else %}Registrar Usuario{% endif %}" />
-                    </div>
-                </form>
-            </div>
-        </div>
+    <div class="col-auto">
+        <!-- Botón para abrir el modal de creación de nuevo cliente -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal"> Añadir Usuario </button>
     </div>
+</div>
 
-    <!-- SECCION DE LISTADO DE USUARIOS -->
-    <div class="col-lg-9 col-md-7">
-        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-            <table id="usuariosTable"  class="table table-hover" >
-                <thead class="thead-light">
-                    <tr>
-                        <th >Username</th>
-                        <th>Correo</th>
-                        <th>Nombre</th>
-                        <th>Apellidos</th>
-                        <th>Celular</th>
-                        <th>Rol</th>
-                        <th colspan="2">Opciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for c in usuarios %}
-                    <tr>
-                        <td>{{ c.username }}</td>
-                        <td>{{ c.email }}</td>
-                        <td>{{ c.first_name }}</td>
-                        <td>{{ c.last_name }}</td>
-                        <td>{{ c.celular }}</td>
-                        <td>{{ c.rol }}</td>
-                        <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
-                        <td><a href="{% url 'usuario_delete' c.username %}" class="btn btn-danger btn-sm">Eliminar</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- SECCION DE LISTADO DE USUARIOS -->
+<div class="">
+    <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+        <table id="usuariosTable" class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Username</th>
+                    <th>Correo</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Celular</th>
+                    <th>Rol</th>
+                    <th colspan="2">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in usuarios %}
+                <tr>
+                    <td>{{ c.username }}</td>
+                    <td>{{ c.email }}</td>
+                    <td>{{ c.first_name }}</td>
+                    <td>{{ c.last_name }}</td>
+                    <td>{{ c.celular }}</td>
+                    <td>{{ c.rol }}</td>
+                    <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
+                    <td><a href="{% url 'usuario_delete' c.username %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para crear un nuevo usuario -->
+<div class="modal fade" id="createUsuarioModal" tabindex="-1" aria-labelledby="createUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <!-- Título del modal -->
+                <h5 class="modal-title" id="createUsuarioLabel">Crear Nuevo Usuario</h5>
+                <!-- Botón para cerrar el modal -->
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Formulario para crear un nuevo cliente -->
+            <form method="post" action="{% url 'usuario_create' %}">
+                <!-- Token de protección CSRF -->
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Formulario del cliente -->
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <!-- Botón para cancelar la creación del cliente -->
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <!-- Botón para enviar el formulario y crear el cliente -->
+                    <button type="submit" class="btn btn-success">Crear Cliente</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
 {% endblock %}

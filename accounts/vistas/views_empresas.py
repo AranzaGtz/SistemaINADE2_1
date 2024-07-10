@@ -84,64 +84,12 @@ def empresa_update(request,pk):
         "direccion_form":direccion_form,
         })
 
-# VISTA ELIMINAR EMPRESAS
-def empresa_delete(request,pk):
-    empresa = Empresa.objects.get(id = pk)
-    direccion = empresa.direccion
-    direccion.delete()
-    empresa.delete()
-    messages.success(request, 'Empresa eliminada!.')
-    return redirect('empresas_cont_list')
-
-# VISTA EDITAR CONTACTOS
-def contacto_edit(request,pk):
-    prospecto = get_object_or_404(Prospecto,id=pk)
-    informacion_contacto = prospecto.informacion_contacto
-    titulos = Titulo.objects.all()
-    
-    prospecto_form = ProspectoForm(instance=prospecto)
-    informacion_contacto_form = InformacionContactoForm(instance=informacion_contacto)
-    
-    prospectos = Prospecto.objects.all()
-    # show_modal = True  # Esta variable indica si la ventana modal debe estar abierta
-    return render(request, "accounts/prospectos/prospecto_editar.html",{
-        "prospecto":prospecto, 
-        "prospectos":prospectos,
-        "prospecto_form":prospecto_form,
-        "contacto_form":informacion_contacto_form ,
-        "titulos":titulos,
-        "cont":True})
-    
-# VISTA ACTUALIZAR CONTACTOS
-def contacto_update(request,pk):
-    contacto = get_object_or_404(Prospecto,id=pk)
-    informacion_contacto = contacto.informacion_contacto
-    
-    if request.method=='POST':
-        contacto_form = ProspectoForm(request.POST, instance=contacto)
-        informacion_contacto_form = InformacionContactoForm(request.POST, instance=informacion_contacto)
-        
-        if contacto_form.is_valid() and informacion_contacto_form.is_valid():
-            informacion_contacto = informacion_contacto_form.save()
-            contacto = contacto_form.save(commit=False)
-            contacto.informacion_contacto = informacion_contacto
-            contacto.save()
-            messages.success(request, 'Contacto actualizado!.')
-            return redirect("empresas_cont_list")
-    else:
-        contacto_form = ProspectoForm(instance=contacto)
-        informacion_contacto_form = InformacionContactoForm(instance=informacion_contacto)
-    return redirect(request, "empresas_cont_list",{
-        "contacto":contacto,
-        "contacto_form":contacto_form,
-        "informacion_contacto_form":informacion_contacto_form,
-        })
-
-# VISTA ELIMINAR CONTACTOS
-def contacto_delete(request,pk):
-    contacto = Prospecto.objects.get(id = pk)
-    informacion_contacto = contacto.informacion_contacto
-    informacion_contacto.delete()
-    contacto.delete()
-    messages.success(request, 'Contacto eliminado!.')
-    return redirect('empresas_cont_list')
+# VISTA PARA ELIMINAR EMPRESA
+def empresa_delete(request, pk):
+    empresa = get_object_or_404(Empresa, id=pk)
+    if request.method == "POST":
+        empresa.delete()
+        messages.success(request, 'Emrpesa Eliminada!.')
+        # Redirigir a la lista de empresas después de la eliminación
+        return redirect('empresas_cont_list')
+    return render(request, 'accounts/empresas/eliminar_empresa.html', {'empresa': empresa})

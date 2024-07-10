@@ -1,19 +1,22 @@
 from django import forms
-from .models import Concepto, CustomUser, Formato, Metodo,Persona,Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
+from .models import Concepto, CustomUser, Formato, Metodo, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
 # ---      USUARIOS     ---
 
 #   FORMULARIO PARA CREAR USUARIO
+
+
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'celular', 'rol')
+        fields = ('username', 'first_name', 'last_name',
+                  'email', 'celular', 'rol')
         widgets = {
             'username': forms.TextInput(attrs={
-                'class': 'form-control', 
-                'placeholder': 'Nombre de usuario',  
+                'class': 'form-control',
+                'placeholder': 'Nombre de usuario',
                 'required': 'True'
             }),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre', 'required': 'False'}),
@@ -22,8 +25,10 @@ class CustomUserCreationForm(UserCreationForm):
             'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
             'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
         }
-        
+
 #   FORMULARIO PARA CAMBIAR USUARIO
+
+
 class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
@@ -35,83 +40,105 @@ class CustomUserChangeForm(forms.ModelForm):
             'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
             'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
         }
-  
+
 # ---      EMPRESAS     ---
 
 #   FORMULARIO PARA DIRECCION DE EMPRESA
+
+
 class DireccionForm(forms.ModelForm):
     class Meta:
         model = Direccion
-        fields = ['calle','numero', 'colonia', 'ciudad', 'codigo', 'estado']
+        fields = ['calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
-            'calle':    forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Calle','required':'True'}),
-            'numero':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Número exterior','required':'True','pattern':r"[0-9A-Za-z\s\-]+"}),
-            'colonia':  forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Colonia','required':'True'}),
-            'ciudad':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ciudad','required':'True'}),
-            'codigo':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Código Postal','required':'True','pattern':r"[0-9]{5}"}),
-            'estado':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Estado','required':'True'}),
+            'calle':    forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Calle', 'required': 'True'}),
+            'numero':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Número exterior', 'required': 'True', 'pattern': r"[0-9A-Za-z\s\-]+"}),
+            'colonia':  forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Colonia', 'required': 'True'}),
+            'ciudad':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ciudad', 'required': 'True'}),
+            'codigo':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Código Postal', 'required': 'True', 'pattern': r"[0-9]{5}"}),
+            'estado':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Estado', 'required': 'True'}),
         }
-      
-#   FORMULARIO PARA EMPRESA  
+
+#   FORMULARIO PARA EMPRESA
+
+
 class EmpresaForm(forms.ModelForm):
     # Campos de Direccion
-    calle = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
-    numero = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
-    colonia = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
-    ciudad = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
-    codigo = forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
-    estado = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
+    calle = forms.CharField(max_length=50, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Calle'}))
+    numero = forms.CharField(max_length=50, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Número'}))
+    colonia = forms.CharField(max_length=100, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
+    ciudad = forms.CharField(max_length=100, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
+    codigo = forms.CharField(max_length=6, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
+    estado = forms.CharField(max_length=100, widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Estado'}))
 
     class Meta:
         model = Empresa
-        fields = ['nombre_empresa', 'rfc', 'moneda', 'condiciones_pago', 'calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
+        fields = ['nombre_empresa', 'rfc', 'moneda', 'condiciones_pago',
+                  'calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
-            'nombre_empresa': forms.TextInput(attrs={'class':'form-control','placeholder':'Ingresa el Nombre de la Empresa','required':'True'}),
-            'rfc': forms.TextInput(attrs={'class':'form-control','placeholder':'Ingresa RFC','required':'False','pattern':r"[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}"}),
-            'moneda': forms.Select(attrs={'class':'form-control'}),
-            'condiciones_pago': forms.NumberInput(attrs={'class':'form-control','placeholder':'Días de pago'}),
+            'nombre_empresa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa el Nombre de la Empresa', 'required': 'True'}),
+            'rfc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa RFC', 'required': 'False', 'pattern': r"[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}"}),
+            'moneda': forms.Select(attrs={'class': 'form-control'}),
+            'condiciones_pago': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Días de pago'}),
         }
-    
+
 # ---      CLIENTES     ---
 
 #   FORMULARIO PARA INFROMACION DE CONTACTO
+
+
 class InformacionContactoForm(forms.ModelForm):
     class Meta:
         model = InformacionContacto
         fields = ['correo_electronico', 'telefono', 'celular', 'fax']
         widgets = {
-            'correo_electronico': forms.EmailInput(attrs={'class':'form-control','placeholder':'Correo electronico','required':'True'}),
-            'telefono': forms.NumberInput(attrs={'class':'form-control','placeholder':'Telefono','required':'False','pattern':"[0-9]{10}"}),
-            'celular': forms.NumberInput(attrs={'class':'form-control','placeholder':'Celular','required':'True'}),
-            'fax': forms.NumberInput(attrs={'class':'form-control','placeholder':'Fax','required':'False'}),
+            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electronico', 'required': 'True'}),
+            'telefono': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Telefono', 'required': 'False', 'pattern': "[0-9]{10}"}),
+            'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}),
+            'fax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Fax', 'required': 'False'}),
         }
- 
-#   FORMULARIO PARA PERSONA         
+
+#   FORMULARIO PARA PERSONA
+
+
 class PersonaForm(forms.ModelForm):
 
     titulo = forms.ModelChoiceField(
         queryset=Titulo.objects.all(),
         required=False,
-        
+
         widget=forms.Select(attrs={'class': 'form-control'})
     )
-    
+
     # Campos de InformacionContactoForm
-    correo_electronico = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}))
-    telefono = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono', 'required': 'False'}))
-    celular = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}))
-    fax = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Fax', 'required': 'False'}))
+    correo_electronico = forms.EmailField(widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}))
+    telefono = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Teléfono', 'required': 'False'}))
+    celular = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}))
+    fax = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Fax', 'required': 'False'}))
 
     class Meta:
         model = Persona
-        fields = ['nombre', 'apellidos', 'titulo', 'correo_electronico', 'telefono', 'celular', 'fax']
+        fields = ['nombre', 'apellidos', 'titulo',
+                  'correo_electronico', 'telefono', 'celular', 'fax']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Nombre del método', 'required': 'True'}),
             'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ambos apellidos', 'required': 'True'}),
             'titulo': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona un título', 'required': 'False'}),
         }
-    
-#   FORMULARIO PARA PROSPECTO        
+
+#   FORMULARIO PARA PROSPECTO
+
+
 class ProspectoForm(forms.ModelForm):
     class Meta:
         model = Prospecto
@@ -123,6 +150,8 @@ class ProspectoForm(forms.ModelForm):
 # ---      METODOS Y SERVICIOS     ---
 
 #   FORMULARIO PARA METODO
+
+
 class MetodoForm(forms.ModelForm):
     class Meta:
         model = Metodo
@@ -132,30 +161,41 @@ class MetodoForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA SERVICIO
+
+
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['nombre_servicio', 'descripcion', 'precio_sugerido' ]
+        fields = [ 'nombre_servicio', 'descripcion',
+                  'precio_sugerido']
         widgets = {
+            
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto','rows': 2}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto', 'rows': 2}),
             'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+
         }
 
 #   FORMULARIO PARA CONCEPTO
+
+
 class ConceptoForm(forms.ModelForm):
     class Meta:
         model = Concepto
-        fields = ['servicio','cantidad_servicios', 'precio',  'notas']
+        fields = ['servicio', 'cantidad_servicios', 'precio',  'notas']
         widgets = {
-            'servicio': forms.Select(attrs={'class':'form-control'}),
+            'servicio': forms.Select(attrs={'class': 'form-control'}),
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
             'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
-            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales','rows': 3}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales', 'rows': 3}),
         }
 
-ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
-ConceptoChangeFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=0, can_delete=True)
+
+ConceptoFormSet = inlineformset_factory(
+    Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
+ConceptoChangeFormSet = inlineformset_factory(
+    Cotizacion, Concepto, form=ConceptoForm, extra=0, can_delete=True)
+
 
 # ---      COTIZACIONES     ---
 
@@ -163,35 +203,45 @@ ConceptoChangeFormSet = inlineformset_factory(Cotizacion, Concepto, form=Concept
 class CotizacionForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
-        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales', 'persona']
+        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago',
+                  'tasa_iva', 'notas', 'correos_adicionales', 'persona']
         widgets = {
             'fecha_solicitud': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_caducidad': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'metodo_pago': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona Tipo de Moneda','required':'True'}),
+            'metodo_pago': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Moneda', 'required': 'True'}),
             'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
-            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).','rows': 3}),
-            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)','rows': 3}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).', 'rows': 3}),
+            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)', 'rows': 3}),
             'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente'}),
         }
-        
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['persona'].queryset = Persona.objects.filter(activo=True)
+
 #   FORMULARIO PARA CAMBIAR COTIZACION
+
+
 class CotizacionChangeForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
-        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales', 'persona']
+        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago',
+                  'tasa_iva', 'notas', 'correos_adicionales', 'persona']
         widgets = {
             'fecha_solicitud': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Fecha en formato dd-mm-aaaa'}),
             'fecha_caducidad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Fecha en formato dd-mm-aaaa'}),
-            'metodo_pago': forms.Select(attrs={'class':'form-control','placeholder':'Selecciona Tipo de Moneda','required':'True'}),
+            'metodo_pago': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Moneda', 'required': 'True'}),
             'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
-            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).','rows': 3}),
-            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)','rows': 3}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).', 'rows': 3}),
+            'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)', 'rows': 3}),
             'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente'}),
         }
-        
+
 # ---      ORGANIZACIÓN     ---
 
 #   FORMULARIO PARA TERMINOS Y AVISOS
+
+
 class TerminosForm(forms.ModelForm):
     class Meta:
         model = Formato
