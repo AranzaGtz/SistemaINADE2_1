@@ -16,9 +16,8 @@ from django.contrib.messages import constants as messages
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-#BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -145,7 +145,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#AUTH_USER_MODEL='accounts.Usuario'
+# AUTH_USER_MODEL='accounts.Usuario'
 
 
 MESSAGE_TAGS = {
@@ -162,6 +162,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.me.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'proyectos.inade@icloud.com'  # Tu nueva dirección de correo de iCloud
-EMAIL_HOST_PASSWORD = 'aiuz-aivh-thmd-vwal'  # La contraseña de la aplicación generada
+# Tu nueva dirección de correo de iCloud
+EMAIL_HOST_USER = 'proyectos.inade@icloud.com'
+# La contraseña de la aplicación generada
+EMAIL_HOST_PASSWORD = 'aiuz-aivh-thmd-vwal'
 DEFAULT_FROM_EMAIL = 'proyectos.inade@icloud.com'

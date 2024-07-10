@@ -160,26 +160,30 @@
                         <div id="concepto_formset">
                             {% for form in concepto_formset %}
 
-                            <div class="col concepto-form">
+                            <div class="concepto-form">
                                 <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
-                                <div class="col-md-12 mt-2">
+                                <div class=" mt-2">
                                     <label for="{{ form.servicio.id_for_label }}">Servicio:</label>
                                     {{form.servicio}}
                                 </div>
-                                <div class="col-md-12 center text-center">
+                                <div class=" center text-center">
                                     <p id="servicio-datos-0" class="alert-primary mt-2"></p>
                                 </div>
-                                <div class="col-md-12 mt-2">
+                                <div class=" mt-2">
                                     <label for="{{ form.cantidad.id_for_label }}">Cantidad de servicios:</label>
                                     {{form.cantidad_servicios}}
                                 </div>
-                                <div class="col-md-12 mt-2">
+                                <div class=" mt-2">
                                     <label for="{{ form.servicio.id_for_label }}">Precio de servicio:</label>
                                     {{form.precio}}
                                 </div>
-                                <div class="col-md-12 mt-2">
+                                <div class=" mt-2">
                                     <label for="{{ form.servicio.id_for_label }}">Notas del servicio:</label>
                                     {{form.notas}}
+                                </div>
+                                <div class="mt-2">
+                                    <label for="{{form.DELETE.id_for_label}}"> Eliminar: </label>
+                                    {{form.DELETE}}
                                 </div>
                             </div>
 
@@ -202,25 +206,30 @@
 <div id="empty_form" style="display: none;">
     <div class="concepto-form">
         <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
-        <div class="col-md-12 mt-2">
+        <div class="mt-2">
             <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Servicio:</label>
             {{concepto_formset.empty_form.servicio}}
         </div>
-        <div class="col-md-12 center text-center">
+        <div class="center text-center">
             <p id="servicio-datos-__prefix__" class="alert-primary mt-2"></p>
         </div>
-        <div class="col-md-12 mt-2">
+        <div class="mt-2">
             <label for="{{ concepto_formset.empty_form.cantidad.id_for_label }}">Cantidad de servicios:</label>
             {{concepto_formset.empty_form.cantidad_servicios}}
         </div>
-        <div class="col-md-12 mt-2">
+        <div class="mt-2">
             <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Precio de servicio:</label>
             {{concepto_formset.empty_form.precio}}
         </div>
-        <div class="col-md-12 mt-2">
+        <div class="mt-2">
             <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Notas del servicio:</label>
             {{concepto_formset.empty_form.notas}}
         </div>
+        <div class=" mt-2">
+            <label for="{{ concepto_formset.empty_form.DELETE.id_for_label }}">Eliminar:</label>
+            {{concepto_formset.empty_form.DELETE}}
+        </div>
+
     </div>
 </div>
 
@@ -269,27 +278,35 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script>
-    document.getElementById('add-concepto-form').onclick = function () {
-        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
-        var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
-        formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);  // Reemplaza el marcador de posición con el contador
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> <!--Este script carga jQuery, una biblioteca JavaScript popular que simplifica la manipulación del DOM y la realización de peticiones AJAX.-->
 
+<script>
+    // Función para agregar un nuevo formulario de concepto
+    document.getElementById('add-concepto-form').onclick = function () {
+        // Obtener el índice actual de formularios
+        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+        // Obtener el template del formulario vacío y reemplazar los marcadores de posición
+        var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
+        formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
+
+        // Agregar el formulario clonado al conjunto de formularios
         $('#concepto_formset').append(formTemplate);
 
-        // Actualizar IDs y nombres de los campos en el nuevo formulario
+        // Actualizar los IDs y nombres de los campos en el nuevo formulario clonado
         $('#concepto_formset .concepto-form:last-child').find(':input').each(function () {
             var name = $(this).attr('name').replace('__prefix__', formIdx);
             var id = 'id_' + name;
             $(this).attr({ 'name': name, 'id': id });
         });
 
+        // Incrementar el contador de formularios totales
         $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
     }
 </script>
 
+
 <script>
+    // Función para obtener y mostrar datos del cliente seleccionado
     document.addEventListener("DOMContentLoaded", function () {
         const clienteSelect = document.querySelector('#id_persona');
         const clienteDatos = document.getElementById('cliente-datos');
@@ -297,9 +314,11 @@
         clienteSelect.addEventListener('change', function () {
             const clienteId = this.value;
             if (clienteId) {
+                // Realizar solicitud fetch para obtener datos del cliente
                 fetch(`/obtener_datos_cliente/${clienteId}/`)
                     .then(response => response.json())
                     .then(data => {
+                        // Actualizar el contenido de clienteDatos con los datos obtenidos
                         if (!data.error) {
                             clienteDatos.innerHTML = `<h5>Cliente <strong> ${data.empresa}</strong></h5>
                                                     RFC:<code> ${data.rfc}</code><br> 
@@ -321,40 +340,44 @@
 </script>
 
 <script>
+    // Función para agregar formulario de concepto con manejo de servicio asociado
     document.getElementById('add-concepto-form').onclick = function () {
         var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
         var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
         formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
-    
+
         $('#concepto_formset').append(formTemplate);
-    
+
         $('#concepto_formset .concepto-form:last-child').find(':input').each(function () {
             var name = $(this).attr('name').replace('__prefix__', formIdx);
             var id = 'id_' + name;
             $(this).attr({ 'name': name, 'id': id });
         });
-    
+
         $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
-    
+
         // Añadir evento de cambio al nuevo selector de servicio
         var newServiceSelect = document.querySelector(`#id_conceptos-${formIdx}-servicio`);
         var newServiceData = document.getElementById(`servicio-datos-${formIdx}`);
-    
+
         newServiceSelect.addEventListener('change', function () {
             obtenerDatosServicio(this.value, newServiceData);
         });
-    
+
         // Inicializar con el valor seleccionado si ya tiene un valor
         if (newServiceSelect.value) {
             obtenerDatosServicio(newServiceSelect.value, newServiceData);
         }
     }
-    
+
+    // Función para obtener y mostrar datos del servicio seleccionado
     function obtenerDatosServicio(servicioId, outputElement) {
         if (servicioId) {
+            // Realizar solicitud fetch para obtener datos del servicio
             fetch(`/obtener_datos_servicio/${servicioId}/`)
                 .then(response => response.json())
                 .then(data => {
+                    // Actualizar el contenido de outputElement con los datos obtenidos
                     if (!data.error) {
                         outputElement.innerHTML = `
                             <strong>Servicio:</strong> ${data.nombre}<br>
@@ -374,26 +397,29 @@
             outputElement.innerHTML = '';
         }
     }
-    
+
     document.addEventListener("DOMContentLoaded", function () {
-        // Inicializar los selects existentes en el formset
+        // Inicializar los selectores de servicio existentes en el formset
         document.querySelectorAll('.concepto-form').forEach((formDiv, index) => {
             const servicioSelect = formDiv.querySelector('select[name$="servicio"]');
             const servicioDatos = document.getElementById(`servicio-datos-${index}`);
-    
+
             if (servicioSelect) {
+                // Añadir evento de cambio a cada selector de servicio existente
                 servicioSelect.addEventListener('change', function () {
                     obtenerDatosServicio(this.value, servicioDatos);
                 });
-    
+
+                // Inicializar con el valor seleccionado si ya tiene un valor
                 if (servicioSelect.value) {
                     obtenerDatosServicio(servicioSelect.value, servicioDatos);
                 }
             }
         });
     });
-    
+
 </script>
+
 
 
 {% endblock %}

@@ -202,7 +202,7 @@ class Metodo(models.Model):
 # MODELO PARA SERVICIO
 class Servicio(models.Model):
     metodo = models.ForeignKey(Metodo,on_delete=models.SET_NULL, null=True)
-    nombre_servicio = models.CharField(max_length=50)# REPRESENTA EL NOMBRE DEL SERVICIO
+    nombre_servicio = models.CharField(max_length=100)# REPRESENTA EL NOMBRE DEL SERVICIO
     precio_sugerido = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()#MUESTRA UNA DESCRIPCION DEL SERVICIO
     

@@ -12,13 +12,6 @@
     </div>
 </div>
 
-<!-- BOTÓN NUEVO -->
-<div class="row mb-3">
-    <div class="col text-right">
-
-    </div>
-</div>
-
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
         <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'serviciosTable')"
@@ -59,7 +52,8 @@
                             <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">Eliminar</button>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">Eliminar</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -126,7 +120,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="createServicioLabel">Crear Nuevo Metodo</h5>
+                <h5 class="modal-title" id="createServicioLabel">Crear Nuevo Servicio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{% url 'servicio_create' %}" method="post">
@@ -197,7 +191,6 @@
 </div>
 
 <!-- Modal para confirmar eliminación de servicio -->
-<!-- Modal para confirmar eliminación de servicio -->
 <div class="modal fade" id="deleteServicioModal" tabindex="-1" aria-labelledby="deleteServicioLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -218,17 +211,76 @@
         </div>
     </div>
 </div>
+
+
+<!-- Script para borrar servicio-->
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    // Espera a que el contenido del documento esté completamente cargado antes de ejecutar el script
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtiene la referencia al modal de eliminación de servicio por su ID
         var deleteServicioModal = document.getElementById('deleteServicioModal');
-        deleteServicioModal.addEventListener('show.bs.modal', function(event) {
+        
+        // Agrega un evento cuando el modal de eliminación se muestra
+        deleteServicioModal.addEventListener('show.bs.modal', function (event) {
+            // Obtiene el botón que activó el modal (el botón relacionado)
             var button = event.relatedTarget;
+            
+            // Obtiene el ID del servicio desde el atributo data-servicio-id del botón
             var servicioId = button.getAttribute('data-servicio-id');
+            
+            // Obtiene el formulario de eliminación de servicio por su ID
             var form = document.getElementById('deleteServicioForm');
+            
+            // Obtiene la acción actual del formulario y reemplaza '0' con el servicioId obtenido
             var action = form.getAttribute('action').replace('0', servicioId);
+            
+            // Actualiza la acción del formulario con la nueva URL que incluye el servicioId
             form.setAttribute('action', action);
         });
     });
 </script>
+
+
+<!-- Script para agregar nuevo metodo-->
+<script>
+    // Espera a que el contenido del documento esté completamente cargado antes de ejecutar el script
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtiene la referencia al checkbox de creación de metodo
+        const checkbox = document.getElementById('crear_metodo_checkbox');
+        // Obtiene la referencia al div que contiene el select de metodos existentes
+        const selectMetodoDiv = document.getElementById('select_metodo_div');
+        // Obtiene la referencia al div que contiene el formulario de nueva metodo
+        const formMetodoDiv = document.getElementById('form_metodo_div');
+        // Obtiene todas las entradas del formulario de nuevo metodo
+        const metodoFormFields = formMetodoDiv.querySelectorAll('input, select, textarea');
+
+        // Agrega un evento de cambio al checkbox
+        checkbox.addEventListener('change', function () {
+            // Si el checkbox está marcado, mostrar el formulario de nuevo metodo y ocultar el select de metodos existentes
+            if (checkbox.checked) {
+                selectMetodoDiv.style.display = 'none';
+                formMetodoDiv.style.display = 'block';
+                // Habilita todos los campos del formulario de nueva metodo
+                metodoFormFields.forEach(field => {
+                    field.removeAttribute('disabled');
+                });
+            } else {
+                // Si el checkbox no está marcado, mostrar el select de metodos existentes y ocultar el formulario de nueva metodo
+                selectMetodoDiv.style.display = 'block';
+                formMetodoDiv.style.display = 'none';
+                // Deshabilita todos los campos del formulario de nuevo metodo
+                metodoFormFields.forEach(field => {
+                    field.setAttribute('disabled', 'disabled');
+                });
+            }
+        });
+
+        // Inicialmente deshabilita los campos del formulario de nuevo metodo
+        metodoFormFields.forEach(field => {
+            field.setAttribute('disabled', 'disabled');
+        });
+    });
+</script>
+
 
 {% endblock %}
