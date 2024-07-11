@@ -162,35 +162,7 @@
     <!-- Bootstrap JS (incluye Popper) -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <!--    Script para Model cliente registrar -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const checkbox = document.getElementById('crear_empresa_checkbox');
-            const selectEmpresaDiv = document.getElementById('select_empresa_div');
-            const formEmpresaDiv = document.getElementById('form_empresa_div');
-            const empresaFormFields = formEmpresaDiv.querySelectorAll('input, select, textarea');
     
-            checkbox.addEventListener('change', function() {
-                if (checkbox.checked) {
-                    selectEmpresaDiv.style.display = 'none';
-                    formEmpresaDiv.style.display = 'block';
-                    empresaFormFields.forEach(field => {
-                        field.removeAttribute('disabled');
-                    });
-                } else {
-                    selectEmpresaDiv.style.display = 'block';
-                    formEmpresaDiv.style.display = 'none';
-                    empresaFormFields.forEach(field => {
-                        field.setAttribute('disabled', 'disabled');
-                    });
-                }
-            });
-    
-            // Inicialmente deshabilitar los campos del formulario de empresa
-            empresaFormFields.forEach(field => {
-                field.setAttribute('disabled', 'disabled');
-            });
-        });
-    </script>
 
     {% block extra_js %}{% endblock %}
 </body>
