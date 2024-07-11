@@ -1,115 +1,72 @@
-<!-- cotizaciones_editar.html -->
 {% extends 'accounts/base_dashboard.html' %}
-{% load static %}
-{% block title %}Modificar Cotización{% endblock %}
-{% block header %}Modificar Cotización{% endblock %}
+{% block title %}Editar Cotización{% endblock %}
+{% block header %}Editar Cotización{% endblock %}
 {% block content %}
-<div class="container mt-4">
-     <h1 class="text-center">Modificar de cotización</h1>
-     <hr />
-     <form method="post">
-          {% csrf_token %}
-          <div class="alert alert-info mb-4">
-               <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
-               Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
-           </div>
-          <div class="form-group mt-4">
-               <h3>Datos para cotizar</h3>
-               <div class="row">
-                    <div class="col-md-12 mt-2">
-                         <label for="{{ cotizacion_form.persona.id_for_label }}">Cliente</label>
-                         {{ cotizacion_form.persona }}
-                    </div>
-               </div>
-               <div class="row">
-                    <!-- FECHA SOLICITADA -->
-                    <div class="col-md-6 mt-2">
-                         <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
-                         {{ cotizacion_form.fecha_solicitud }}
-                    </div>
-                    <!-- FECHA DE CADUCIDAD -->
-                    <div class="col-md-6 mt-2">
-                         <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
-                         {{ cotizacion_form.fecha_caducidad }}
-                    </div>
-               </div>
-               <!-- fechas -->
-               <div class="mt-2 text-end" style="text-align: right;">
-                    <span class="text-info">Por favor, ingresa las fechas en el formato correcto (por ejemplo: 2024-07-28).</span>
-                </div>
-               <div class="row">
-                    <!-- TIPO DE MONEDA O METODO DE PAGO -->
-                    <div class="col-md-6 mt-2">
-                         <label for="{{ cotizacion_form.metodo_pago.id_for_label }}">Denominación</label>
-                         {{ cotizacion_form.metodo_pago }}
-                    </div>
-                    <!-- TASA DE IVA ACTUAL -->
-                    <div class="col-md-6 mt-2">
-                         <label for="{{ cotizacion_form.tasa_iva.id_for_label }}">Tasa del IVA actual</label>
-                         {{ cotizacion_form.tasa_iva }}
-                    </div>
-               </div>
-               <div class="row mt-2">
-                    <!-- NOTAS DE LA COTIZACION -->
-                    <div class="col-12">
-                         <label for="{{ cotizacion_form.notas.id_for_label }}">Notas</label>
-                         {{ cotizacion_form.notas }}
-                    </div>
-               </div>
-               <div class="row mt-2">
-                    <!-- CORREOS ADICIONALES -->
-                    <div class="col-12">
-                         <label for="{{ cotizacion_form.correos_adicionales.id_for_label }}">Correos Adicionales</label>
-                         {{ cotizacion_form.correos_adicionales }}
-                    </div>
-               </div>
-               <br>
-               <h3>Agregar Conceptos</h3>
-               <div class="mt-2 text-end" style="text-align: right;">
-                    <span class="text-info">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deceas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
-                </div>
-               {{ concepto_formset.management_form }}
-               <div id="concepto_formset">
-                    {% for form in concepto_formset %}
-                    <div class="concepto-form">
-                         <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
-                         {{ form.as_p }}
-                    </div>
-                    {% endfor %}
-               </div>
-               <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir Concepto</button>
-          </div>
-          <div class="form-group text-right mt-4">
-               <input type="submit" class="btn btn-success" value="Guardar Cotización" />
-               <a href="{% url 'cotizaciones_list' %}" class="btn btn-secondary">Cancelar</a>
-          </div>
-     </form>
-</div>
+<style>
+    .border-custom {
+        border: 1px solid lightgrey;
+        /* Borde gris por defecto */
+    }
 
-<div id="empty_form" style="display: none;">
-     <div class="concepto-form">
-         <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
-         {{ concepto_formset.empty_form.as_p }}
-     </div>
- </div>
+    .border-custom-left {
+        border-left: 5px solid #17a2b8;
+        /* Borde izquierdo color bg-info */
+    }
+</style>
+
+<h1 class="text-center">Editar Cotización</h1>
+<form method="post" action="">
+    {% csrf_token %}
+    {{ cotizacion_form.as_p }}
+
+    <!-- Contenedor donde se agregarán los formularios de concepto -->
+    <div id="conceptos-container">
+        {% for form in concepto_formset %}
+        <div class="border-custom border-custom-left p-3 bg-light mt-5 concepto-form">
+            {{ form.as_p }}
+            <button type="button" class="btn btn-danger remove-concepto mt-2">Eliminar Concepto</button>
+        </div>
+        {% empty %}
+        <!-- Si no hay formularios de concepto, mostrar un mensaje o dejar vacío -->
+        {% endfor %}
+    </div>
+
+    <!-- Botón para agregar concepto -->
+    <button type="button" id="add-concepto" class="btn btn-primary mt-3">Agregar Concepto</button>
+
+    <!-- Seccion de botones del formulario cotizaciones -->
+    <div class="form-group text-right mt-4">
+        <input type="submit" class="btn btn-success" value="Guardar Cotización" />
+        <a href="{% url 'cotizaciones_list' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+<!-- Template para un formulario de concepto -->
+<script id="concepto-template" type="text/template">
+    <div class="border-custom border-custom-left p-3 bg-light mt-5 concepto-form">
+        {{ form.as_p }}
+        <button type="button" class="btn btn-danger remove-concepto mt-2">Eliminar Concepto</button>
+    </div>
+</script>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-     document.getElementById('add-concepto-form').onclick = function() {
-         var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
-         var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
-         formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);  // Reemplaza el marcador de posición con el contador
- 
-         $('#concepto_formset').append(formTemplate);
- 
-         // Actualizar IDs y nombres de los campos en el nuevo formulario
-         $('#concepto_formset .concepto-form:last-child').find(':input').each(function() {
-             var name = $(this).attr('name').replace('__prefix__', formIdx);
-             var id = 'id_' + name;
-             $(this).attr({'name': name, 'id': id});
-         });
- 
-         $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
-     }
- </script>
+    $(document).ready(function() {
+        var conceptoIndex = {{ concepto_formset.total_form_count }};
+
+        // Agregar el primer formulario de concepto al cargar la página
+        $('#add-concepto').click(function() {
+            var conceptoTemplate = $('#concepto-template').html();
+            conceptoTemplate = conceptoTemplate.replace(/__prefix__/g, conceptoIndex);
+            $('#conceptos-container').append(conceptoTemplate);
+            conceptoIndex++;
+        });
+
+        // Eliminar formulario de concepto
+        $(document).on('click', '.remove-concepto', function() {
+            $(this).closest('.concepto-form').remove();
+        });
+    });
+</script>
+
 {% endblock %}
