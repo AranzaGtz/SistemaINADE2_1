@@ -244,3 +244,13 @@ class TerminosForm(forms.ModelForm):
             'terminos': forms.Textarea(attrs={'class': 'form-control'}),
             'avisos': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+
+# ---       CORREOS     ---
+
+#   FORMULARIO PARA ORDEN DE PEDIDOS DE LOS USUARIOS
+class FormularioSolicitudCotizacion(forms.Form):
+    nombre = forms.CharField(max_length=100)
+    correo_electronico = forms.EmailField()
+    mensaje = forms.CharField(widget=forms.Textarea)
+    archivo = forms.FileField()

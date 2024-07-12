@@ -1,0 +1,25 @@
+<!-- Plantilla para notificaciones.html -->
+
+<!-- Extiende la plantilla base del dashboard -->
+{% extends 'accounts/base_dashboard.html' %}
+<!-- Carga las etiquetas estáticas de Django -->
+{% load static %}
+<!-- Bloque para el título de la página -->
+{% block title %}Editar Usuario{% endblock %}
+<!-- Bloque para el encabezado de la página -->
+{% block header %}Editar Usuario{% endblock %}
+<!-- Bloque para el contenido principal de la página -->
+{% block content %}
+<h1>Notificaciones</h1>
+<ul>
+     {% for notificacion in notificaciones %}
+     <li>
+          <a href="{{ notificacion.enlace }}">
+               {{ notificacion.mensaje }}
+          </a>
+     </li>
+     {% empty %}
+     <li>No hay notificaciones.</li>
+     {% endfor %}
+</ul>
+{% endblock %}
