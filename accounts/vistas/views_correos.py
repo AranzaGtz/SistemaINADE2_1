@@ -1,9 +1,11 @@
 from datetime import datetime
+from django import forms
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.mail import EmailMessage
-from accounts.models import Cotizacion, Concepto, Organizacion, Formato, CustomUser, Persona
-from accounts.forms import ConceptoForm, CotizacionForm, ConceptoFormSet
+from SistemaINADE2 import settings
+from accounts.models import Cotizacion, Concepto, Notificacion, Organizacion, Formato, CustomUser, Persona
+from accounts.forms import ConceptoForm, CotizacionForm, ConceptoFormSet, FormularioSolicitudCotizacion
 from django.contrib import messages
 from django.db import IntegrityError
 from django.template.loader import render_to_string
@@ -11,8 +13,6 @@ from weasyprint import HTML  # type: ignore # Asegúrate de tener weasyprint ins
 from django.urls import reverse
 
 #   VISTA PARA ENVIAR CORREO DE TEXTO
-
-
 def enviar_correo(request):
     if request.method == 'POST':
         asunto = 'Cotización creada'
@@ -26,8 +26,6 @@ def enviar_correo(request):
     return render(request, 'accounts/correos/enviar_correo.html')
 
 #   VISTA PARA ENVIAR COTIZACIÓN
-
-
 def enviar_cotizacion(request, pk, destinatarios):
     # Obtiene la cotización correspondiente al id proporcionado o devuelve un error 404 si no se encuentra
     cotizacion = get_object_or_404(Cotizacion, id=pk)
@@ -36,8 +34,8 @@ def enviar_cotizacion(request, pk, destinatarios):
     conceptos = cotizacion.conceptos.all()
 
     # Obtiene la organización y el formato por sus id (en este caso asumiendo que id=1 es válido)
-    ogr = get_object_or_404(Organizacion, id=1)
-    formato = get_object_or_404(Formato, id=1)
+    ogr = get_object_or_404(Organizacion, id=4)
+    formato = get_object_or_404(Formato, id=3)
 
     # Calcula el subtotal para cada concepto multiplicando la cantidad de servicios por el precio
     for concepto in conceptos:
@@ -61,17 +59,17 @@ def enviar_cotizacion(request, pk, destinatarios):
     }
 
     # Renderiza la plantilla HTML con el contexto proporcionado
-    html_string = render_to_string(
-        'accounts/cotizaciones/cotizacion_platilla.html', context)
+    html_string = render_to_string('accounts/cotizaciones/cotizacion_platilla.html', context)
 
     # Convierte el HTML renderizado en un archivo PDF
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     pdf = html.write_pdf()
 
     # Construir la URL de confirmación
-    confirm_url = request.build_absolute_uri(
-        reverse('confirmar_recepcion', args=[cotizacion.id]))
+    confirm_url = request.build_absolute_uri(reverse('confirmar_recepcion', args=[cotizacion.id]))
 
+    form_url = request.build_absolute_uri(reverse('formulario_descarga_subida', args=[cotizacion.id]))
+    
     # Prepara el asunto y mensaje del correo electrónico
     subject = f'Cotización {cotizacion.id_personalizado}'
     message = f'''
@@ -79,7 +77,11 @@ def enviar_cotizacion(request, pk, destinatarios):
 
     Adjunto a este correo encontrará la cotización solicitada con el ID {cotizacion.id_personalizado}.
 
-    Por favor, revise el documento adjunto y confirme la recepción de la cotización haciendo clic en el siguiente enlace:{confirm_url}
+    Por favor, revise el documento adjunto y confirme la recepción de la cotización haciendo clic en el siguiente enlace:
+    {confirm_url}
+
+    Para descargar la cotización y subir su orden de trabajo, haga clic en el siguiente enlace:
+    {form_url}
 
     Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nosotros a través de este correo.
 
@@ -95,15 +97,13 @@ def enviar_cotizacion(request, pk, destinatarios):
     # Crea el objeto EmailMessage, adjunta el PDF y envía el correo a los destinatarios proporcionados
     email = EmailMessage(
         subject, message, 'proyectos.inade@icloud.com', destinatarios)
-    email.attach(
-        f'cotizacion_{cotizacion.id_personalizado}.pdf', pdf, 'application/pdf')
+    email.attach(f'cotizacion_{cotizacion.id_personalizado}.pdf', pdf, 'application/pdf')
     email.send()
 
     messages.success(request, 'Cotización enviada por correo.')
 
     # Redirige al usuario a la página de detalles de la cotización
     return redirect('cotizacion_detalle', pk=cotizacion.id)
-
 
 #   VISTA PARA SELECCIONAR CORREOS Y ENVIAR COTIZACIÓN
 def seleccionar_correos(request, pk):
@@ -158,8 +158,6 @@ def seleccionar_correos(request, pk):
     })
 
 #   VISTA PARA RENDERIZAR FORMULARIO DE CONFIRMACIÓN
-
-
 def confirmar_recepcion(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     if request.method == 'POST':
@@ -170,6 +168,36 @@ def confirmar_recepcion(request, pk):
         return redirect('confirmacion_recepcion')
     return render(request, 'accounts/correos/confirmar_recepcion.html', {'cotizacion': cotizacion})
 
-
+#   VISTA DE CONFIRMACIÓN
 def confirmacion_recepcion(request):
     return render(request, 'accounts/correos/confirmacion_recepcion.html')
+
+# ---       CORREOS     ---
+
+#   FORMULARIO PARA ORDEN DE PEDIDOS DE LOS USUARIOS
+class OrdenTrabajoForm(forms.Form):
+    archivo = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),
+        label=''
+    )
+
+def formulario_descarga_subida(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    if request.method == 'POST':
+        form = OrdenTrabajoForm(request.POST, request.FILES)
+        if form.is_valid():
+            archivo = form.cleaned_data['archivo']
+            # Aquí guardamos el archivo en el sistema de archivos o en la base de datos
+             # Crear una notificación
+            Notificacion.objects.create(
+                usuario=request.user,
+                tipo='orden_trabajo_subida',
+                mensaje=f'Se ha subido la orden de trabajo para la cotización {cotizacion.id}',
+                enlace=reverse('cotizacion_detalle', args=[cotizacion.id])
+            )
+            # Por simplicidad, solo mostramos un mensaje de éxito
+            messages.success(request, 'Orden de trabajo subida exitosamente.')
+            return redirect('confirmacion_recepcion')
+    else:
+        form = OrdenTrabajoForm()
+    return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})

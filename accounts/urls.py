@@ -1,4 +1,5 @@
 from django.urls import path
+from accounts.views import notificaciones
 from accounts.vistas import views_clientes, views_empresas, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
 from accounts.vistas.views_autenticacion import CustomPasswordResetView
@@ -11,16 +12,19 @@ urlpatterns = [
     path('', views_autenticacion.dashboard, name='dashboard'),
     path('login/', views_autenticacion.login_view, name='login'),
     path('logout/', views_autenticacion.logout_view, name='logout'),
-    path('mostrar_CustomUser/', views_autenticacion.mostrar_CustomUser,
-         name='mostrar_CustomUser'),
+    path('mostrar_CustomUser/', views_autenticacion.mostrar_CustomUser,name='mostrar_CustomUser'),
 
     #   ---     RECUPERACIÓN DE CONTRASEÑA       ---
 
-    path('password_reset/', CustomPasswordResetView.as_view(), name='pa∫ssword_reset'),
+    path('password_reset/', CustomPasswordResetView.as_view(), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/autenticacion/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/autenticacion/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/autenticacion/password_reset_complete.html'), name='password_reset_complete'),
 
+    #   ---     INTERFAZ HOME       ---
+    
+    path('notificaciones/', notificaciones, name='notificaciones'),
+    
     #   ---     INTERFAZ HOME       ---
 
     path('home/', views_home.home, name='home'),
@@ -92,6 +96,7 @@ urlpatterns = [
     path('cotizacion/<int:pk>/seleccionar_correos/', views_correos.seleccionar_correos, name='seleccionar_correos'),
     path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
+    path('formulario_descarga_subida/<int:pk>/', views_correos.formulario_descarga_subida, name='formulario_descarga_subida'),
 
     # Define otras rutas según las vistas que hayas definido
 ]

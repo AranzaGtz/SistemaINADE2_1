@@ -71,6 +71,21 @@ class CustomUser(AbstractUser):
         return self.username
 
 #----------------------------------------------------
+# MODELO PARA CLIENTES
+#----------------------------------------------------
+
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=100)
+    mensaje = models.TextField()
+    enlace = models.URLField()
+    leido = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+        
+#----------------------------------------------------
 # MODELO PARA EMPRESAS
 #----------------------------------------------------
 

@@ -6,7 +6,7 @@ from accounts.models import Formato
 
 
 def terminos_avisos(request):
-    formato = get_object_or_404(Formato, pk=1)
+    formato = get_object_or_404(Formato, id=3)
     if request.method == 'POST':
         form = TerminosForm(request.POST, instance=formato)
         if form.is_valid():
@@ -16,4 +16,5 @@ def terminos_avisos(request):
             return redirect('home')
     else:
         form = TerminosForm(instance=formato)
-    return render(request, 'accounts/organizacion/terminos.html', {'form': form})
+   
+    return render(request, 'accounts/organizacion/terminos.html',{'form':form})
