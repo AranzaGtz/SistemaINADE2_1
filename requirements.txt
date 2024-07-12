@@ -17,7 +17,7 @@ cssselect==1.2.0
 cssselect2==0.7.0
 cssutils==2.11.1
 cycler==0.12.1
-Django==5.0.6
+Django==5.0.7
 django-crispy-forms==2.2
 djangorestframework==3.15.1
 Faker==25.8.0
