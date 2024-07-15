@@ -1,0 +1,16 @@
+<!-- templates/editar_organizacion.html -->
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Términos y Avisos de Privacidad{% endblock %}
+{% block header %}Términos y Avisos de Privacidad{% endblock %}
+{% block content %}
+<h2>Editar Organización</h2>
+{% if not organizacion.pk %}
+<p>Se está creando una nueva organización ya que no existe ninguna previamente.</p>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar Cambios</button>
+</form>
+{% endblock %}
