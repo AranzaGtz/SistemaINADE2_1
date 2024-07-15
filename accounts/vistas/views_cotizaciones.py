@@ -347,9 +347,9 @@ def cotizacion_pdf(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     print("\nAlgo pasa con cotización")
     conceptos = cotizacion.conceptos.all()
-    ogr = get_object_or_404(Organizacion, nombre='Ingenieria y Administración Estratégica, S.A. de C.V.')
+    ogr = get_object_or_404(Organizacion, id='4')
     print("\nAlgo pasa con organizacion")
-    formato = get_object_or_404(Formato, nombre_formato='FOR-G-007')
+    formato = get_object_or_404(Formato, id=3)
     print("\nAlgo pasa con formato")
     # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
