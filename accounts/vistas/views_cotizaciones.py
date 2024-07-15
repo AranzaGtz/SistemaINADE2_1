@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
+from accounts.helpers import get_formato_default, get_unica_organizacion
 from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Organizacion, Formato, CustomUser, Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm, TerminosForm
 from django.contrib import messages
@@ -345,17 +346,11 @@ def cotizacion_duplicar(request, pk):
 # VISTA PARA GENERAR ARCHIVO PDF
 def cotizacion_pdf(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
-    print("\nAlgo pasa con cotización")
     conceptos = cotizacion.conceptos.all()
-    ogr = get_object_or_404(Organizacion, id='4')
-    print("\nAlgo pasa con organizacion")
-    formato = get_object_or_404(Formato, id=3)
-    print("\nAlgo pasa con formato")
-    # Verifica si el usuario está autenticado
-    if request.user.is_authenticated:
-        username = request.user.username
-        user = get_object_or_404(CustomUser, username=username)
-    # Ahora puedes trabajar con el objeto 'user'
+    org = get_unica_organizacion()
+    formato = get_formato_default(org)
+    
+    user = request.user if request.user.is_authenticated else None
 
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
@@ -363,7 +358,7 @@ def cotizacion_pdf(request, pk):
     logo_url = request.build_absolute_uri('/static/img/logo.png')
     current_date = datetime.now().strftime("%Y/%m/%d")
     context = {
-        'org': ogr,
+        'org': org,
         'org_form': formato,
         'user': user,
         'cotizacion': cotizacion,

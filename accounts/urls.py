@@ -89,6 +89,7 @@ urlpatterns = [
     #   ---     INTERFAZ TERMINOS Y AVISOS       ---
 
     path('terminos/', views_organizacion.terminos_avisos, name='terminos_avisos'),
+    path('organizacion/terminos/', views_organizacion.editar_organizacion, name='editar_organizacion'),
 
     #   ---     ENVIOS DE CORREOS       ---
 

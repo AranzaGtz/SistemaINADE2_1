@@ -11,6 +11,7 @@ from django.db import IntegrityError
 from django.template.loader import render_to_string
 from weasyprint import HTML  # type: ignore # Asegúrate de tener weasyprint instalado
 from django.urls import reverse
+from accounts.helpers import get_formato_default, get_unica_organizacion
 
 #   VISTA PARA ENVIAR CORREO DE TEXTO
 def enviar_correo(request):
@@ -34,8 +35,8 @@ def enviar_cotizacion(request, pk, destinatarios):
     conceptos = cotizacion.conceptos.all()
 
     # Obtiene la organización y el formato por sus id (en este caso asumiendo que id=1 es válido)
-    ogr = get_object_or_404(Organizacion, id=4)
-    formato = get_object_or_404(Formato, id=3)
+    ogr = get_unica_organizacion()
+    formato = get_formato_default(ogr)
 
     # Calcula el subtotal para cada concepto multiplicando la cantidad de servicios por el precio
     for concepto in conceptos:

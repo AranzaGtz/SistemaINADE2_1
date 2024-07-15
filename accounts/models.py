@@ -238,9 +238,9 @@ class Concepto(models.Model):
 
 # MODELO PARA ORGANIZACION
 class Organizacion(models.Model):
-    nombre = models.CharField(max_length=255)
-    direccion = models.CharField(max_length=255)
-    telefono = models.CharField(max_length=20)
+    nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
+    direccion = models.CharField(max_length=255, default='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106')
+    telefono = models.CharField(max_length=20, default='(664) 104 51 44')
     pagina_web = models.URLField()
     
     def __str__(self):
@@ -257,3 +257,4 @@ class Formato(models.Model):
     
     def __str__(self):
         return f'{self.nombre_formato} - {self.version}'
+    

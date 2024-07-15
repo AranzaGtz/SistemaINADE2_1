@@ -1,5 +1,5 @@
 from django import forms
-from .models import Concepto, CustomUser, Formato, Metodo, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
+from .models import Concepto, CustomUser, Formato, Metodo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -233,9 +233,19 @@ class CotizacionChangeForm(forms.ModelForm):
 
 # ---      ORGANIZACIÓN     ---
 
+#   FORMULARIO PARA LA ORGANIZACION 
+class OrganizacionForm(forms.ModelForm):
+    class Meta:
+        model = Organizacion
+        fields = ['nombre', 'direccion', 'telefono', 'pagina_web']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'pagina_web': forms.URLInput(attrs={'class': 'form-control'}),
+        }
+
 #   FORMULARIO PARA TERMINOS Y AVISOS
-
-
 class TerminosForm(forms.ModelForm):
     class Meta:
         model = Formato
