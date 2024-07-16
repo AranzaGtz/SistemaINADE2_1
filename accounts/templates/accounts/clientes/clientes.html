@@ -39,9 +39,7 @@
             <thead class="thead-light">
                 <tr>
                     <th>#</th>
-                    <th>Título</th>
-                    <th>Nombre</th>
-                    <th>Apellidos</th>
+                    <th colspan="3">Cliente</th>
                     <th>Empresa</th>
                     <th>Correo</th>
                     <th colspan="4">Opciones</th>
@@ -52,7 +50,7 @@
                 {% for persona in personas %}
                 <tr>
                     <td>{{ forloop.counter }}</td> <!-- Contador de la fila -->
-                    <td>{{ persona.titulo }}</td> <!-- Título del cliente -->
+                    <td>{{ persona.titulo.abreviatura }}</td> <!-- Título del cliente -->
                     <td>{{ persona.nombre }}</td> <!-- Nombre del cliente -->
                     <td>{{ persona.apellidos }}</td> <!-- Apellidos del cliente -->
                     <td>{{ persona.empresa.nombre_empresa }}</td> <!-- Nombre de la empresa del cliente -->
@@ -122,5 +120,35 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const checkbox = document.getElementById('crear_empresa_checkbox');
+        const selectEmpresaDiv = document.getElementById('select_empresa_div');
+        const formEmpresaDiv = document.getElementById('form_empresa_div');
+        const empresaFormFields = formEmpresaDiv.querySelectorAll('input, select, textarea');
+
+        checkbox.addEventListener('change', function() {
+            if (checkbox.checked) {
+                selectEmpresaDiv.style.display = 'none';
+                formEmpresaDiv.style.display = 'block';
+                empresaFormFields.forEach(field => {
+                    field.removeAttribute('disabled');
+                });
+            } else {
+                selectEmpresaDiv.style.display = 'block';
+                formEmpresaDiv.style.display = 'none';
+                empresaFormFields.forEach(field => {
+                    field.setAttribute('disabled', 'disabled');
+                });
+            }
+        });
+
+        // Inicialmente deshabilitar los campos del formulario de empresa
+        empresaFormFields.forEach(field => {
+            field.setAttribute('disabled', 'disabled');
+        });
+    });
+</script>
 
 {% endblock %}

@@ -1,16 +1,26 @@
 <!-- templates/editar_organizacion.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Términos y Avisos de Privacidad{% endblock %}
-{% block header %}Términos y Avisos de Privacidad{% endblock %}
+{% block title %}Organización{% endblock %}
+{% block header %}Organización{% endblock %}
 {% block content %}
-<h2>Editar Organización</h2>
+<!-- SECCIÓN DE TÍTULO ENCABEZANDO -->
+<div class="row">
+    <div class="col">
+         <h1 class="text-center">Organización</h1>
+         <hr />
+    </div>
+</div>
 {% if not organizacion.pk %}
-<p>Se está creando una nueva organización ya que no existe ninguna previamente.</p>
 {% endif %}
+<div class="alert alert-warning mb-4">
+    <h4 class="alert-heading">¡Atención!</h4>
+    <p>Este formulario es para cambiar datos de la organizacion, al cambia la información no podra recuperar la información cambiada.</p>
+</div>
+<p><strong>Cambie la información necesaria y de click en "Guardar Cambios".</strong></p>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Guardar Cambios</button>
+    <button type="submit" class="btn btn-primary mb-3">Guardar Cambios</button>
 </form>
 {% endblock %}
