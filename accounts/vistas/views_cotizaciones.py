@@ -7,7 +7,7 @@ from accounts.helpers import get_formato_default, get_unica_organizacion
 from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Organizacion, Formato, CustomUser, Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm, TerminosForm
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from weasyprint import HTML  # type: ignore
 from django.template.loader import render_to_string
 from django.db import IntegrityError, transaction
@@ -352,42 +352,22 @@ def cotizacion_duplicar(request, pk):
 # VISTA PARA GENERAR ARCHIVO PDF
 def cotizacion_pdf(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
-    conceptos = cotizacion.conceptos.all()
-    org = get_unica_organizacion()
-    formato = get_formato_default(org)
-    user = request.user if request.user.is_authenticated else None
+    # Verificar si el archivo PDF existe
+    if cotizacion.cotizacion_pdf:
+        # Retornar el archivo PDF guardado
+        return FileResponse(cotizacion.cotizacion_pdf.open(), content_type='application/pdf')
+    else:
+        raise Http404("El archivo PDF no se encuentra.")
 
-    for concepto in conceptos:
-        concepto.subtotal = concepto.cantidad_servicios * concepto.precio
-    # Construir la URL absoluta del archivo de la imagen
-    logo_url = request.build_absolute_uri('/static/img/logo.png')
-    current_date = datetime.now().strftime("%Y/%m/%d")
-    context = {
-        'org': org,
-        'org_form': formato,
-        'user': user,
-        'cotizacion': cotizacion,
-        'conceptos': conceptos,
-        'current_date': current_date,
-        'logo_url': logo_url,  # Agregar la URL de la imagen al contexto
-    }
-
-    html_string = render_to_string(
-        'accounts/cotizaciones/cotizacion_platilla.html', context)
-    # Asegurarse de que las URLs sean absolutas
-    html = HTML(string=html_string, base_url=request.build_absolute_uri())
-    pdf = html.write_pdf()
-
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename="cotizacion_{
-        cotizacion.id_personalizado}.pdf"'
-    return response
-
-
+# VISTA PARA GENERAR PDF Y GUARDARLO EN BD
 def generar_pdf_cotizacion(request,cotizacion):
     conceptos = cotizacion.conceptos.all()
     org = get_unica_organizacion()
-    formato = get_formato_default(org)
+    formato = get_formato_default()
+    user = request.user if request.user.is_authenticated else None
+    
+    for concepto in conceptos:
+        concepto.subtotal = concepto.cantidad_servicios * concepto.precio
     
     current_date = datetime.now().strftime("%Y/%m/%d")
     logo_url = request.build_absolute_uri('/static/img/logo.png')  # Necesitas obtener este request de alguna manera, o ajustar para no usar request aquí
@@ -395,6 +375,7 @@ def generar_pdf_cotizacion(request,cotizacion):
     context = {
         'org': org,
         'org_form': formato,
+        'user': user,
         'cotizacion': cotizacion,
         'conceptos': conceptos,
         'current_date': current_date,
