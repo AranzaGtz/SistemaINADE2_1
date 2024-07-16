@@ -178,6 +178,7 @@ class Cotizacion(models.Model):
     persona = models.ForeignKey(Persona, on_delete=models.PROTECT, blank=True, null=True)
     id_personalizado = models.CharField(max_length=4, unique=True, default='0001')
     cotizacion_pdf = models.FileField(upload_to='cotizaciones_pdfs/',null=True,blank=True)
+    orden_pedido_pdf = models.FileField(upload_to='ordenes_pedido_pdfs/', null=True, blank=True)  # Corregido
     
     def calculate_subtotal(self):
         return sum(concepto.cantidad_servicios * concepto.precio for concepto in self.conceptos.all())

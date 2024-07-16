@@ -18,6 +18,10 @@
             <a href="{% url 'seleccionar_correos' cotizacion.id %}" class="btn btn-success mx-1">Enviar cotización</a>
             <a href="" class="btn btn-warning mx-1">Actualizar estado</a>
             <a href="{% url 'cotizacion_pdf' cotizacion.id %}" class="btn btn-secondary mx-1">Ver PDF</a>
+            <!-- cotizacion_detalle.html -->
+            {% if cotizacion.orden_pedido_pdf %}
+                <a href="{% url 'ver_orden_pedido' cotizacion.id %}" class="btn btn-info">Ver Orden de Pedido</a>
+            {% endif %}
         </div>
         <!-- DATOS DE COTIZACION -->
         <div class="col mx-auto">
