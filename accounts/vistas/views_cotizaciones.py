@@ -349,7 +349,7 @@ def cotizacion_duplicar(request, pk):
         'concepto_formset': formset
     })
 
-# VISTA PARA GENERAR ARCHIVO PDF
+# VISTA PARA VER ARCHIVO PDF COTIZACION
 def cotizacion_pdf(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     # Verificar si el archivo PDF existe
@@ -358,6 +358,13 @@ def cotizacion_pdf(request, pk):
         return FileResponse(cotizacion.cotizacion_pdf.open(), content_type='application/pdf')
     else:
         raise Http404("El archivo PDF no se encuentra.")
+
+# VISTA PARA VER ARCHIVO PDF ORDEN PEDIDO
+def ver_orden_pedido(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    if not cotizacion.orden_pedido_pdf:
+        raise Http404("El archivo PDF de la orden de pedido no se encuentra.")
+    return FileResponse(cotizacion.orden_pedido_pdf.open(), content_type='application/pdf')
 
 # VISTA PARA GENERAR PDF Y GUARDARLO EN BD
 def generar_pdf_cotizacion(request,cotizacion):

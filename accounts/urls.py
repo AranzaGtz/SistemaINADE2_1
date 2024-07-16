@@ -84,6 +84,7 @@ urlpatterns = [
     path('cotizaciones/<int:pk>/delete/', views_cotizaciones.cotizacion_delete, name='cotizacion_delete'),
 
     path('cotizacion/<int:pk>/pdf/', views_cotizaciones.cotizacion_pdf, name='cotizacion_pdf'),
+    path('cotizacion/<int:pk>/ver_orden_pedido/', views_cotizaciones.ver_orden_pedido, name='ver_orden_pedido'),
     # ESTA SIENDO DUP`LICADA PORQUE SE UNA EN LA CREACION DE COTIZACIÓN LA DE ARRIBA SE USA SOLO PARA VER
     path('cotizaciones/<int:pk>/duplicar/', views_cotizaciones.cotizacion_duplicar, name='cotizacion_duplicar'),
     path('cotizacion/pdf', views_cotizaciones.generar_pdf_cotizacion, name='generar_pdf_cotizacion'),
@@ -94,7 +95,6 @@ urlpatterns = [
 
     #   ---     ENVIOS DE CORREOS       ---
 
-    path('enviar_correo/', views_correos.enviar_correo, name='enviar_correo'),
     path('cotizacion/<int:pk>/seleccionar_correos/', views_correos.seleccionar_correos, name='seleccionar_correos'),
     path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),

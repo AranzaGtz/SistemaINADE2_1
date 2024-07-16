@@ -258,12 +258,9 @@ class TerminosForm(forms.ModelForm):
             'avisos': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
-
-# ---       CORREOS     ---
-
-#   FORMULARIO PARA ORDEN DE PEDIDOS DE LOS USUARIOS
-class FormularioSolicitudCotizacion(forms.Form):
-    nombre = forms.CharField(max_length=100)
-    correo_electronico = forms.EmailField()
-    mensaje = forms.CharField(widget=forms.Textarea)
-    archivo = forms.FileField()
+#   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
+class OrdenTrabajoForm(forms.Form):
+    archivo = forms.FileField(
+        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),
+        label=''
+    )
