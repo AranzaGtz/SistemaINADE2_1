@@ -244,6 +244,7 @@ class Organizacion(models.Model):
     telefono = models.CharField(max_length=20, default='(664) 104 51 44')
     pagina_web = models.URLField()
     
+    
     def __str__(self):
         return self.nombre
 
