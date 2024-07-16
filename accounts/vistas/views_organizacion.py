@@ -1,10 +1,10 @@
 # VISTA PARA MODIFICAR NUESTRA INFORMACION DE FORMATO
-from pyexpat.errors import messages
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import OrganizacionForm, TerminosForm
 from accounts.models import Formato, Organizacion
 
-
+#   VISTA PARTA ACTUALIZAR TERMINOS Y AVISOS
 def terminos_avisos(request):
     formato = Formato.objects.first()
     if not formato:
@@ -23,6 +23,7 @@ def terminos_avisos(request):
    
     return render(request, 'accounts/organizacion/terminos.html',{'form':form})
 
+#   VISTA PARA ACTUALIZAR LA ORGANIZACIÓN
 def editar_organizacion(request):
     organizacion = Organizacion.objects.first()
     if not organizacion:

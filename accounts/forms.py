@@ -249,8 +249,11 @@ class OrganizacionForm(forms.ModelForm):
 class TerminosForm(forms.ModelForm):
     class Meta:
         model = Formato
-        fields = ['terminos', 'avisos']
+        fields = ['nombre_formato','version','emision','terminos', 'avisos']
         widgets = {
+            'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
+            'version': forms.TextInput(attrs={'class': 'form-control'}),
+            'emision': forms.DateInput(attrs={'class': 'form-control'}),
             'terminos': forms.Textarea(attrs={'class': 'form-control'}),
             'avisos': forms.Textarea(attrs={'class': 'form-control'}),
         }

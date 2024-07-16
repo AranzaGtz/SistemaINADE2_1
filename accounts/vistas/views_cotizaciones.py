@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib import request
 from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
@@ -10,6 +11,8 @@ from django.http import HttpResponse, JsonResponse
 from weasyprint import HTML  # type: ignore
 from django.template.loader import render_to_string
 from django.db import IntegrityError, transaction
+from django.core.files.base import ContentFile
+from io import BytesIO
 
 # VISTA PARA GENERAD ID PERSONALIZADO
 def generate_new_id_personalizado():
@@ -105,7 +108,10 @@ def cotizacion_form(request):
                         (cotizacion.tasa_iva / 100)
                     cotizacion.total = cotizacion.subtotal + cotizacion.iva
                     cotizacion.save()
-
+                    # Generar PDF y guardar en el modelo
+                    pdf_data = generar_pdf_cotizacion(request, cotizacion)
+                    cotizacion.cotizacion_pdf.save(f"cotizacion_{cotizacion.id_personalizado}.pdf", ContentFile(pdf_data))
+                    cotizacion.save()
                     messages.success(request, 'Cotización creada con éxito.')
                     return redirect('cotizacion_detalle', pk=cotizacion.id)
             except IntegrityError:
@@ -349,7 +355,6 @@ def cotizacion_pdf(request, pk):
     conceptos = cotizacion.conceptos.all()
     org = get_unica_organizacion()
     formato = get_formato_default(org)
-    
     user = request.user if request.user.is_authenticated else None
 
     for concepto in conceptos:
@@ -377,4 +382,30 @@ def cotizacion_pdf(request, pk):
     response['Content-Disposition'] = f'inline; filename="cotizacion_{
         cotizacion.id_personalizado}.pdf"'
     return response
+
+
+def generar_pdf_cotizacion(request,cotizacion):
+    conceptos = cotizacion.conceptos.all()
+    org = get_unica_organizacion()
+    formato = get_formato_default(org)
+    
+    current_date = datetime.now().strftime("%Y/%m/%d")
+    logo_url = request.build_absolute_uri('/static/img/logo.png')  # Necesitas obtener este request de alguna manera, o ajustar para no usar request aquí
+
+    context = {
+        'org': org,
+        'org_form': formato,
+        'cotizacion': cotizacion,
+        'conceptos': conceptos,
+        'current_date': current_date,
+        'logo_url': logo_url,
+    }
+
+    html_string = render_to_string(
+        'accounts/cotizaciones/cotizacion_platilla.html', context)
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())  # Ajustar según sea necesario sin request
+    pdf = html.write_pdf()
+
+    # Devolver los datos binarios del PDF
+    return pdf
 
