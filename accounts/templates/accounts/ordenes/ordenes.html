@@ -12,13 +12,16 @@
     </div>
 </div>
 
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'ordenesTable')" placeholder="Buscar ordenes de trabajo...">
+<!-- BUSCADOR -->
+<div class="row mb-3 justify-content-center">
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar ordenes de trabajo..." onkeyup="filterTable('searchInput', 'ordenesTable')">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'ordenesTable')">Buscar</button>
+            </div>
+        </div>
     </div>
-    <!-- <div class="col-auto">
-        <a href="{% url 'cotizaciones_list' %}" class="btn btn-info mb-3">Ver Cotizaciones No Aceptadas</a>
-    </div> -->
 </div>
 <!-- TABLA -->
 <div class="row">
@@ -31,7 +34,7 @@
                         <th>ID</th>
                         <th>Cotización</th>
                         <th>Cliente</th>
-                        <th>Recibbe</th>
+                        <th>Recibe</th>
                         <th>Estado</th>
                         <th colspan="2">Opciones</th>
                     </tr>
@@ -43,7 +46,7 @@
                         <td>{{ orden.id_personalizado }}</td>
                         <td>{{ orden.cotizacion }}</td>
                         <td>{{ orden.cotizacion.persona }} </td>
-                        <td>{{ orden.receptor }}</td>
+                        <td>{{ orden.receptor.first_name }} {{ orden.receptor.last_name }}</td>
                         <td>{% if orden.estado %}Terminado{% else %}Pendiente{% endif %}</td>
                         <td><a href="" class="btn btn-primary btn-sm">Detalles</a></td>
                         <td><a href="" class="btn btn-primary btn-sm">Actualizar estado</a></td>
