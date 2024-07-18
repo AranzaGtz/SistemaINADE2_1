@@ -1,18 +1,16 @@
 from datetime import datetime
-from urllib import request
 from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import get_formato_default, get_unica_organizacion
-from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Organizacion, Formato, CustomUser, Persona, Prospecto, Servicio, Titulo
-from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm, TerminosForm
+from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto,Persona, Prospecto, Servicio, Titulo
+from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm
 from django.contrib import messages
-from django.http import FileResponse, Http404, HttpResponse, JsonResponse
+from django.http import FileResponse, Http404, JsonResponse
 from weasyprint import HTML  # type: ignore
 from django.template.loader import render_to_string
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
-from io import BytesIO
 
 # VISTA PARA GENERAD ID PERSONALIZADO
 def generate_new_id_personalizado():
@@ -26,7 +24,8 @@ def generate_new_id_personalizado():
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
     # Inicializar la consulta de cotizaciones
-    cotizaciones = Cotizacion.objects.all()
+     # Filtrar cotizaciones que no están aceptadas
+    cotizaciones = Cotizacion.objects.filter(estado=False)
     cotizacion_form = CotizacionForm()
     concepto_formset = ConceptoFormSet()
 
@@ -397,3 +396,10 @@ def generar_pdf_cotizacion(request,cotizacion):
     # Devolver los datos binarios del PDF
     return pdf
 
+# VISTA PARA CAMBIAR ESTADO DE COTIZACIÓN
+def actualizar_estado(request, pk):
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    cotizacion.estado = True
+    cotizacion.save()
+    messages.success(request, 'El estado de la cotización ha sido actualizado a Aceptado.')
+    return redirect('cotizacion_detalle', pk=cotizacion.id)
