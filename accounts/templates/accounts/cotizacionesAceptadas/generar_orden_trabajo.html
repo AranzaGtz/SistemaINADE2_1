@@ -95,7 +95,7 @@
      <div class="form-group">
           <h2 class="mt-3 mb-3">Proyecto a gestion</h2>
           <div class="form-check">
-               <input class="form-check-input" type="checkbox" name="proyecto_a_gestion" id="proyecto_a_gestion" >
+               <input class="form-check-input" type="checkbox" name="proyecto_a_gestion" id="proyecto_a_gestion">
                <label class="form-check-label" for="proyecto_a_gestion">
                     Selecciona si es un proyecto a gestión.
                </label>
@@ -104,43 +104,45 @@
      <div class="form-group">
           <h2 class="mt-3 mb-3">Datos del Proyecto</h2>
           <ul class="list-unstyled">
-              {% for concepto in conceptos %}
-              <li class="mb-2">
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" name="usare_concepto_{{ concepto.id }}"
-                          id="usare_concepto_{{ concepto.id }}" value="{{ concepto.id }}"
-                          data-target="#info_{{ concepto.id }}">
-                      <label class="form-check-label" for="usare_concepto_{{ concepto.id }}">
-                          {{ concepto.servicio.nombre_servicio }} - {{ concepto.servicio.metodo }}
-                      </label>
-                  </div>
-              </li>
-              {% endfor %}
+               {% for concepto in conceptos %}
+               <li class="mb-2">
+                    <div class="form-check">
+                         <input class="form-check-input" type="checkbox" name="usare_concepto_{{ concepto.id }}"
+                              id="usare_concepto_{{ concepto.id }}" value="{{ concepto.id }}"
+                              data-target="#info_{{ concepto.id }}">
+                         <label class="form-check-label" for="usare_concepto_{{ concepto.id }}">
+                              {{ concepto.servicio.nombre_servicio }} - {{ concepto.servicio.metodo }}
+                         </label>
+                    </div>
+               </li>
+               {% endfor %}
           </ul>
-      </div>
-      <div id="informacion-adicional" class="mt-4">
+     </div>
+     <div id="informacion-adicional" class="mt-4">
           {% for concepto in conceptos %}
-          <div id="info_{{ concepto.id }}" class="border-custom border-custom-left p-3 bg-light mt-5" style="display: none;">
-              <h4 class="mb-3">{{ concepto.servicio.nombre_servicio }}</h4>
-              <p class="m-1"><strong>Método: </strong>{{ concepto.servicio.metodo }}</p>
-              <p class="m-1"><strong>Descripción: </strong>{{ concepto.servicio.descripcion }}</p>
-              <p class="m-1"><strong>Cantidad: </strong>{{ concepto.cantidad_servicios }}</p>
-              <p class="m-1"><strong>Notas: </strong>{{ concepto.notas }}</p>
-              <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="usar_otra_descripcion_{{ concepto.id }}"
-                      id="usar_otra_descripcion_{{ concepto.id }}" data-target="#textarea_{{ concepto.id }}">
-                  <label class="form-check-label" for="usar_otra_descripcion_{{ concepto.id }}">
-                      Usar otra descripción para este dato
-                  </label>
-              </div>
-              <div id="textarea_{{ concepto.id }}" style="display: none;">
-                  <textarea class="form-control mt-2" name="otra_descripcion_{{ concepto.id }}" rows="3"
-                      placeholder="Ingrese otra descripción"></textarea>
-              </div>
+          <div id="info_{{ concepto.id }}" class="border-custom border-custom-left p-3 bg-light mt-5"
+               style="display: none;">
+               <h4 class="mb-3">{{ concepto.servicio.nombre_servicio }}</h4>
+               <p class="m-1"><strong>Método: </strong>{{ concepto.servicio.metodo }}</p>
+               <p class="m-1"><strong>Descripción: </strong>{{ concepto.servicio.descripcion }}</p>
+               <p class="m-1"><strong>Cantidad: </strong>{{ concepto.cantidad_servicios }}</p>
+               <p class="m-1"><strong>Notas: </strong>{{ concepto.notas }}</p>
+               <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="usar_otra_descripcion_{{ concepto.id }}"
+                         id="usar_otra_descripcion_{{ concepto.id }}" data-target="#textarea_{{ concepto.id }}">
+                    <label class="form-check-label" for="usar_otra_descripcion_{{ concepto.id }}">
+                         Usar otra descripción para este dato
+                    </label>
+               </div>
+               <div id="textarea_{{ concepto.id }}" style="display: none;">
+                    <textarea class="form-control mt-2" name="otra_descripcion_{{ concepto.id }}" rows="3"
+                         placeholder="Ingrese otra descripción"></textarea>
+               </div>
+
           </div>
           {% endfor %}
-      </div>
-    
+     </div>
+
      <!-- Seccion de botones del formulario cotizaciones -->
      <div class="form-group text-right mt-4">
           <input type="submit" class="btn btn-success" value="Generar Orden de Trabajo" />
