@@ -118,6 +118,10 @@
                width: 100px;
           }
 
+          .m-0 {
+               margin: 0px;
+          }
+
           .m-1 {
                margin: 5px;
           }
@@ -143,6 +147,9 @@
                font-size: 12px;
                color: #555;
           }
+          .letra{
+               font-size: smaller;
+          }
      </style>
 </head>
 
@@ -150,21 +157,21 @@
      <table>
           <tbody>
                <tr>
-                    <td rowspan="3"><img class="logo" src="{{ logo_url }}" alt="Logo"></td>
-                    <td><h4 class="text-center">{{ org }}</h4></td>
-                    <td>{{ formato }}</td>
+                    <td rowspan="3" class="center text-center mt-0"><img class="logo" src="{{ logo_url }}" alt="Logo"></td>
+                    <td><strong class="text-center mt-0">{{ org }}</strong></td>
+                    <td class="mt-0 letra">{{ formato }}</td>
                </tr>
                <tr>
-                    <td rowspan="2">Orden de Trabajo</td>
-                    <td>Versión {{ version }}</td>
+                    <td rowspan="2" class="text-center mt-0">Orden de Trabajo</td>
+                    <td class="mt-0 letra">Versión {{ version }}</td>
                </tr>
                <tr>
-                    <td>Emisión: {{ emision|date:"d/m/Y" }}</td>
+                    <td class="mt-0 letra">Emisión: {{ emision }}</td>
                </tr>
           </tbody>
      </table>
 
-     <h3 class="text-center">Orden de Trabajo {{ orden_trabajo.id_personalizado }}</h3>
+     <h2 class="text-center mt-10">Orden de Trabajo {{ orden_trabajo.id_personalizado }}</h2>
 
      <div class="row sb">
           <div class="w-m">
@@ -206,10 +213,11 @@
           <p><strong>Método de referencia:</strong> {{ concepto.servicio.metodo }}</p>
           <p><strong>Descripción:</strong> {{ concepto.servicio.descripcion }}</p>
           <p><strong>Cantidad o número de muestras autorizadas:</strong> {{ concepto.cantidad_servicios }}</p>
-          <p class="ml-2">{{ concepto.notas }} {{ descripcion }}</p>
+          <p class="ml-2"> {% if descripcion %} {{ descripcion }}{%else%} {{ concepto.notas }} {% endif%}</p>
 
           {% endfor %}
      </div>
+     <br><br><br><br>
 
      <div class="row sb mt-10">
           <div class="col">

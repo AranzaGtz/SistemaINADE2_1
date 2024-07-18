@@ -1,6 +1,6 @@
 from django.urls import path
 from accounts.views import notificaciones
-from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
+from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_orden_trabajo, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
 from accounts.vistas.views_autenticacion import CustomPasswordResetView
 
@@ -92,6 +92,10 @@ urlpatterns = [
     
     path('cotizaciones_aceptadas/', views_cotizaciones_aceptadas.cotizaciones_aceptadas_list,name='cotizaciones_aceptadas_list'),
     path('cotizaciones_aceptadas/generar_orden_trabajo/<int:pk>', views_cotizaciones_aceptadas.generar_orden_trabajo , name='generar_orden_trabajo'),
+    
+    #   ---     INTERFAZ ORDENES DE TRABAJO     ---
+    
+    path('ordenes_de_trabajo/', views_orden_trabajo.ordenes_list, name='ordenes_list'),
     
     #   ---     INTERFAZ TERMINOS Y AVISOS       ---
 
