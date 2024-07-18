@@ -292,4 +292,4 @@ class Formato(models.Model):
     
     def __str__(self):
         return f'{self.nombre_formato} - {self.version}'
-    
+

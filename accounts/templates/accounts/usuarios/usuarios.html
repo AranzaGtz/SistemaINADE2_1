@@ -7,12 +7,20 @@
 <h1 class="text-center">Usuarios del Sistema</h1>
 <hr class="featurette-divider">
 
+<!-- BUSCADOR -->
+<div class="row mb-3 justify-content-center">
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario..." onkeyup="filterTable('searchInput', 'usuariosTable')">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'usuariosTable')">Buscar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ENTRADA DE BUSQUEDA -->
 <div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'usuariosTable')"
-            placeholder="Buscar usuarios...">
-    </div>
     <div class="col-auto">
         <!-- Botón para abrir el modal de creación de nuevo cliente -->
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal"> Añadir Usuario </button>

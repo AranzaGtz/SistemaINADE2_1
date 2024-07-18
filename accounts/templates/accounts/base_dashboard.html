@@ -42,8 +42,20 @@
     <header class="">
         <nav class="navbar bg-body-tertiary fixed-top">
             <div class="container-fluid">
-                <a class="navbar-brand " href="#"><img src="{% static 'img/gotalogo.png' %}" alt="Logo"
-                        style="max-height: 40px;" class="mr-2"> INADE Laboratorio Ambiental</a>
+                <div class="row">
+                    <div class="col d-flex align-items-center">
+                        <a class="navbar-brand d-flex align-items-center" href="#"><img src="{% static 'img/gotalogo.png' %}" alt="Logo"
+                                style="max-height: 40px;" class="mr-2"> INADE Laboratorio Ambiental</a>
+                    </div>
+                    <div class="col d-flex align-items-center">
+                        <!-- Enlace de Notificaciones -->
+                        <a  class="navbar-brand" href="{% url 'notificaciones' %}" style="max-height: 40px;"> Notificaciones
+                            {% if notificaciones_no_leidas > 0 %}
+                            <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -65,7 +77,8 @@
                                 <a class="nav-link" href="{% url 'cotizaciones_list' %}">Cotizaciones</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}">Cotizaciones Acepatadas</a>
+                                <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}">Cotizaciones
+                                    Acepatadas</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'ordenes_list' %}">Ordenes de Trabajo</a>

@@ -5,6 +5,7 @@
 {% block content %}
 
 <!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
+
 <div class="row">
     <div class="col">
         <h1 class="text-center">Servicios</h1>
@@ -12,11 +13,19 @@
     </div>
 </div>
 
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'serviciosTable')"
-            placeholder="Buscar servicios...">
+<!-- BUSCADOR -->
+<div class="row mb-3 justify-content-center">
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar servicios..." onkeyup="filterTable('searchInput', 'serviciosTable')">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'serviciosTable')">Buscar</button>
+            </div>
+        </div>
     </div>
+</div>
+
+<div class="row mb-3 justify-content-end">
     <div class="col-auto">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
             data-bs-target="#createServicioModal">Añadir Servicio</button>
@@ -63,7 +72,7 @@
     </div>
 </div>
 
-<hr class="featurette-divider">
+<hr>
 
 <!-- SECCIÓN DE MÉTODOS -->
 <div class="row">
@@ -74,10 +83,6 @@
 </div>
 
 <div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'metodosTable')"
-            placeholder="Buscar metodos...">
-    </div>
     <div class="col-auto">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMetodoModal">Añadir
             Metodo</button>

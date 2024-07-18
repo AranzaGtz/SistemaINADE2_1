@@ -12,10 +12,19 @@
     </div>
 </div>
 
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <input type="text" id="searchInput" class="form-control" onkeyup="filterTable('searchInput', 'cotizacionesTable')" placeholder="Buscar cotizaciones...">
+<!-- BUSCADOR -->
+<div class="row mb-3 justify-content-center">
+    <div class="col-md-6">
+        <div class="input-group mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar cotizaciones..." onkeyup="filterTable('searchInput', 'cotizacionesTable')">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'cotizacionesTable')">Buscar</button>
+            </div>
+        </div>
     </div>
+</div>
+
+<div class="row mb-3 justify-content-end">
     <div class="col-auto">
         <a href="{% url 'cotizaciones_list' %}" class="btn btn-info mb-3">Ver Cotizaciones No Aceptadas</a>
     </div>
@@ -34,7 +43,6 @@
                         <th>Solicitud</th>
                         <th>Expiración</th>
                         <th>Moneda</th>
-                        <th>Estado</th>
                         <th colspan="3">Opciones</th>
                     </tr>
                 </thead>
@@ -49,7 +57,6 @@
                         <td>{{ c.fecha_solicitud|date:"d/m/Y" }}</td>
                         <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
                         <td>{{ c.metodo_pago }}</td>
-                        <td> NA </td>
                         <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a></td>
                         <td><a href="{% url 'generar_orden_trabajo' c.id %}" class="btn btn-primary btn-sm auto">Crea Orden de Trabajo</a></td>
                         <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>

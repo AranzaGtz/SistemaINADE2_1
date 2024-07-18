@@ -286,3 +286,5 @@ class OrdenTrabajoForm(forms.ModelForm):
         labels = {
             'receptor': 'Seleccione el receptor de la orden:',
         }
+
+

@@ -4,12 +4,84 @@
 {% block header %}Home{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
 <div class="container mt-4">
-    <h1>Bienvenidos a SistemaINADE2</h1>
-<!-- Dentro de tu plantilla dashboard_admin_home.html -->
-<a href="{% url 'notificaciones' %}" class="notifications">
-    Notificaciones
-    <span class="count">{{ notificaciones_no_leidas }}</span>
-</a>
+    <h1 class="mb-5">Bienvenidos a SistemaINADE2</h1>
+    <!-- Dentro de tu plantilla dashboard_admin_home.html -->
+
+
+    <div class="row">
+        <!-- BOTON PARA CREAR CLIENTES -->
+        <div class="col">
+            <a href="" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-person-add" style="font-size: 5rem;"></i>
+                        <!-- Ícono de lápiz de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Agregar Cliente</h5>
+                        <p class="card-text">"Registra nuevos clientes fácilmente para mejorar la gestión y seguimiento
+                            de tus interacciones. ¡Empieza ahora".</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- BOTON PARA ADMINISTRAR SERVICIOS -->
+        <div class="col">
+            <a href="{% url 'servicios_list' %}" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-droplet-half" style="font-size: 5rem;"></i>
+                        <!-- Ícono de lápiz de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Servicios</h5>
+                        <p class="card-text">"Explora nuestros servicios de análisis y muestreo ambiental. Precisión y
+                            calidad para responder a tus necesidades."</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- BOTON PÀRA COTIZAR -->
+        <div class="col">
+            <a href="{% url 'cotizacion_form' %}" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-pencil" style="font-size: 5rem;"></i> <!-- Ícono de lápiz de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Cotizar</h5>
+                        <p class="card-text">"Inicia el proceso para crear cotizaciones completas: registra datos,
+                            selecciona
+                            servicios y envía el PDF final por correo. ¡Comienza ahora!"</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- BOTON PARA GENERAR ORDEN DE TRABAJO -->
+        <div class="col">
+            <a href="" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-clipboard-data" style="font-size: 5rem;"></i>
+                        <!-- Ícono de datos de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Generar Orden de Trabajo</h5>
+                        <p class="card-text">Inicia el proceso para formalizar una orden de trabajo: registra los
+                            detalles necesarios,
+                            asigna recursos y agenda la ejecución. ¡Optimiza tu flujo de trabajo ahora!</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
 </div>
 {% endblock %}

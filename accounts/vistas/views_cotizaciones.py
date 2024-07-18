@@ -25,7 +25,7 @@ def generate_new_id_personalizado():
 def cotizaciones_list(request):
     # Inicializar la consulta de cotizaciones
      # Filtrar cotizaciones que no están aceptadas
-    cotizaciones = Cotizacion.objects.filter(estado=False)
+    cotizaciones = Cotizacion.objects.all()
     cotizacion_form = CotizacionForm()
     concepto_formset = ConceptoFormSet()
 
