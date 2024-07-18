@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
@@ -68,7 +69,7 @@ class CustomUser(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.username
+        return f"{self.first_name} {self.last_name} | {self.username}"
 
 #----------------------------------------------------
 # MODELO PARA CLIENTES
@@ -162,11 +163,12 @@ class Prospecto(models.Model):
 
 # MODELO DE COTIZACION
 class Cotizacion(models.Model):
+    id_personalizado = models.CharField(max_length=4, unique=True, null=True, blank=True)
     fecha_solicitud = models.DateField()
     fecha_caducidad = models.DateField()
     tipo_moneda = [
-        ('mxn', 'MXN - Moneda Nacional Mexicana'),
-        ('usd', 'USD - Dolar Estadunidense')
+        ('MXN', 'MXN - Moneda Nacional Mexicana'),
+        ('USD', 'USD - Dolar Estadunidense')
     ]
     metodo_pago = models.CharField(max_length=100, choices=tipo_moneda)
     tasa_iva = models.DecimalField(max_digits=4, decimal_places=2, default=0.16)
@@ -176,9 +178,9 @@ class Cotizacion(models.Model):
     iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     persona = models.ForeignKey(Persona, on_delete=models.PROTECT, blank=True, null=True)
-    id_personalizado = models.CharField(max_length=4, unique=True, default='0001')
+    estado = models.BooleanField(default=False)  # False para "No Aceptado", True para "Aceptado"
     cotizacion_pdf = models.FileField(upload_to='cotizaciones_pdfs/',null=True,blank=True)
-    orden_pedido_pdf = models.FileField(upload_to='ordenes_pedido_pdfs/', null=True, blank=True)  # Corregido
+    orden_pedido_pdf = models.FileField(upload_to='ordenes_pedido_pdfs/', null=True, blank=True)
     
     def calculate_subtotal(self):
         return sum(concepto.cantidad_servicios * concepto.precio for concepto in self.conceptos.all())
@@ -233,7 +235,37 @@ class Concepto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
-    
+
+#----------------------------------------------------
+# MODELO PARA ORDENES DE TRABAJO
+#----------------------------------------------------
+
+class OrdenTrabajo(models.Model):
+    id_personalizado = models.CharField(max_length=20, unique=True, blank=True, primary_key=True)  
+    cotizacion = models.ForeignKey(Cotizacion, on_delete=models.CASCADE, related_name='orden_trabajo')
+    receptor = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='ordenes_trabajo')
+    direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE, null=True, blank=True, related_name='ordenes_trabajo')
+    estado = models.BooleanField(default=False)  # False para "No terminado", True para "Terminado"
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    gestion = models.BooleanField(default=False) # False para "No gestion", True para "Gestion"
+    orden_trabajo_pdf = models.FileField(upload_to='ordenes_trabajo_pdfs/', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.id_personalizado:
+            self.id_personalizado = self.generate_id_personalizado()
+        super(OrdenTrabajo, self).save(*args, **kwargs)
+
+    def generate_id_personalizado(self):
+        today = datetime.today()
+        date_str = today.strftime('%y%m%d')
+        count = OrdenTrabajo.objects.filter(fecha_creacion__date=today.date()).count() + 1
+        return f'{date_str}-{str(count).zfill(2)}'
+
+    def __str__(self):
+        return f'Orden de Trabajo {self.id_personalizado} para Cotización {self.cotizacion.id_personalizado}'
+
+
 #----------------------------------------------------
 # MODELO PARA MI ORGANIZACIÓN
 #----------------------------------------------------

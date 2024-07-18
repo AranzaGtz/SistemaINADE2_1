@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.core.mail import EmailMessage
 from SistemaINADE2 import settings
 from accounts.models import Cotizacion, Concepto, Notificacion, Organizacion, Formato, CustomUser, Persona
-from accounts.forms import ConceptoForm, CotizacionForm, ConceptoFormSet, OrdenTrabajoForm
+from accounts.forms import ConceptoForm, CotizacionForm, ConceptoFormSet, OrdenPedidoForm
 from django.contrib import messages
 from django.db import IntegrityError
 from django.template.loader import render_to_string
@@ -119,7 +119,7 @@ def confirmacion_recepcion(request):
 def formulario_descarga_subida(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     if request.method == 'POST':
-        form = OrdenTrabajoForm(request.POST, request.FILES)
+        form = OrdenPedidoForm(request.POST, request.FILES)
         if form.is_valid():
             archivo = form.cleaned_data['archivo']
             cotizacion.orden_pedido_pdf.save(archivo.name, archivo)  # Guardar el archivo correctamente
@@ -133,5 +133,5 @@ def formulario_descarga_subida(request, pk):
             messages.success(request, 'Orden de trabajo subida exitosamente.')
             return redirect('confirmacion_recepcion')
     else:
-        form = OrdenTrabajoForm()
+        form = OrdenPedidoForm()
     return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})

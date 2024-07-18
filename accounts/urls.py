@@ -1,6 +1,6 @@
 from django.urls import path
 from accounts.views import notificaciones
-from accounts.vistas import views_clientes, views_empresas, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
+from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
 from accounts.vistas.views_autenticacion import CustomPasswordResetView
 
@@ -88,6 +88,11 @@ urlpatterns = [
     # ESTA SIENDO DUP`LICADA PORQUE SE UNA EN LA CREACION DE COTIZACIÓN LA DE ARRIBA SE USA SOLO PARA VER
     path('cotizaciones/<int:pk>/duplicar/', views_cotizaciones.cotizacion_duplicar, name='cotizacion_duplicar'),
     path('cotizacion/pdf', views_cotizaciones.generar_pdf_cotizacion, name='generar_pdf_cotizacion'),
+    path('cotizacion/<int:pk>/actualizar_estado/', views_cotizaciones.actualizar_estado, name='actualizar_estado'),
+    
+    path('cotizaciones_aceptadas/', views_cotizaciones_aceptadas.cotizaciones_aceptadas_list,name='cotizaciones_aceptadas_list'),
+    path('cotizaciones_aceptadas/generar_orden_trabajo/<int:pk>', views_cotizaciones_aceptadas.generar_orden_trabajo , name='generar_orden_trabajo'),
+    
     #   ---     INTERFAZ TERMINOS Y AVISOS       ---
 
     path('terminos/', views_organizacion.terminos_avisos, name='terminos_avisos'),

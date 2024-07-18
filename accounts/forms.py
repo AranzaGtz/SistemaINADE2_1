@@ -1,5 +1,5 @@
 from django import forms
-from .models import Concepto, CustomUser, Formato, Metodo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
+from .models import Concepto, CustomUser, Formato, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -166,10 +166,10 @@ class MetodoForm(forms.ModelForm):
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = [ 'nombre_servicio', 'descripcion',
+        fields = ['nombre_servicio', 'descripcion',
                   'precio_sugerido']
         widgets = {
-            
+
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto', 'rows': 2}),
             'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
@@ -210,7 +210,7 @@ class CotizacionForm(forms.ModelForm):
             'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).', 'rows': 3}),
             'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)', 'rows': 3}),
-            'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente', 'id':'id_persona', 'name':'persona'}),
+            'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente', 'id': 'id_persona', 'name': 'persona'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -233,7 +233,9 @@ class CotizacionChangeForm(forms.ModelForm):
 
 # ---      ORGANIZACIÓN     ---
 
-#   FORMULARIO PARA LA ORGANIZACION 
+#   FORMULARIO PARA LA ORGANIZACION
+
+
 class OrganizacionForm(forms.ModelForm):
     class Meta:
         model = Organizacion
@@ -246,10 +248,12 @@ class OrganizacionForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA TERMINOS Y AVISOS
+
+
 class TerminosForm(forms.ModelForm):
     class Meta:
         model = Formato
-        fields = ['nombre_formato','version','emision','terminos', 'avisos']
+        fields = ['nombre_formato', 'version', 'emision', 'terminos', 'avisos']
         widgets = {
             'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
             'version': forms.TextInput(attrs={'class': 'form-control'}),
@@ -259,8 +263,26 @@ class TerminosForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
-class OrdenTrabajoForm(forms.Form):
+
+
+class OrdenPedidoForm(forms.Form):
     archivo = forms.FileField(
-        widget=forms.FileInput(attrs={'class': 'custom-file-input', 'id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),
+        widget=forms.FileInput(attrs={'class': 'custom-file-input',
+                               'id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),
         label=''
     )
+
+#   FORMULARIO PARA ORDEN DE TRABAJO
+
+
+class OrdenTrabajoForm(forms.ModelForm):
+    # Campos adicionales del cliente
+    class Meta:
+        model = OrdenTrabajo
+        fields = ['receptor','gestion']
+        widgets = {
+            'receptor': forms.Select(attrs={'class': 'form-control'})
+        }
+        labels = {
+            'receptor': 'Seleccione el receptor de la orden:',
+        }
