@@ -14,12 +14,18 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.core.files.base import ContentFile
 
-
+# VISTA PRA DIRIGIR A INTERFAZ DE COTIZACIONES ACEPTADAS
 def cotizaciones_aceptadas_list(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     # Filtrar cotizaciones que están aceptadas
     cotizaciones = Cotizacion.objects.filter(estado=True)
     
     context = {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizaciones': cotizaciones
     }
     return render(request, "accounts/cotizacionesAceptadas/cotizaciones_aceptadas.html", context)

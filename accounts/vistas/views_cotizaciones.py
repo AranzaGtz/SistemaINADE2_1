@@ -23,6 +23,10 @@ def generate_new_id_personalizado():
 
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     # Inicializar la consulta de cotizaciones
      # Filtrar cotizaciones que no están aceptadas
     cotizaciones = Cotizacion.objects.all()
@@ -37,6 +41,8 @@ def cotizaciones_list(request):
     prospecto_from = ProspectoForm()
 
     context = {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizaciones': cotizaciones,
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,

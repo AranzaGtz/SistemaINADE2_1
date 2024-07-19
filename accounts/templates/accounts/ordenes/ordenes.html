@@ -36,6 +36,7 @@
                         <th>Cliente</th>
                         <th>Recibe</th>
                         <th>Estado</th>
+                        <th>Vigencia</th>
                         <th colspan="2">Opciones</th>
                     </tr>
                 </thead>
@@ -48,6 +49,7 @@
                         <td>{{ orden.cotizacion.persona }} </td>
                         <td>{{ orden.receptor.first_name }} {{ orden.receptor.last_name }}</td>
                         <td>{% if orden.estado %}Terminado{% else %}Pendiente{% endif %}</td>
+                        <td>{{ orden.cotizacion.fecha_caducidad}}</td>
                         <td><a href="" class="btn btn-primary btn-sm">Detalles</a></td>
                         <td><a href="" class="btn btn-primary btn-sm">Actualizar estado</a></td>
                     </tr>

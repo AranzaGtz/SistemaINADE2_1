@@ -1,5 +1,5 @@
-# Python
-*.pyc
+# Byte-compiled / optimized / DLL files
+*.py[cod]
 __pycache__/
 
 # Virtual environment
@@ -27,6 +27,8 @@ env/
 *.bak
 *.orig
 *.rej
+local_settings.py
+db.sqlite3
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -43,11 +45,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-
 # Sentry
 .sentryclirc
 
@@ -59,4 +56,3 @@ media/
 # IDEs
 .idea/
 .vscode/
-

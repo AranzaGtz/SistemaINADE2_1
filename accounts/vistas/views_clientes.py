@@ -7,6 +7,11 @@ from accounts.models import Empresa, Persona, InformacionContacto, Titulo
 
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
 def lista_clientes(request):
+    
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     # Obtiene todas las personas activas
     personas = Persona.objects.filter(activo=True)
     # Obtiene todos los títulos
@@ -20,6 +25,8 @@ def lista_clientes(request):
     
     # Contexto que se pasa a la plantilla
     context = {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'personas': personas,
         'titulos': titulos,
         'empresas': empresas,
