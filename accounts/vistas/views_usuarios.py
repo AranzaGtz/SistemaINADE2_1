@@ -7,9 +7,19 @@ from django.contrib import messages
 
 # VISTA PARA DIRIGIR A INTERFAZ DE USUARIO
 def usuario_list(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     Lista_usuarios = CustomUser.objects.all()
     form = CustomUserCreationForm()
-    return render(request, "accounts/usuarios/usuarios.html",{"usuarios": Lista_usuarios,'form':form})
+    context={
+        'usuarios':Lista_usuarios,
+        'form':form,
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
+    }
+    return render(request, "accounts/usuarios/usuarios.html",context)
 
 # VISTA PARA REGISTRAR UN USUARIO
 def usuario_create(request):

@@ -18,7 +18,9 @@
                <p>Por favor, ingrese su texto utilizando las etiquetas que se muestran en la sección de abajo. Si
                     tiene algún problema, no dude en contactarnos.</p>
           </div>
-          <p><strong>Edita el texto en los contenedores segun las necesidades que tengas y da click en guardar para conservar cambios.</strong></p>
+
+          <p><strong>Edita el texto en los contenedores segun las necesidades que tengas y da click en guardar para
+                    conservar cambios.</strong></p>
           <form method="post">
                {% csrf_token %}
                {{ form.as_p }}
@@ -37,12 +39,14 @@
 
                     <li><strong>Cursiva</strong></li>
                     <p>Para poner texto en cursiva, usa la etiqueta <code>&lt;em&gt;</code>. El texto entre
-                         <code>&lt;em&gt;</code> y <code>&lt;/em&gt;</code> se verá en cursiva.</p>
+                         <code>&lt;em&gt;</code> y <code>&lt;/em&gt;</code> se verá en cursiva.
+                    </p>
                     <p>Ejemplo: <code>&lt;em&gt;Este texto se verá en cursiva&lt;/em&gt;</code></p>
 
                     <li><strong>Subrayado</strong></li>
                     <p>Para subrayar texto, usa la etiqueta <code>&lt;u&gt;</code>. El texto entre
-                         <code>&lt;u&gt;</code> y <code>&lt;/u&gt;</code> estará subrayado.</p>
+                         <code>&lt;u&gt;</code> y <code>&lt;/u&gt;</code> estará subrayado.
+                    </p>
                     <p>Ejemplo: <code>&lt;u&gt;Este texto estará subrayado&lt;/u&gt;</code></p>
 
                     <li><strong>Saltos de línea</strong></li>
@@ -56,7 +60,8 @@
                     <p>Para crear listas con viñetas, usa las etiquetas <code>&lt;ul&gt;</code> y
                          <code>&lt;li&gt;</code>. La etiqueta <code>&lt;ul&gt;</code> inicia una lista no ordenada
                          (con viñetas) y cada elemento de la lista va entre <code>&lt;li&gt;</code> y
-                         <code>&lt;/li&gt;</code>.</p>
+                         <code>&lt;/li&gt;</code>.
+                    </p>
                     <p>Ejemplo:</p>
                     <p><code>&lt;ul&gt;<br>&lt;li&gt;Primer ítem de la lista&lt;/li&gt;<br>&lt;li&gt;Segundo ítem de la lista&lt;/li&gt;<br>&lt;li&gt;Tercer ítem de la lista&lt;/li&gt;<br>&lt;/ul&gt;</code>
                     </p>
@@ -68,5 +73,17 @@
           </div>
      </div>
 </div>
+<script>
+     function buscarFormato() {
+          var formatoId = document.getElementById('formatoSelect').value;
+          fetch(`/ruta-para-obtener-formato/${formatoId}`) // Asegúrate de que esta URL sea correcta
+              .then(response => response.json())
+              .then(data => {
+                  // Actualiza tu formulario aquí con los datos recibidos
+                  // Ejemplo: document.getElementById('input-formulario').value = data.detalle;
+              })
+              .catch(error => console.error('Error al cargar datos del formato', error));
+      }
+</script>
 
 {% endblock %}

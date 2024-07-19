@@ -37,9 +37,9 @@ def load_initial_data(sender, **kwargs):
         ], ignore_conflicts=True)  # Agregar ignore_conflicts para evitar duplicados
         
         Organizacion.objects.bulk_create([
-            Organizacion(id=1,nombre='Ingenieria y Administración Estratégica, S.A. de C.V.',direccion='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106', telefono='(664) 104 51 44',pagina_web= 'http://www.inade.mx')
+            Organizacion(nombre='Ingenieria y Administración Estratégica, S.A. de C.V.',direccion='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106', telefono='(664) 104 51 44',pagina_web= 'http://www.inade.mx')
         ],ignore_conflicts=True)
         
         Formato.objects.bulk_create([
-            Formato(id=1,nombre_formato='FOR-G-007',version='1.0', terminos='Aqui tus terminos', avisos='Aqui tus avisos')
+            Formato(nombre_formato='FOR-G-007',version='6.0', terminos='Aqui tus terminos', avisos='Aqui tus avisos')
         ],ignore_conflicts=True)

@@ -5,10 +5,16 @@ from django.contrib import messages
 
 # VISTA MOSTRAR EMPRESAS
 def empresa_cont_list(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     empresas = Empresa.objects.all()
     contactos = Persona.objects.all()
     empresa_form = EmpresaForm()
     context={
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'empresas':empresas,
         'contactos':contactos,
         'empresa_form':empresa_form,

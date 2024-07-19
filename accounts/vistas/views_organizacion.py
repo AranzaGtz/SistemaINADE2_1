@@ -6,6 +6,10 @@ from accounts.models import Formato, Organizacion
 
 #   VISTA PARTA ACTUALIZAR TERMINOS Y AVISOS
 def terminos_avisos(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     formato = Formato.objects.first()
     if not formato:
         # Si no existe ninguna organización, crea una nueva instancia
@@ -20,11 +24,18 @@ def terminos_avisos(request):
             return redirect('home')
     else:
         form = TerminosForm(instance=formato)
-   
-    return render(request, 'accounts/organizacion/terminos.html',{'form':form})
+    context = {
+        'form': form,
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
+    }
+    return render(request, 'accounts/organizacion/terminos.html',context)
 
 #   VISTA PARA ACTUALIZAR LA ORGANIZACIÓN
 def editar_organizacion(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     organizacion = Organizacion.objects.first()
     if not organizacion:
         # Si no existe ninguna organización, crea una nueva instancia
@@ -38,5 +49,9 @@ def editar_organizacion(request):
             return redirect('home')  # Redirige a la página de inicio o a la página adecuada
     else:
         form = OrganizacionForm(instance=organizacion)
-
-    return render(request, 'accounts/organizacion/editar_organizacion.html', {'form': form})
+    context={
+        'form':form,
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
+    }
+    return render(request, 'accounts/organizacion/editar_organizacion.html',context)

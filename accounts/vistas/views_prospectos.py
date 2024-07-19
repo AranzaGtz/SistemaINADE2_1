@@ -6,6 +6,10 @@ from accounts.models import Empresa, InformacionContacto, Persona, Prospecto, Ti
 
 # VISTA PARA DIRIGIR A INTERFAZ DE PROSPECTOS
 def prospecto_list(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     prospectos = Prospecto.objects.all()
     titulos = Titulo.objects.all()
     empresas = Empresa.objects.all()
@@ -13,6 +17,8 @@ def prospecto_list(request):
     empresa_form = EmpresaForm()
     prospecto_from = ProspectoForm()
     context ={
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'prospectos':prospectos,
         'titulos': titulos,
         'empresas':empresas,

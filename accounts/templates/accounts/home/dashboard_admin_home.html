@@ -14,14 +14,14 @@
     <div class="row">
         <!-- BOTON PARA CREAR CLIENTES -->
         <div class="col">
-            <a href="" class="text-decoration-none">
+            <a href="{% url 'lista_clientes' %}" class="text-decoration-none">
                 <div class="card h-100" style="width: 18rem;">
                     <div class="card-img-top p-1 text-center">
                         <i class="bi bi-person-add" style="font-size: 5rem;"></i>
                         <!-- Ícono de lápiz de Bootstrap Icons -->
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Agregar Cliente</h5>
+                        <h5 class="card-title">Clientes</h5>
                         <p class="card-text">"Registra nuevos clientes fácilmente para mejorar la gestión y seguimiento
                             de tus interacciones. ¡Empieza ahora".</p>
                     </div>
@@ -65,7 +65,7 @@
 
         <!-- BOTON PARA GENERAR ORDEN DE TRABAJO -->
         <div class="col">
-            <a href="" class="text-decoration-none">
+            <a href="{% url 'ordenes_list' %}" class="text-decoration-none">
                 <div class="card h-100" style="width: 18rem;">
                     <div class="card-img-top p-1 text-center">
                         <i class="bi bi-clipboard-data" style="font-size: 5rem;"></i>
@@ -81,6 +81,75 @@
             </a>
         </div>
 
+    </div>
+    <hr>
+    <div class="row mt-3">
+
+        <!-- BOTON PARA EMPRESAS -->
+        <div class="col">
+            <a href="{% url 'empresas_cont_list' %}" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-buildings" style="font-size: 5rem;"></i>
+                        <!-- Ícono de datos de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Empresas</h5>
+                        <p class="card-text">"Colsulta la información de las empresas que han sido parte de nuestros procesos y gestiona la información"</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
+        <!-- BOTON PARA CREAR USUARIOS DEL SISTEMA -->
+        <div class="col">
+            <a href="{% url 'usuario_list' %}" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-people" style="font-size: 5rem;"></i>
+                        <!-- Ícono de lápiz de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Usuarios</h5>
+                        <p class="card-text">"Registra nuevos usuarios en el sistema la de cotizaciones INADE.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- BOTON PARA ADMINISTRAR ORganización -->
+        <div class="col">
+            <a href="{% url 'editar_organizacion' %}" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-diagram-3" style="font-size: 5rem;"></i>
+                        <!-- Ícono de lápiz de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Organización</h5>
+                        <p class="card-text">"Revisa la información de la organización y gestionala."</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- BOTON PÀRA TERMINOS Y AVISOS -->
+        <div class="col">
+            <a href="{% url 'terminos_avisos' %}" class="text-decoration-none">
+                <div class="card h-100" style="width: 18rem;">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-card-checklist" style="font-size: 5rem;"></i> <!-- Ícono de lápiz de Bootstrap Icons -->
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Términos y avisos</h5>
+                        <p class="card-text">"Consulta los términos y avisos del formato de cotizaciónes."</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        
     </div>
 
 </div>

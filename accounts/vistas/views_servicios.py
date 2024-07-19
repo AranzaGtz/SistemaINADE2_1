@@ -6,7 +6,12 @@ from django.contrib import messages
 
 # VISTA PARA DIRIGIR A INTERFAZ DE SERVICIOS
 def servicios_list(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     context = {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'servicios' : Servicio.objects.all(),
         'metodos' : Metodo.objects.all(),
         'metodo_form' : MetodoForm(),
