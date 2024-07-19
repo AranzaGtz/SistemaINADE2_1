@@ -1,5 +1,6 @@
 from django.urls import path
-from accounts.views import notificaciones
+from accounts import views
+from accounts.views import notificaciones, marcar_notificacion_leida, borrar_notificacion
 from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_orden_trabajo, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
 from accounts.vistas.views_autenticacion import CustomPasswordResetView
@@ -21,9 +22,11 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='accounts/autenticacion/password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='accounts/autenticacion/password_reset_complete.html'), name='password_reset_complete'),
 
-    #   ---     INTERFAZ HOME       ---
+    #   ---     INTERFAZ NOTIFICACIONES       ---
     
     path('notificaciones/', notificaciones, name='notificaciones'),
+    path('notificacion/leida/<int:pk>/', marcar_notificacion_leida, name='marcar_notificacion_leida'),
+    path('notificacion/borrar/<int:pk>/', views.borrar_notificacion, name='borrar_notificacion'),
     
     #   ---     INTERFAZ HOME       ---
 
