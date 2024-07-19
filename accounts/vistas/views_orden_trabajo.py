@@ -13,4 +13,4 @@ def ordenes_list(request):
           'notificaciones_no_leidas': notificaciones_no_leidas,
           'ordenes':ordenes
      }
-     return render(request, 'accounts/ordenes/ordenes.html', {'ordenes': ordenes})
+     return render(request, 'accounts/ordenes/ordenes.html', context)

@@ -1,6 +1,7 @@
+from django.http import JsonResponse
 from django.views.generic.list import ListView
 from django.utils import timezone
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from accounts.models import  Notificacion
 
@@ -17,3 +18,16 @@ def notificaciones(request):
         'notificaciones_no_leidas': notificaciones_no_leidas,
     }
     return render(request, 'accounts/notificaciones/notificaciones.html', context)
+
+#   VISTA PARA HACER QUE LA NOTIFICACIÓN CAMBIE A LEIDA
+def marcar_notificacion_leida(request, pk):
+    notificacion = get_object_or_404(Notificacion, pk=pk)
+    notificacion.leido = True
+    notificacion.save()
+    return JsonResponse({'success': True})
+
+#   VISTA PARA BORRAR NOTIFICACIONES
+def borrar_notificacion(request, pk):
+    notificacion = get_object_or_404(Notificacion, pk=pk)
+    notificacion.delete()
+    return JsonResponse({'success': True})
