@@ -31,18 +31,18 @@
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
                     <tr>
-                        <th>ID</th>
-                        <th>Cotización</th>
-                        <th>Cliente</th>
-                        <th>Recibe</th>
-                        <th>Estado</th>
-                        <th>Vigencia</th>
+                        <th><a href="?order_by=id_personalizado">ID</a></th>
+                        <th><a href="?order_by=cotizacion">Cotización</a></th>
+                        <th><a href="?order_by=cotizacion__persona__nombre">Cliente</a></th>
+                        <th><a href="?order_by=receptor__last_name">Recibe</a></th>
+                        <th><a href="?order_by=estado">Estado</a></th>
+                        <th><a href="?order_by=cotizacion__fecha_caducidad">Vigencia</a></th>
                         <th colspan="2">Opciones</th>
                     </tr>
                 </thead>
                 <!-- CUERPO DE TABLA -->
                 <tbody>
-                    {% for orden in ordenes %}
+                    {% for orden in ordenes_page %}
                     <tr>
                         <td>{{ orden.id_personalizado }}</td>
                         <td>{{ orden.cotizacion }}</td>
@@ -56,7 +56,20 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <p>Numero de prospectos: {{ordenes.count}}</p>
+            <p>Numero de ordenes de trabajo: {{ordenes.count}}</p>
+
+            <div class="pagination">
+                {% if ordenes_page.has_previous %}
+                    <a href="?page=1&order_by={{ request.GET.order_by }}">Primera</a>
+                    <a href="?page={{ ordenes_page.previous_page_number }}&order_by={{ request.GET.order_by }}">Anterior</a>
+                {% endif %}
+                Página {{ ordenes_page.number }} de {{ ordenes_page.paginator.num_pages }}.
+                {% if ordenes_page.has_next %}
+                    <a href="?page={{ ordenes_page.next_page_number }}&order_by={{ request.GET.order_by }}">Siguiente</a>
+                    <a href="?page={{ ordenes_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}">Última</a>
+                {% endif %}
+            </div>
+            
         </div>
     </div>
 </div>

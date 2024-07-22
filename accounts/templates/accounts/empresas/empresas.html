@@ -40,21 +40,21 @@
             <!-- ENCABEZADO DE TABLA -->
             <thead class="thead-light">
                 <tr>
-                    <th>#</th>
-                    <th>Empresa</th>
-                    <th>RFC</th>
-                    <th>Direccion</th>
-                    <th>Moneda</th>
-                    <th>Condiciones de pago</th>
+                    <th><a href="?order_by=id">#</a></th>
+                    <th><a href="?order_by=nombre_empresa">Empresa</a></th>
+                    <th><a href="?order_by=rfc">RFC</a></th>
+                    <th><a href="?order_by=direccion">Direccion</a></th>
+                    <th><a href="?order_by=moneda">Moneda</a></th>
+                    <th><a href="?order_by=condiciones_pago">Condiciones</a></th>
                     <th colspan="2">Opciones</th>
                 </tr>
             </thead>
 
             <!-- CUERPO DE TABLA -->
             <tbody>
-                {% for e in empresas %}
+                {% for e in empresas_page %}
                 <tr>
-                    <td>{{ forloop.counter }}</td>
+                    <td>{{ e.id }}</td>
                     <td>{{ e.nombre_empresa }}</td>
                     <td>{{ e.rfc }}</td>
                     <td>{{ e.direccion }}</td>
@@ -67,7 +67,19 @@
             </tbody>
         </table>
     </div>
-    <p>Número de empresas: {{empresas.count}}</p>
+    <p>Número de empresas: {{ empresas_page.paginator.count }}</p>
+     <!-- CONTROLES DE PAGINACIÓN -->
+     <div class="pagination">
+        {% if empresas_page.has_previous %}
+            <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+            <a href="?page={{ empresas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+        {% endif %}
+        Página {{ empresas_page.number }} de {{ empresas_page.paginator.num_pages }}.
+        {% if empresas_page.has_next %}
+            <a href="?page={{ empresas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+            <a href="?page={{ empresas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+        {% endif %}
+    </div>
     <hr class="featurette-divider">
 </div>
 

@@ -1,40 +1,48 @@
 # views_personas.py
-
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from accounts.forms import DireccionForm, EmpresaForm, PersonaForm
 from accounts.models import Empresa, Persona, InformacionContacto, Titulo
+from django.core.paginator import Paginator
 
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
 def lista_clientes(request):
-    
     # Notificación
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
-    
-    # Obtiene todas las personas activas
-    personas = Persona.objects.filter(activo=True)
-    # Obtiene todos los títulos
+
+    # Parámetro de ordenamiento desde la URL
+    order_by = request.GET.get('order_by', 'nombre')  # Ordena por 'nombre' como predeterminado
+
+    # Obtiene todas las personas activas y las ordena
+    personas = Persona.objects.filter(activo=True).order_by(order_by)
+    poersonas = Persona.objects.all().count
+
+    # Paginación
+    paginator = Paginator(personas, 15)  # Muestra 15 personas por página
+    page_number = request.GET.get('page')
+    personas_page = paginator.get_page(page_number)
+
+    # Obtiene todos los títulos y empresas
     titulos = Titulo.objects.all()
-    # Obtiene todas las empresas
     empresas = Empresa.objects.all()
-    # Crea un formulario vacío de Persona
+
+    # Formularios vacíos
     persona_form = PersonaForm()
-    # Crea un formulario vacío de Empresa
     empresa_form = EmpresaForm()
-    
+
     # Contexto que se pasa a la plantilla
     context = {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
-        'personas': personas,
+        'personas_page': personas_page,
         'titulos': titulos,
         'empresas': empresas,
         'persona_form': persona_form,
-        'empresa_form': empresa_form
+        'empresa_form': empresa_form,
+        'personas': poersonas,
     }
     
-    # Renderiza la plantilla de clientes con el contexto
     return render(request, 'accounts/clientes/clientes.html', context)
 
 # VISTA PARA CREAR CLIENTES DESDE MODAL

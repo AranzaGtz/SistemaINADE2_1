@@ -1,18 +1,15 @@
 from datetime import datetime
-from gettext import translation
-import io
-from tkinter import Canvas
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import DireccionForm, OrdenTrabajoForm
-from accounts.helpers import get_formato_default, get_unica_organizacion
-from accounts.models import Concepto, Cotizacion, CustomUser, Direccion
+from accounts.helpers import get_unica_organizacion
+from accounts.models import Concepto, Cotizacion, Direccion
 from django.contrib import messages
-from django.core.mail import EmailMessage
 from accounts.forms import OrdenTrabajoForm, DireccionForm
 from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
 
 # VISTA PRA DIRIGIR A INTERFAZ DE COTIZACIONES ACEPTADAS
 def cotizaciones_aceptadas_list(request):
@@ -20,17 +17,26 @@ def cotizaciones_aceptadas_list(request):
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
+    # Parámetro de ordenamiento desde la URL
+    order_by = request.GET.get('order_by', 'fecha_solicitud')  # Default order
+    
     # Filtrar cotizaciones que están aceptadas
-    cotizaciones = Cotizacion.objects.filter(estado=True)
+    cotizaciones = Cotizacion.objects.filter(estado=True).order_by(order_by)
+    
+    # Paginación
+    paginator = Paginator(cotizaciones, 15) # Mostrar 15 cotizaciones aceptadas por página
+    page_number = request.GET.get('page')
+    cotizaciones_page = paginator.get_page(page_number)
     
     context = {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
-        'cotizaciones': cotizaciones
+        'cotizaciones': cotizaciones,
+        'cotizaciones_page': cotizaciones_page,  # Cambiando a cotizaciones_page
     }
     return render(request, "accounts/cotizacionesAceptadas/cotizaciones_aceptadas.html", context)
 
-
+# VISTA PARA CREAR ORDEN DE TRABAJO
 def generar_orden_trabajo(request, pk):
     # Obtener la cotización según el ID proporcionado
     cotizacion = get_object_or_404(Cotizacion, id=pk)
@@ -128,13 +134,13 @@ def generar_orden_trabajo(request, pk):
     }
     return render(request, 'accounts/cotizacionesAceptadas/generar_orden_trabajo.html', context)
 
-
+# VISTA PARA CREAR PDF DE ORDEN DE TRABAJO
 def generar_pdf_orden_trabajo(request, orden_trabajo, conceptos_seleccionados):
     conceptos = Concepto.objects.filter(cotizacion=orden_trabajo.cotizacion)
     org = get_unica_organizacion()
-    formato = 'FOR-G-023'
-    version = '5.0'
-    emision = '25/03/2024'
+    formato = org.f_orden.nombre_formato
+    version = org.f_orden.version
+    emision = org.f_orden.emision
     user = request.user if request.user.is_authenticated else None
 
     for concepto in conceptos:

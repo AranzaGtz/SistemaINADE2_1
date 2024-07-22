@@ -40,19 +40,19 @@
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
                     <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Método</th>
-                        <th>Descripción</th>
-                        <th>Precio sugerido</th>
+                        <th><a href="?order_by=id">#</a></th>
+                        <th><a href="?order_by=nombre_servicio">Nombre</a></th>
+                        <th><a href="?order_by=metodo__metodo">Método</a></th>
+                        <th><a href="?order_by=descripcion">Descripción</a></th>
+                        <th><a href="?order_by=precio_sugerido">Precio sugerido</a></th>
                         <th colspan="2" class="col-md-1">Opciones</th>
                     </tr>
                 </thead>
                 <!-- CUERPO DE TABLA -->
                 <tbody>
-                    {% for s in servicios %}
+                    {% for s in servicios_page %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
+                        <td>{{ s.id }}</td>
                         <td>{{ s.nombre_servicio }}</td>
                         <td>{{ s.metodo.metodo }}</td>
                         <td>{{ s.descripcion }}</td>
@@ -68,6 +68,18 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="pagination">
+                {% if servicios_page.has_previous %}
+                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                    <a href="?page={{ servicios_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+                {% endif %}
+                <div class="m-1">Página {{ servicios_page.number }} de {{ servicios_page.paginator.num_pages }}.</div>
+                {% if servicios_page.has_next %}
+                    <a href="?page={{ servicios_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+                    <a href="?page={{ servicios_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+                {% endif %}
+            </div>
+            
         </div>
     </div>
 </div>

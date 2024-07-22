@@ -3,21 +3,41 @@ from django.db.models.deletion import ProtectedError
 from accounts.forms import MetodoForm, ServicioForm
 from accounts.models import Metodo, Servicio
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 # VISTA PARA DIRIGIR A INTERFAZ DE SERVICIOS
 def servicios_list(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+
+    # Parámetro de ordenamiento desde la URL
+    order_by = request.GET.get('order_by', 'nombre_servicio')  # Default order
+    if not order_by:  # Asegura que siempre haya un valor válido para order_by
+        order_by = 'nombre_servicio'
+
+    # Filtrar servicios y aplicar ordenamiento
+    servicios = Servicio.objects.all().order_by(order_by)
+    
+    # Paginación
+    paginator = Paginator(servicios, 10)  # Mostrar 10 servicios por página
+    page_number = request.GET.get('page')
+    servicios_page = paginator.get_page(page_number)
+
+    # Datos adicionales y formularios
+    metodos = Metodo.objects.all()
+    metodo_form = MetodoForm()
+    servicio_form = ServicioForm()
+
     context = {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
-        'servicios' : Servicio.objects.all(),
-        'metodos' : Metodo.objects.all(),
-        'metodo_form' : MetodoForm(),
-        'servicio_form': ServicioForm()
+        'servicios_page': servicios_page,
+        'metodos': metodos,
+        'metodo_form': metodo_form,
+        'servicio_form': servicio_form
     }
-    return render(request,'accounts/servicios/servicios.html',context)
+    return render(request, 'accounts/servicios/servicios.html', context)
 
 # VISTA PARA CREAR UN SERVICIO
 def servicio_create(request):

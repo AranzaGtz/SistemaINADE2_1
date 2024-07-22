@@ -38,18 +38,18 @@
         <table id="clientesTable" class="table table-hover">
             <thead class="thead-light">
                 <tr>
-                    <th>#</th>
-                    <th colspan="3">Cliente</th>
-                    <th>Empresa</th>
-                    <th>Correo</th>
+                    <th><a href="?order_by=id">#</a></th>
+                    <th colspan="3"><a href="?order_by=nombre">Cliente</a></th>
+                    <th><a href="?order_by=empresa__nombre_empresa">Empresa</a></th>
+                    <th><a href="?order_by=informacion_contacto__correo_electronico">Correo</a></th>
                     <th colspan="4">Opciones</th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Itera sobre la lista de personas (clientes) y crea una fila para cada una -->
-                {% for persona in personas %}
+                {% for persona in personas_page %}
                 <tr>
-                    <td>{{ forloop.counter }}</td> <!-- Contador de la fila -->
+                    <td>{{ persona.id }}</td> <!-- Contador de la fila -->
                     <td>{{ persona.titulo.abreviatura }}</td> <!-- Título del cliente -->
                     <td>{{ persona.nombre }}</td> <!-- Nombre del cliente -->
                     <td>{{ persona.apellidos }}</td> <!-- Apellidos del cliente -->
@@ -66,7 +66,19 @@
         </table>
     </div>
     <!-- Muestra el número total de clientes -->
-    <p>Número de clientes: {{ personas.count }}</p>
+    <p>Número de clientes: {{ personas }}</p>
+    <div class="pagination">
+        {% if personas_page.has_previous %}
+            <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+            <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+        {% endif %}
+        <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.</div>
+        {% if personas_page.has_next %}
+            <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+            <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+        {% endif %}
+    </div>
+    
 </div>
 
 <!-- Modal para crear un nuevo cliente -->

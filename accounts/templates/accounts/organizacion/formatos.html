@@ -1,0 +1,44 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Términos y Avisos de Privacidad{% endblock %}
+{% block header %}Términos y Avisos de Privacidad{% endblock %}
+{% block content %}
+
+<!-- SECCIÓN DE TÍTULO ENCABEZANDO -->
+<div class="row">
+     <div class="col">
+          <h1 class="text-center">Formatos de la organización</h1>
+          <hr />
+     </div>
+</div>
+<div class="container mt-5">
+     <ul class="nav nav-tabs">
+          <li class="nav-item">
+               <a class="nav-link active" href="#cotizaciones" data-bs-toggle="tab">Cotizaciones</a>
+          </li>
+          <li class="nav-item">
+               <a class="nav-link" href="#ordenes" data-bs-toggle="tab">Órdenes de Trabajo</a>
+          </li>
+     </ul>
+
+     <div class="tab-content">
+          <div class="tab-pane fade show active" id="cotizaciones">
+               <h2 class="mt-3">Cotizaciones</h2>
+               <form method="post">
+                    {% csrf_token %}
+                    {{ formato_cotizacion_form.as_p }}
+                    <button type="submit" name="guardar_cotizacion" class="btn btn-success">Guardar Cotización</button>
+               </form>
+          </div>
+
+          <div class="tab-pane fade" id="ordenes">
+               <h2 class="mt-3">Órdenes de Trabajo</h2>
+               <form method="post">
+                    {% csrf_token %}
+                    {{ formato_orden_form.as_p }}
+                    <button type="submit" name="guardar_orden" class="btn btn-success">Guardar Orden</button>
+               </form>
+          </div>
+     </div>
+</div>
+{% endblock %}

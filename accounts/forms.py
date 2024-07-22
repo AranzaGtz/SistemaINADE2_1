@@ -1,5 +1,5 @@
 from django import forms
-from .models import Concepto, CustomUser, Formato, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
+from .models import Concepto, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -27,8 +27,6 @@ class CustomUserCreationForm(UserCreationForm):
         }
 
 #   FORMULARIO PARA CAMBIAR USUARIO
-
-
 class CustomUserChangeForm(forms.ModelForm):
     class Meta:
         model = CustomUser
@@ -44,8 +42,6 @@ class CustomUserChangeForm(forms.ModelForm):
 # ---      EMPRESAS     ---
 
 #   FORMULARIO PARA DIRECCION DE EMPRESA
-
-
 class DireccionForm(forms.ModelForm):
     class Meta:
         model = Direccion
@@ -60,8 +56,6 @@ class DireccionForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA EMPRESA
-
-
 class EmpresaForm(forms.ModelForm):
     # Campos de Direccion
     calle = forms.CharField(max_length=50, widget=forms.TextInput(
@@ -91,8 +85,6 @@ class EmpresaForm(forms.ModelForm):
 # ---      CLIENTES     ---
 
 #   FORMULARIO PARA INFROMACION DE CONTACTO
-
-
 class InformacionContactoForm(forms.ModelForm):
     class Meta:
         model = InformacionContacto
@@ -105,8 +97,6 @@ class InformacionContactoForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA PERSONA
-
-
 class PersonaForm(forms.ModelForm):
 
     titulo = forms.ModelChoiceField(
@@ -137,8 +127,6 @@ class PersonaForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA PROSPECTO
-
-
 class ProspectoForm(forms.ModelForm):
     class Meta:
         model = Prospecto
@@ -150,8 +138,6 @@ class ProspectoForm(forms.ModelForm):
 # ---      METODOS Y SERVICIOS     ---
 
 #   FORMULARIO PARA METODO
-
-
 class MetodoForm(forms.ModelForm):
     class Meta:
         model = Metodo
@@ -161,8 +147,6 @@ class MetodoForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA SERVICIO
-
-
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
@@ -177,8 +161,6 @@ class ServicioForm(forms.ModelForm):
         }
 
 #   FORMULARIO PARA CONCEPTO
-
-
 class ConceptoForm(forms.ModelForm):
     class Meta:
         model = Concepto
@@ -190,10 +172,8 @@ class ConceptoForm(forms.ModelForm):
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales', 'rows': 3}),
         }
 
-
 ConceptoFormSet = inlineformset_factory(
     Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
-
 
 # ---      COTIZACIONES     ---
 
@@ -218,8 +198,6 @@ class CotizacionForm(forms.ModelForm):
         self.fields['persona'].queryset = Persona.objects.filter(activo=True)
 
 #   FORMULARIO PARA CAMBIAR COTIZACION
-
-
 class CotizacionChangeForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
@@ -234,8 +212,6 @@ class CotizacionChangeForm(forms.ModelForm):
 # ---      ORGANIZACIÓN     ---
 
 #   FORMULARIO PARA LA ORGANIZACION
-
-
 class OrganizacionForm(forms.ModelForm):
     class Meta:
         model = Organizacion
@@ -247,24 +223,7 @@ class OrganizacionForm(forms.ModelForm):
             'pagina_web': forms.URLInput(attrs={'class': 'form-control'}),
         }
 
-#   FORMULARIO PARA TERMINOS Y AVISOS
-
-
-class TerminosForm(forms.ModelForm):
-    class Meta:
-        model = Formato
-        fields = ['nombre_formato', 'version', 'emision', 'terminos', 'avisos']
-        widgets = {
-            'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
-            'version': forms.TextInput(attrs={'class': 'form-control'}),
-            'emision': forms.DateInput(attrs={'class': 'form-control'}),
-            'terminos': forms.Textarea(attrs={'class': 'form-control'}),
-            'avisos': forms.Textarea(attrs={'class': 'form-control'}),
-        }
-
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
-
-
 class OrdenPedidoForm(forms.Form):
     archivo = forms.FileField(
         widget=forms.FileInput(attrs={'class': 'custom-file-input',
@@ -273,8 +232,6 @@ class OrdenPedidoForm(forms.Form):
     )
 
 #   FORMULARIO PARA ORDEN DE TRABAJO
-
-
 class OrdenTrabajoForm(forms.ModelForm):
     # Campos adicionales del cliente
     class Meta:
@@ -287,4 +244,26 @@ class OrdenTrabajoForm(forms.ModelForm):
             'receptor': 'Seleccione el receptor de la orden:',
         }
 
+#   FORMULARIO PARA FORMATOS DE COTIZACIÓN
+class FormatoCotizacionForm(forms.ModelForm):
+    class Meta:
+        model = FormatoCotizacion
+        fields = ['nombre_formato','version','emision','terminos','avisos']
+        widgets = {
+            'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
+            'version': forms.TextInput(attrs={'class': 'form-control'}),
+            'emision': forms.DateInput(attrs={'class': 'form-control'}),
+            'terminos': forms.Textarea(attrs={'class': 'form-control'}),
+            'avisos': forms.Textarea(attrs={'class': 'form-control'}),
+        }
 
+
+class FormatoOrdenForm(forms.ModelForm):
+    class Meta:
+        model = FormatoOrden
+        fields = ['nombre_formato', 'version', 'emision']
+        widgets = {
+            'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
+            'version': forms.TextInput(attrs={'class': 'form-control'}),
+            'emision': forms.DateInput(attrs={'class': 'form-control'}),
+        }

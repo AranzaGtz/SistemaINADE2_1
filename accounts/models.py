@@ -270,26 +270,30 @@ class OrdenTrabajo(models.Model):
 # MODELO PARA MI ORGANIZACIÓN
 #----------------------------------------------------
 
-# MODELO PARA ORGANIZACION
-class Organizacion(models.Model):
-    nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
-    direccion = models.CharField(max_length=255, default='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106')
-    telefono = models.CharField(max_length=20, default='(664) 104 51 44')
-    pagina_web = models.URLField()
-    
-    
-    def __str__(self):
-        return self.nombre
-
-# MODELO PARA FORMATO
-class Formato(models.Model):
-    organizacion = models.ForeignKey(Organizacion, related_name='formatos', on_delete=models.CASCADE)
+# MODELO PARA FORMATO DE COTIZACIÓN
+class FormatoCotizacion (models.Model):
     nombre_formato = models.CharField(max_length=255)
     version = models.CharField(max_length=50)
     emision = models.DateField(default=timezone.now)
     terminos = models.TextField(blank=True)  # Campo para términos
     avisos = models.TextField(blank=True)    # Campo para avisos
     
+# MODELO PARA FORMATO DE ORDEN DE TRABAJO
+class FormatoOrden (models.Model):
+    nombre_formato = models.CharField(max_length=255)
+    version = models.CharField(max_length=50)
+    emision = models.DateField(default=timezone.now)
+
+# MODELO PARA ORGANIZACION
+class Organizacion(models.Model):
+    nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
+    direccion = models.CharField(max_length=255, default='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106')
+    telefono = models.CharField(max_length=20, default='(664) 104 51 44')
+    pagina_web = models.URLField()
+    f_cotizacion = models.ForeignKey(FormatoCotizacion, related_name='formatos', on_delete=models.CASCADE, null=True)
+    f_orden = models.ForeignKey(FormatoOrden, related_name='formatos', on_delete=models.CASCADE, null=True)
+    
+    
     def __str__(self):
-        return f'{self.nombre_formato} - {self.version}'
+        return self.nombre
 
