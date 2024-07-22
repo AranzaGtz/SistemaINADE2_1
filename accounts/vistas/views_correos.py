@@ -1,18 +1,9 @@
-from datetime import datetime
-from django import forms
-from django.forms import modelformset_factory
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.mail import EmailMessage
-from SistemaINADE2 import settings
-from accounts.models import Cotizacion, Concepto, Notificacion, Organizacion, Formato, CustomUser, Persona
-from accounts.forms import ConceptoForm, CotizacionForm, ConceptoFormSet, OrdenPedidoForm
+from accounts.models import Cotizacion, Notificacion, CustomUser, Persona
+from accounts.forms import OrdenPedidoForm
 from django.contrib import messages
-from django.db import IntegrityError
-from django.template.loader import render_to_string
-from weasyprint import HTML  # type: ignore # Asegúrate de tener weasyprint instalado
 from django.urls import reverse
-from accounts.helpers import get_formato_default, get_unica_organizacion
 
 #   VISTA PARA ENVIAR COTIZACIÓN
 def enviar_cotizacion(request, pk, destinatarios):

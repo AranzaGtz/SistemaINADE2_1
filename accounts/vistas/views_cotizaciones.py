@@ -11,6 +11,7 @@ from weasyprint import HTML  # type: ignore
 from django.template.loader import render_to_string
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
 
 # VISTA PARA GENERAD ID PERSONALIZADO
 def generate_new_id_personalizado():
@@ -27,30 +28,22 @@ def cotizaciones_list(request):
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
-    # Inicializar la consulta de cotizaciones
-     # Filtrar cotizaciones que no están aceptadas
-    cotizaciones = Cotizacion.objects.all()
-    cotizacion_form = CotizacionForm()
-    concepto_formset = ConceptoFormSet()
+    # Parámetro de ordenamiento desde la URL
+    order_by = request.GET.get('order_by', 'fecha_solicitud')  # Default order
 
-    # Inicializar formularios para crear prospectos
-    titulos = Titulo.objects.all()
-    empresas = Empresa.objects.all()
-    persona_form = PersonaForm()
-    empresa_form = EmpresaForm()
-    prospecto_from = ProspectoForm()
+    # Filtrar cotizaciones que no están aceptadas y ordenarlas
+    cotizaciones = Cotizacion.objects.all().order_by(order_by)
+    
+    # Paginación
+    paginator = Paginator(cotizaciones, 15)  # Mostrar 15 cotizaciones por página
+    page_number = request.GET.get('page')
+    cotizaciones_page = paginator.get_page(page_number)
 
     context = {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
-        'cotizaciones': cotizaciones,
-        'cotizacion_form': cotizacion_form,
-        'concepto_formset': concepto_formset,
-        'titulos': titulos,
-        'empresas': empresas,
-        'persona_form': persona_form,
-        'empresa_form': empresa_form,
-        'prospecto_form': prospecto_from
+        'cotizaciones_page': cotizaciones_page,  # Cambiado a cotizaciones_page
+        'cotizaciones':cotizaciones,
     }
     return render(request, "accounts/cotizaciones/cotizaciones.html", context)
 
@@ -375,7 +368,7 @@ def ver_orden_pedido(request, pk):
 def generar_pdf_cotizacion(request,cotizacion):
     conceptos = cotizacion.conceptos.all()
     org = get_unica_organizacion()
-    formato = get_formato_default()
+    formato = org.f_cotizacion
     user = request.user if request.user.is_authenticated else None
     
     for concepto in conceptos:

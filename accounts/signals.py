@@ -1,6 +1,6 @@
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from .models import Formato, Organizacion, Titulo, Metodo
+from .models import   Titulo, Metodo
 
 @receiver(post_migrate)
 def load_initial_data(sender, **kwargs):
@@ -35,11 +35,3 @@ def load_initial_data(sender, **kwargs):
             Metodo(metodo='NOM-010-STPS-2014'),
             Metodo(metodo='NOM-081-SEMARNAT-1994'),
         ], ignore_conflicts=True)  # Agregar ignore_conflicts para evitar duplicados
-        
-        Organizacion.objects.bulk_create([
-            Organizacion(nombre='Ingenieria y Administración Estratégica, S.A. de C.V.',direccion='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106', telefono='(664) 104 51 44',pagina_web= 'http://www.inade.mx')
-        ],ignore_conflicts=True)
-        
-        Formato.objects.bulk_create([
-            Formato(nombre_formato='FOR-G-007',version='6.0', terminos='Aqui tus terminos', avisos='Aqui tus avisos')
-        ],ignore_conflicts=True)

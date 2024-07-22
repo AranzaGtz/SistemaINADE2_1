@@ -1,25 +1,36 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from accounts.forms import DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm
-from accounts.models import Direccion, Empresa, Persona, Prospecto, Titulo
+from accounts.forms import DireccionForm, EmpresaForm
+from accounts.models import Direccion, Empresa, Persona
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 # VISTA MOSTRAR EMPRESAS
 def empresa_cont_list(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+
+    # Parámetro de ordenamiento desde la URL
+    order_by = request.GET.get('order_by', 'id')  # Orden por defecto
+
+    # Obtener todas las empresas y ordenarlas
+    empresas = Empresa.objects.all().order_by(order_by)
     
-    empresas = Empresa.objects.all()
-    contactos = Persona.objects.all()
+    # Paginación
+    paginator = Paginator(empresas, 15)  # Muestra 15 empresas por página
+    page_number = request.GET.get('page')
+    empresas_page = paginator.get_page(page_number)
+
     empresa_form = EmpresaForm()
-    context={
+
+    context = {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
-        'empresas':empresas,
-        'contactos':contactos,
-        'empresa_form':empresa_form,
+        'empresas_page': empresas_page,  # Usar solo empresas_page para la tabla
+        'empresa_form': empresa_form
     }
-    return render(request, "accounts/empresas/empresas.html",context)
+    
+    return render(request, "accounts/empresas/empresas.html", context)
 
 
 # VISTA CREAR EMPRESA EN MODAL

@@ -37,18 +37,18 @@
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
                     <tr>
-                        <th>Cotizacion</th>
-                        <th>Empresa</th>
+                        <th><a href="?order_by=id_personalizado">Cotización</a></th>
+                        <th><a href="?order_by=persona__empresa__nombre_empresa">Empresa</a></th>
                         <th colspan="2">Contacto</th>
-                        <th>Solicitud</th>
-                        <th>Expiración</th>
-                        <th>Moneda</th>
+                        <th><a href="?order_by=fecha_solicitud">Solicitud</a></th>
+                        <th><a href="?order_by=fecha_caducidad">Expiración</a></th>
+                        <th><a href="?order_by=metodo_pago">Moneda</a></th>
                         <th colspan="3">Opciones</th>
                     </tr>
                 </thead>
                 <!-- CUERPO DE TABLA -->
                 <tbody>
-                    {% for c in cotizaciones %}
+                    {% for c in cotizaciones_page %}
                     <tr>
                         <td>{{ c.id_personalizado }}</td>
                         <td>{{ c.persona.empresa.nombre_empresa }}</td>
@@ -64,7 +64,18 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <p>Numero de prospectos: {{cotizaciones.count}}</p>
+            <p>Número de prospectos: {{cotizaciones.count}}</p>
+            <div class="pagination">
+                {% if cotizaciones_page.has_previous %}
+                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                    <a href="?page={{ cotizaciones_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+                {% endif %}
+                <div class="m-1">Página {{ cotizaciones_page.number }} de {{ cotizaciones_page.paginator.num_pages }}.</div> 
+                {% if cotizaciones_page.has_next %}
+                    <a href="?page={{ cotizaciones_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+                    <a href="?page={{ cotizaciones_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
