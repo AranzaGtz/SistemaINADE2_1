@@ -32,12 +32,15 @@ def cotizaciones_aceptadas_list(request):
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizaciones': cotizaciones,
-        'cotizaciones_page': cotizaciones_page,  # Cambiando a cotizaciones_page
+        'cotizaciones_page': cotizaciones_page,  
+        
+        
     }
     return render(request, "accounts/cotizacionesAceptadas/cotizaciones_aceptadas.html", context)
 
 # VISTA PARA CREAR ORDEN DE TRABAJO
 def generar_orden_trabajo(request, pk):
+    
     # Obtener la cotización según el ID proporcionado
     cotizacion = get_object_or_404(Cotizacion, id=pk)
 

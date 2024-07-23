@@ -239,7 +239,7 @@ def cotizaciones_prospecto_create(request):
 
 # INTERFAZ DE DETALLES DE CADA COTIZACION
 def cotizacion_detalle(request, pk):
-    cotizacion = get_object_or_404(Cotizacion, pk=pk)
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
     conceptos = cotizacion.conceptos.all()
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio

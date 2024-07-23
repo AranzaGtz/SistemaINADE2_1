@@ -27,3 +27,5 @@ def ordenes_list(request):
           'ordenes_page': ordenes_page, # Usar ordenes_page en lugar de ordenes
      }
      return render(request, 'accounts/ordenes/ordenes.html', context)
+
+#    VISTA PARA DETALLES DE UNA ORDEN DE TRABAJO
