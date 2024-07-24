@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from accounts.models import OrdenTrabajo
 from django.core.paginator import Paginator
 
@@ -29,3 +29,12 @@ def ordenes_list(request):
      return render(request, 'accounts/ordenes/ordenes.html', context)
 
 #    VISTA PARA DETALLES DE UNA ORDEN DE TRABAJO
+def detalle_orden_trabajo(request, id_personalizado):
+     orden_trabajo = get_object_or_404(OrdenTrabajo, id_personalizado = id_personalizado)
+     conceptos = orden_trabajo.conceptos.all()
+     context = {
+          'orden_trabajo': orden_trabajo,
+          'conceptos': orden_trabajo,
+     }
+     return render(request, 'accounts/ordenes/orden_detalle.html', context) 
+     

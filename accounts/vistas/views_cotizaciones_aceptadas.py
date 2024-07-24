@@ -3,7 +3,7 @@ from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import DireccionForm, OrdenTrabajoForm
 from accounts.helpers import get_unica_organizacion
-from accounts.models import Concepto, Cotizacion, Direccion
+from accounts.models import Concepto, Cotizacion, Direccion, OrdenTrabajoConcepto
 from django.contrib import messages
 from accounts.forms import OrdenTrabajoForm, DireccionForm
 from django.template.loader import render_to_string
@@ -69,8 +69,7 @@ def generar_orden_trabajo(request, pk):
                     # Verificar si la dirección ha cambiado
                     if not all(direccion_data[key] == getattr(direccion_actual, key) for key in direccion_data):
                         # Crear una nueva dirección si los datos son diferentes
-                        nueva_direccion = Direccion.objects.create(
-                            **direccion_data)
+                        nueva_direccion = Direccion.objects.create(**direccion_data)
                         orden_trabajo.direccion = nueva_direccion
                     else:
                         # Usar la dirección actual si los datos no han cambiado
@@ -85,30 +84,29 @@ def generar_orden_trabajo(request, pk):
                     orden_trabajo.save()
 
                     # Filtrar los conceptos seleccionados
-                    conceptos_seleccionados = request.POST.getlist('conceptos')
-                    for concepto_id in conceptos_seleccionados:
-                        concepto = Concepto.objects.get(id=concepto_id)
-                        usar_otra_descripcion = request.POST.get(f'usar_otra_descripcion_{concepto_id}')
-                        if usar_otra_descripcion:
-                            nueva_descripcion = request.POST.get(f'otra_descripcion_{concepto_id}')
-                            concepto.notas = nueva_descripcion
-                        concepto.save()
-                    
-                    conceptos_seleccionados = []
-                    for concepto in conceptos:
-                        if f'usare_concepto_{concepto.id}' in request.POST:
-                            descripcion = request.POST.get(f'otra_descripcion_{concepto.id}', concepto.notas)
-                            conceptos_seleccionados.append((concepto, descripcion))
-
-                    # Generar el PDF y guardarlo en el modelo
-                    pdf_data = generar_pdf_orden_trabajo(request, orden_trabajo, conceptos_seleccionados)
+                    conceptos_orden_trabajo = []
+                    for concepto in Concepto.objects.filter(cotizacion=cotizacion):
+                        if f'usar_concepto_{concepto.id}' in request.POST:
+                            # El concepto ha sido seleccionado para incluirse en la orden de trabajo
+                            usar_otra_descripcion = request.POST.get(f'usar_otra_descripcion_{concepto.id}', 'off') == 'on'
+                            descripcion_personalizada = request.POST.get(f'otra_descripcion_{concepto.id}', '').strip() if usar_otra_descripcion else None
+                            
+                            OrdenTrabajoConcepto.objects.create(
+                                orden_de_trabajo=orden_trabajo,
+                                concepto=concepto,
+                                descripcion_personalizada=descripcion_personalizada
+                            )
+                            conceptos_orden_trabajo.append(concepto)
+                            
+                    # Generar el PDF
+                    pdf_data = generar_pdf_orden_trabajo(request, orden_trabajo)
+                    # Guardar el PDF en el modelo
                     orden_trabajo.orden_trabajo_pdf.save(f"orden_trabajo_{orden_trabajo.id_personalizado}.pdf", ContentFile(pdf_data))
-
                     orden_trabajo.save()
-
-                    messages.success(
-                        request, 'Orden de trabajo generada exitosamente.')
+                    messages.success(request, 'Orden de trabajo generada exitosamente.')
                     return redirect('cotizacion_detalle', pk=cotizacion.id)
+                
+                
             except IntegrityError:
                 messages.error(
                     request, 'Hubo un error al crear la orden de trabajo. Inténtalo de nuevo.')
@@ -117,6 +115,7 @@ def generar_orden_trabajo(request, pk):
             print(direccion_form.errors)
             messages.error(
                 request, 'Hubo un error en el formulario. Por favor, revisa los campos e intenta nuevamente.')
+    
     else:
         direccion_initial_data = {
             'calle': cotizacion.persona.empresa.direccion.calle,
@@ -138,30 +137,35 @@ def generar_orden_trabajo(request, pk):
     return render(request, 'accounts/cotizacionesAceptadas/generar_orden_trabajo.html', context)
 
 # VISTA PARA CREAR PDF DE ORDEN DE TRABAJO
-def generar_pdf_orden_trabajo(request, orden_trabajo, conceptos_seleccionados):
+def generar_pdf_orden_trabajo(request, orden_trabajo):
+    # Asumimos que orden_trabajo es la instancia de OrdenDeTrabajo para la cual generar el PDF.
+    conceptos_orden_trabajo = OrdenTrabajoConcepto.objects.filter(orden_de_trabajo=orden_trabajo)
+    
     conceptos = Concepto.objects.filter(cotizacion=orden_trabajo.cotizacion)
     org = get_unica_organizacion()
-    formato = org.f_orden.nombre_formato
-    version = org.f_orden.version
-    emision = org.f_orden.emision
-    user = request.user if request.user.is_authenticated else None
-
-    for concepto in conceptos:
-        concepto.subtotal = concepto.cantidad_servicios * concepto.precio
-
-    current_date = datetime.now().strftime("%Y/%m/%d")
-    logo_url = request.build_absolute_uri('/static/img/logo.png')
+    # Suponiendo que conceptos_seleccionados ya contiene los conceptos correctos con su descripción personalizada
+    conceptos_data = [
+        {
+            'nombre': ctp.concepto.servicio.nombre_servicio,
+            'metodo': ctp.concepto.servicio.metodo,
+            'descripcion': ctp.concepto.servicio.descripcion,
+            'cantidad': ctp.concepto.cantidad_servicios,
+            'descripcion_personalizada': ctp.descripcion_personalizada if ctp.descripcion_personalizada else ctp.concepto.notas,
+            'nota': ctp.concepto.notas,
+        } 
+        for ctp in conceptos_orden_trabajo
+    ]
 
     context = {
-        'org': org,
-        'formato': formato,
-        'version':version,
-        'emision':emision,
-        'user': user,
+        'org': get_unica_organizacion(),
+        'formato': org.f_orden.nombre_formato,
+        'version':org.f_orden.version,
+        'emision':org.f_orden.emision.strftime("%Y/%m/%d"),
+        'user': request.user if request.user.is_authenticated else None,
+        'current_date': datetime.now().strftime("%Y/%m/%d"),
+        'logo_url': request.build_absolute_uri('/static/img/logo.png'),
         'orden_trabajo': orden_trabajo,
-        'conceptos_seleccionados': conceptos_seleccionados,
-        'current_date': current_date,
-        'logo_url': logo_url,
+        'conceptos_data': conceptos_data,
     }
 
     html_string = render_to_string(
