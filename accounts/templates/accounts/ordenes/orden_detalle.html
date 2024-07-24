@@ -5,31 +5,45 @@
 {% block content %}
 <style>
     .gestion-alert {
-        color: #ffffff; /* Texto en color blanco */
-        background-color: #1cb75a; /* Fondo rojo para indicar importancia */
-        padding: 10px; /* Espaciado interno para que el mensaje no esté tan apretado */
-        border: 1px solid #1cb75a; /* Borde más oscuro para más contraste */
-        border-radius: 5px; /* Bordes redondeados para un look más moderno */
-        display: inline-block; /* Asegura que el padding y border afecten correctamente */
-        margin-top: 10px; /* Espacio arriba para separarlo de otros elementos */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para más profundidad */
+        color: #ffffff;
+        /* Texto en color blanco */
+        background-color: #1cb75a;
+        /* Fondo rojo para indicar importancia */
+        padding: 10px;
+        /* Espaciado interno para que el mensaje no esté tan apretado */
+        border: 1px solid #1cb75a;
+        /* Borde más oscuro para más contraste */
+        border-radius: 5px;
+        /* Bordes redondeados para un look más moderno */
+        display: inline-block;
+        /* Asegura que el padding y border afecten correctamente */
+        margin-top: 10px;
+        /* Espacio arriba para separarlo de otros elementos */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        /* Sombra ligera para más profundidad */
     }
 </style>
 
 <div class="container mt-4">
     <h1 class="text-center">Detalles de la Orden de Trabajo: {{ orden_trabajo.id_personalizado }}</h1>
     <hr />
-    <div class="form-group mt-4">
-        <!-- BOTONES DE ACCIÓN -->
-        <div class="text-center mb-4">
-            <a href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion %}" class="btn btn-primary mx-1">Ir a cotización</a>
-            <a href="" class="btn btn-warning mx-1">Actualizar estado</a>
-            <a href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" class="btn btn-secondary mx-1">Ver PDF</a>
-        </div>
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="dropdown text-end dropleft">
+        <!-- Botón para activar el dropdown -->
+        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            Acciones para orden de trabajo
+        </button>
+        <!-- Elementos del dropdown -->
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion %}">Ir a cotización</a></li>
+            <li><a class="dropdown-item" href="#">Actualizar estado</a></li>
+            <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}">Ver PDF</a></li>
+        </ul>
     </div>
 
     <!-- DATOS DE COTIZACION -->
-        <p class="text-center">
+    <p class="text-center">
         {% if orden_trabajo.gestion %}
         <strong class="gestion-alert">¡Atención! Esta orden de trabajo requiere gestión.</strong>
         {% endif %}
@@ -39,7 +53,7 @@
     <p><strong>Dirección:</strong> {{ orden_trabajo.direccion }}</p>
     <p><strong>Estado:</strong> {{ orden_trabajo.estado }}</p>
 
-    
+
 
     <h2>Conceptos Asociados</h2>
     <!-- DETALLES DE CONCEPTOS -->
@@ -62,7 +76,8 @@
                     <td>{{ concepto.concepto.servicio.metodo }}</td>
                     <td>{{ concepto.concepto.cantidad_servicios }}</td>
                     <td>{{ concepto.concepto.precio }}</td>
-                    <td> {% if concepto.descripcion_personalizada == NULL %} {{concepto.concepto.notas}}  {% else %} {{ concepto.descripcion_personalizada }} {% endif %}</td>
+                    <td> {% if concepto.descripcion_personalizada == NULL %} {{concepto.concepto.notas}} {% else %}
+                        {{ concepto.descripcion_personalizada }} {% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>

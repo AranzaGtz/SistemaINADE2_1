@@ -6,76 +6,80 @@
 
 <!-- CONTENEDOR DETALLES DE COTIZACION -->
 <div class="container mt-4">
-    
-    <h1 class="text-center">{% if cotizacion.estado %} Proyecto {% else %}Detalles de la Cotización {{ cotizacion.id_personalizado }} {% endif %}</h1>
-    <hr />
-    
-    <div class="form-group mt-4">
-        <!-- BOTONES DE ACCIÓN -->
-        <div class="text-center mb-4">
-            <a href="{% url 'cotizacion_duplicar' cotizacion.id%}" class="btn btn-primary mx-1">Duplicar</a> 
-            <a href="{% url 'cotizacion_edit' cotizacion.id%}" class="btn btn-primary mx-1">Editar</a>
-            <a href="{% url 'cotizacion_delete' cotizacion.id %}" class="btn btn-danger mx-1">Borrar</a>
-            <a href="{% url 'seleccionar_correos' cotizacion.id %}" class="btn btn-success mx-1">Enviar cotización</a>
-            <a href="{% url 'actualizar_estado' cotizacion.id %}" class="btn btn-warning mx-1">Actualizar estado</a>
-            <a href="{% url 'cotizacion_pdf' cotizacion.id %}" class="btn btn-secondary mx-1">Ver PDF</a>
-            <!-- cotizacion_detalle.html -->
-            {% if cotizacion.orden_pedido_pdf %}
-                <a href="{% url 'ver_orden_pedido' cotizacion.id %}" class="btn btn-info">Ver Orden de Pedido</a>
-            {% endif %}
-        </div>
-        <!-- DATOS DE COTIZACION -->
-        <div class="col mx-auto">
-            <div class="p-4 mb-2">
-                <p><strong>Atención a :</strong> {{ cotizacion.persona.nombre }} {{ cotizacion.persona.apellidos }}</p>
-                <p><strong>Empresa :</strong> {{ cotizacion.persona.empresa.nombre_empresa }}</p>
-                <p><strong>Direccion :</strong> {{ cotizacion.persona.empresa.direccion }}</p>
-                <p><strong>Fecha solicitada: </strong> {{ cotizacion.fecha_solicitud }}</p>
-                <p><strong>Fecha de caducidad: </strong> {{ cotizacion.fecha_caducidad }}</p>
-                <p><strong>Denominación: </strong> {{ cotizacion.metodo_pago }}</p>
-                <p><strong>Tasa IVA: </strong> {{ cotizacion.tasa_iva }}</p>
-                <p><strong>Notas: </strong> {{ cotizacion.notas }}</p>
-                <p><strong>Correos adicionales: </strong> {{ cotizacion.correos_adicionales }}</p>
-            </div>
-        </div>
 
-        <!-- DETALLES DE CONCEPTOS -->
-        <h3 class="text-center">Servicios</h3>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Servicio</th>
-                        <th>Notas</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Subtotal</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for concepto in conceptos %}
-                    <tr>
-                        <td>{{ concepto.servicio }}</td>
-                        <td>{{ concepto.notas }}</td>
-                        <td>{{ concepto.cantidad_servicios }}</td>
-                        <td>{{ concepto.precio }}</td>
-                        <td>{{ concepto.subtotal }}</td>
-                        
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <h1 class="text-center"> Detalles de la Cotización {{ cotizacion.id_personalizado }}{% if cotizacion.estado %}
+        Proyecto {% endif %}</h1>
+    <hr />
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="dropdown text-end dropleft">
+        <!-- Botón para activar el dropdown -->
+        <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            Acciones para cotizacion
+        </button>
+        <!-- Elementos del dropdown -->
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{% url 'cotizacion_duplicar' cotizacion.id%}"
+                    class="btn btn-primary mx-1">Duplicar</a></li>
+            <li><a class="dropdown-item" href="{% url 'cotizacion_edit' cotizacion.id%}">Editar</a></li>
+            <li><a class="dropdown-item" href="{% url 'cotizacion_delete' cotizacion.id %}">Borrar</a></li>
+            <li><a class="dropdown-item" href="{% url 'seleccionar_correos' cotizacion.id %}">Enviar cotización</a></li>
+            <li><a class="dropdown-item" href="{% url 'actualizar_estado' cotizacion.id %}">Actualizar estado</a></li>
+            <li><a class="dropdown-item" href="{% url 'cotizacion_pdf' cotizacion.id %}">Ver PDF</a></li>
+        </ul>
+    </div>
+    <!-- DATOS DE COTIZACION -->
+    <div class="col mx-auto">
+        <div class="p-4 mb-2">
+            <p><strong>Atención a :</strong> {{ cotizacion.persona.nombre }} {{ cotizacion.persona.apellidos }}</p>
+            <p><strong>Empresa :</strong> {{ cotizacion.persona.empresa.nombre_empresa }}</p>
+            <p><strong>Direccion :</strong> {{ cotizacion.persona.empresa.direccion }}</p>
+            <p><strong>Fecha solicitada: </strong> {{ cotizacion.fecha_solicitud }}</p>
+            <p><strong>Fecha de caducidad: </strong> {{ cotizacion.fecha_caducidad }}</p>
+            <p><strong>Denominación: </strong> {{ cotizacion.metodo_pago }}</p>
+            <p><strong>Tasa IVA: </strong> {{ cotizacion.tasa_iva }}</p>
+            <p><strong>Notas: </strong> {{ cotizacion.notas }}</p>
+            <p><strong>Correos adicionales: </strong> {{ cotizacion.correos_adicionales }}</p>
         </div>
-        
-        <!-- RESUMEN -->
-        <div class="d-flex justify-content-end mt-4">
-            <div class="p-2">
-                <h4>Resumen</h4>
-                <p><strong>Subtotal:</strong> ${{ cotizacion.subtotal }}</p>
-                <p><strong>IVA ({{ cotizacion.tasa_iva }}%):</strong> ${{ cotizacion.iva }}</p>
-                <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
-            </div>
+    </div>
+
+    <!-- DETALLES DE CONCEPTOS -->
+    <h3 class="text-center">Servicios</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Servicio</th>
+                    <th>Notas</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for concepto in conceptos %}
+                <tr>
+                    <td>{{ concepto.servicio }}</td>
+                    <td>{{ concepto.notas }}</td>
+                    <td>{{ concepto.cantidad_servicios }}</td>
+                    <td>{{ concepto.precio }}</td>
+                    <td>{{ concepto.subtotal }}</td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="d-flex justify-content-end mt-4">
+        <div class="p-2">
+            <h4>Resumen</h4>
+            <p><strong>Subtotal:</strong> ${{ cotizacion.subtotal }}</p>
+            <p><strong>IVA ({{ cotizacion.tasa_iva }}%):</strong> ${{ cotizacion.iva }}</p>
+            <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
         </div>
     </div>
 </div>
