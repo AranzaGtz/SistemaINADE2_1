@@ -50,7 +50,7 @@
                         <td>{{ orden.receptor.first_name }} {{ orden.receptor.last_name }}</td>
                         <td>{% if orden.estado %}Terminado{% else %}Pendiente{% endif %}</td>
                         <td>{{ orden.cotizacion.fecha_caducidad}}</td>
-                        <td><a href="" class="btn btn-primary btn-sm">Detalles</a></td>
+                        <td><a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}" class="btn btn-primary btn-sm">Detalles</a></td>
                         <td><a href="" class="btn btn-primary btn-sm">Actualizar estado</a></td>
                     </tr>
                     {% endfor %}

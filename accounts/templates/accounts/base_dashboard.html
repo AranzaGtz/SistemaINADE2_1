@@ -42,12 +42,12 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col d-flex align-items-center">
-                        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}"><img src="{% static 'img/gotalogo.png' %}" alt="Logo"
+                        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}" ><img src="{% static 'img/gotalogo.png' %}" alt="Logo"
                                 style="max-height: 40px;" class="mr-2"> INADE Laboratorio Ambiental</a>
                     </div>
                     <div class="col d-flex align-items-center">
                         <!-- Enlace de Notificaciones -->
-                        <a  class="navbar-brand" href="{% url 'notificaciones' %}" style="max-height: 40px;"> Notificaciones <img src="{% static 'img/campana.svg' %}" alt="">
+                        <a  class="navbar-brand" href="{% url 'notificaciones' %}" style="max-height: 40px; "> Notificaciones <img src="{% static 'img/campana.svg' %}" alt="">
                             {% if notificaciones_no_leidas > 0 %}
                             <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
                             {% endif %}
@@ -57,7 +57,7 @@
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"> <img src="{% static 'img/menu.png' %}" alt=""> </span>
+                    <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"alt=""></span>
                 </button>
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
                     aria-labelledby="offcanvasNavbarLabel">

@@ -231,6 +231,7 @@ class Servicio(models.Model):
 # MODELO PARA CONCEPTO
 class Concepto(models.Model):
     cotizacion = models.ForeignKey(Cotizacion, related_name='conceptos', on_delete=models.CASCADE)
+    
     cantidad_servicios = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     notas = models.TextField(null=True, blank=True)
@@ -264,7 +265,11 @@ class OrdenTrabajo(models.Model):
 
     def __str__(self):
         return f'Orden de Trabajo {self.id_personalizado} para Cotización {self.cotizacion.id_personalizado}'
-
+    
+class OrdenTrabajoConcepto(models.Model):
+    orden_de_trabajo = models.ForeignKey(OrdenTrabajo, related_name='conceptos', on_delete=models.CASCADE)
+    concepto = models.ForeignKey(Concepto, on_delete=models.CASCADE)
+    descripcion_personalizada = models.TextField(null=True, blank=True)
 
 #----------------------------------------------------
 # MODELO PARA MI ORGANIZACIÓN

@@ -99,6 +99,7 @@ urlpatterns = [
     #   ---     INTERFAZ ORDENES DE TRABAJO     ---
     
     path('ordenes_de_trabajo/', views_orden_trabajo.ordenes_list, name='ordenes_list'),
+    path('orden_trabajo/<id_personalizado>/', views_orden_trabajo.detalle_orden_trabajo, name='detalle_orden_trabajo'),
     
     #   ---     INTERFAZ TERMINOS Y AVISOS       ---
 
