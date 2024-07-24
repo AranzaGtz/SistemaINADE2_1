@@ -6,7 +6,8 @@
 
 <!-- CONTENEDOR DETALLES DE COTIZACION -->
 <div class="container mt-4">
-    <h1 class="text-center">Detalles de la Cotización {{ cotizacion.id_personalizado }}</h1>
+    
+    <h1 class="text-center">{% if cotizacion.estado %} Proyecto {% else %}Detalles de la Cotización {{ cotizacion.id_personalizado }} {% endif %}</h1>
     <hr />
     
     <div class="form-group mt-4">

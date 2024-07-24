@@ -1,13 +1,13 @@
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Cotizaciones Aceptadas{% endblock %}
-{% block header %}Cotizaciones Aceptadas{% endblock %}
+{% block title %}Proyectos{% endblock %}
+{% block header %}Proyectos{% endblock %}
 {% block content %}
 
 <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
 <div class="row">
     <div class="col">
-        <h1 class="text-center">Cotizaciones Aceptadas</h1>
+        <h1 class="text-center">Proyectos</h1>
         <hr />
     </div>
 </div>
@@ -16,7 +16,7 @@
 <div class="row mb-3 justify-content-center">
     <div class="col-md-6">
         <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar cotizaciones..." onkeyup="filterTable('searchInput', 'cotizacionesTable')">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar proyectos..." onkeyup="filterTable('searchInput', 'cotizacionesTable')">
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'cotizacionesTable')">Buscar</button>
             </div>
@@ -26,7 +26,7 @@
 
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
-        <a href="{% url 'cotizaciones_list' %}" class="btn btn-info mb-3">Ver Cotizaciones No Aceptadas</a>
+        <a href="{% url 'cotizaciones_list' %}" class="btn btn-info mb-3">Ver Cotizaciones</a>
     </div>
 </div>
 <!-- TABLA -->
@@ -58,7 +58,7 @@
                         <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
                         <td>{{ c.metodo_pago }}</td>
                         <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a></td>
-                        <td><a href="{% url 'generar_orden_trabajo' c.id %}" class="btn btn-primary btn-sm auto">Crea Orden de Trabajo</a></td>
+                        <td><a href="{% url 'generar_orden_trabajo' c.id %}" class="btn btn-primary btn-sm auto">Crea Orden</a></td>
                         <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                     </tr>
                     {% endfor %}

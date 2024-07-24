@@ -1,5 +1,6 @@
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
-from accounts.models import OrdenTrabajo
+from accounts.models import OrdenTrabajo, OrdenTrabajoConcepto
 from django.core.paginator import Paginator
 
 #    VISTA PARA ORDENES DE TRABAJO
@@ -30,11 +31,27 @@ def ordenes_list(request):
 
 #    VISTA PARA DETALLES DE UNA ORDEN DE TRABAJO
 def detalle_orden_trabajo(request, id_personalizado):
+     # Notificación
+     notificaciones = request.user.notificacion_set.all()
+     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
      orden_trabajo = get_object_or_404(OrdenTrabajo, id_personalizado = id_personalizado)
-     conceptos = orden_trabajo.conceptos.all()
+     conceptos = OrdenTrabajoConcepto.objects.filter(orden_de_trabajo=orden_trabajo.id_personalizado)
+     
      context = {
+          'notificaciones': notificaciones,
+          'notificaciones_no_leidas': notificaciones_no_leidas,
           'orden_trabajo': orden_trabajo,
-          'conceptos': orden_trabajo,
+          'conceptos': conceptos,
      }
      return render(request, 'accounts/ordenes/orden_detalle.html', context) 
      
+#    VISTA PARA VER ARCHIVO PDF ORDEN DE TRABAJO
+def orden_trabajo_pdf(request, id_personalizado):
+     orden_trabajo = get_object_or_404(OrdenTrabajo, id_personalizado = id_personalizado)
+     # Verificar si el archivo PDF existe
+     if OrdenTrabajo.orden_trabajo_pdf:
+          # Retornar el archivo PDF guardado
+          return FileResponse(orden_trabajo.orden_trabajo_pdf.open(), content_type='application/pdf')
+     else:
+          raise Http404("El archivo PDF no se encuentra.")
