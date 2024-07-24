@@ -1,28 +1,73 @@
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Detalles de la Cotización{% endblock %}
-{% block header %}Detalles de la Cotización{% endblock %}
+{% block title %}Detalles de la Orden de trabajo{% endblock %}
+{% block header %}Detalles de la Orden de trabajo{% endblock %}
 {% block content %}
+<style>
+    .gestion-alert {
+        color: #ffffff; /* Texto en color blanco */
+        background-color: #1cb75a; /* Fondo rojo para indicar importancia */
+        padding: 10px; /* Espaciado interno para que el mensaje no esté tan apretado */
+        border: 1px solid #1cb75a; /* Borde más oscuro para más contraste */
+        border-radius: 5px; /* Bordes redondeados para un look más moderno */
+        display: inline-block; /* Asegura que el padding y border afecten correctamente */
+        margin-top: 10px; /* Espacio arriba para separarlo de otros elementos */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para más profundidad */
+    }
+</style>
 
-<div class="container">
-     <h1>Detalle de la Orden de Trabajo: {{ orden_trabajo.id_personalizado }}</h1>
-     <p><strong>Receptor:</strong> {{ orden_trabajo.receptor }}</p>
-     <p><strong>Dirección:</strong> {{ orden_trabajo.direccion }}</p>
-     <p><strong>Estado:</strong> {{ orden_trabajo.estado }}</p>
-     <p><strong>Gestión:</strong> {{ orden_trabajo.gestion }}</p>
- 
-     <h2>Conceptos Asociados</h2>
-     <ul>
-         {% for concepto in conceptos %}
-         <li>
-             <strong>Servicio:</strong> {{ concepto.servicio.nombre_servicio }},
-             <strong>Método:</strong> {{ concepto.servicio.metodo }},
-             <strong>Cantidad:</strong> {{ concepto.cantidad_servicios }},
-             <strong>Precio:</strong> {{ concepto.precio }},
-             <strong>Notas:</strong> {{ concepto.notas }}
-         </li>
-         {% endfor %}
-     </ul>
- </div>
+<div class="container mt-4">
+    <h1 class="text-center">Detalles de la Orden de Trabajo: {{ orden_trabajo.id_personalizado }}</h1>
+    <hr />
+    <div class="form-group mt-4">
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="text-center mb-4">
+            <a href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion %}" class="btn btn-primary mx-1">Ir a cotización</a>
+            <a href="" class="btn btn-warning mx-1">Actualizar estado</a>
+            <a href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" class="btn btn-secondary mx-1">Ver PDF</a>
+        </div>
+    </div>
+
+    <!-- DATOS DE COTIZACION -->
+        <p class="text-center">
+        {% if orden_trabajo.gestion %}
+        <strong class="gestion-alert">¡Atención! Esta orden de trabajo requiere gestión.</strong>
+        {% endif %}
+    </p>
+    <p><strong>Cliente:</strong> {{ orden_trabajo.cotizacion.persona.empresa.nombre_empresa }}</p>
+    <p><strong>Receptor:</strong> {{ orden_trabajo.receptor }}</p>
+    <p><strong>Dirección:</strong> {{ orden_trabajo.direccion }}</p>
+    <p><strong>Estado:</strong> {{ orden_trabajo.estado }}</p>
+
+    
+
+    <h2>Conceptos Asociados</h2>
+    <!-- DETALLES DE CONCEPTOS -->
+    <h3 class="text-center">Servicios</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Nombre del servicio</th>
+                    <th>Método</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Notas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for concepto in conceptos %}
+                <tr>
+                    <td>{{ concepto.concepto.servicio.nombre_servicio}}</td>
+                    <td>{{ concepto.concepto.servicio.metodo }}</td>
+                    <td>{{ concepto.concepto.cantidad_servicios }}</td>
+                    <td>{{ concepto.concepto.precio }}</td>
+                    <td> {% if concepto.descripcion_personalizada == NULL %} {{concepto.concepto.notas}}  {% else %} {{ concepto.descripcion_personalizada }} {% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}

@@ -87,7 +87,8 @@ urlpatterns = [
     path('cotizaciones/<int:pk>/delete/', views_cotizaciones.cotizacion_delete, name='cotizacion_delete'),
 
     path('cotizacion/<int:pk>/pdf/', views_cotizaciones.cotizacion_pdf, name='cotizacion_pdf'),
-    path('cotizacion/<int:pk>/ver_orden_pedido/', views_cotizaciones.ver_orden_pedido, name='ver_orden_pedido'),
+    # esta vista de abajo aun no es funcional
+    # path('cotizacion/<int:pk>/ver_orden_pedido/', views_cotizaciones.ver_orden_pedido, name='ver_orden_pedido'),
     # ESTA SIENDO DUP`LICADA PORQUE SE UNA EN LA CREACION DE COTIZACIÓN LA DE ARRIBA SE USA SOLO PARA VER
     path('cotizaciones/<int:pk>/duplicar/', views_cotizaciones.cotizacion_duplicar, name='cotizacion_duplicar'),
     path('cotizacion/pdf', views_cotizaciones.generar_pdf_cotizacion, name='generar_pdf_cotizacion'),
@@ -100,6 +101,7 @@ urlpatterns = [
     
     path('ordenes_de_trabajo/', views_orden_trabajo.ordenes_list, name='ordenes_list'),
     path('orden_trabajo/<id_personalizado>/', views_orden_trabajo.detalle_orden_trabajo, name='detalle_orden_trabajo'),
+    path('orden_trabajo/<id_personalizado>/pdf', views_orden_trabajo.orden_trabajo_pdf, name= 'orden_trabajo_pdf'),
     
     #   ---     INTERFAZ TERMINOS Y AVISOS       ---
 

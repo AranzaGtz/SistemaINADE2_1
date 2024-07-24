@@ -3,7 +3,7 @@ from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import get_formato_default, get_unica_organizacion
-from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto,Persona, Prospecto, Servicio, Titulo
+from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, OrdenTrabajo,Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm
 from django.contrib import messages
 from django.http import FileResponse, Http404, JsonResponse
