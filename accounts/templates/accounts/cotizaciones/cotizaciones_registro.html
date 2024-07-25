@@ -16,15 +16,15 @@
         /* Borde izquierdo color bg-info */
     }
 </style>
+<script type="text/javascript">
+    // Asegúrate de que los datos de servicios se cargan en una variable de JavaScript
+    var servicios = {{ servicios_json| safe }};
+</script>
 
 <h1 class="text-center">Registro de cotización</h1>
-<!-- Incluye jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <hr />
 <!--id: cotizacionForm-->
-<form action="{% url 'cotizacion_form' %}" method="post" id="cotizacionForm">
+<form action="" method="post" id="cotizacionForm">
 
     {% csrf_token %}
 
@@ -38,37 +38,29 @@
         </div>
 
         <!-- Alerta para mostrar la información del cliente elejido en select -->
-        <h4>Cliente prospeco</h4>
-        <div class="row mt-2 center text-center  mt-2">
-            <div class="col-md-12 ">
-                <p id="cliente-datos" class="alert-primary mt-2">
-                </p>
-                {% if persona%}
-                <div id="cliente-datos" class="alert-primary mt-2 ">
-                    <h5>Cliente <strong> {{ empresa  }}</strong></h5>
-                    RFC:<code> {{ rfc }}</code><br>
-                    <strong>Representante: </strong>{{persona}}<br>
-                    <strong>Informacion de contacto: </strong> {{informacionContacto}}
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white text-center">
+                            <h5>Cliente <strong>{{ cliente.empresa.nombre_empresa }}</strong></h5>
+                        </div>
+                        <div class="card-body bg-light">
+                            <p class="card-text">
+                                <strong>RFC:</strong> <span class="text-monospace">{{ cliente.empresa.rfc }}</span>
+                            </p>
+                            <p class="card-text">
+                                <strong>Representante:</strong> {{ cliente }}
+                            </p>
+                            <p class="card-text">
+                                <strong>Información de contacto:</strong> {{ cliente.informacion_contacto }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
             </div>
         </div>
 
-
-        <!-- Boton para agregar prospecto -->
-        <div class="col-auto text-end mt-2" style="text-align: right;">
-            <span class="text-info mr-2">Si no existe el cliente prospecto, puede crearlo desde el boton.</span>
-            <a href="{% url 'cotizaciones_prospecto_create'%}" type="button" class="btn btn-primary">Añadir Prospecto
-            </a>
-        </div>
-
-        <!-- Select del formulario de cliente/persona/prospecto -->
-        <div class="row">
-            <div class="col-md-12 mt-2">
-                <label for="{{ cotizacion_form.persona.id_for_label }}">Cliente</label>
-                {{ cotizacion_form.persona }}
-            </div>
-        </div>
 
         <!-- fechas -->
         <div class="row">
@@ -243,195 +235,67 @@
     </div>
 </div>
 
-<!-- Modal para crear un nuevo prospecto -->
-<!--id: createProspectoModal-->
-<div class="modal fade" id="createProspectoModal" tabindex="-1" aria-labelledby="createProspectoLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createProspectoLabel">Crear Nuevo Prospecto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <!--id: prospectoForm-->
-            <form method="post" action="{% url 'cotizaciones_prospecto_create' %}" id="prospectoForm">
-                {% csrf_token %}
-                <div class="modal-body">
-
-                    {{ persona_form.as_p }}
-
-                    <p>
-                        Crear empresa:
-                        <input type="checkbox" id="crear_empresa_checkbox" name="crear_empresa_checkbox"
-                            placeholder="Crear empresa">
-                    </p>
-
-                    <div class="mb-3" id="select_empresa_div">
-                        <label for="empresaSelect" class="form-label">Empresa:</label>
-                        <select class="form-select" id="empresaSelect" name="empresa">
-                            <option value="">Selecciona una empresa o crea una nueva</option>
-                            {% for empresa in empresas %}
-                            <option value="{{ empresa.id }}">{{ empresa.nombre_empresa }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="mb-3" id="form_empresa_div" style="display: none;">
-                        {{ empresa_form.as_p }}
-                        {{ direccion_form.as_p }}
-                    </div>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <!--id: crearProspecto-->
-                    <button type="button" class="btn btn-success" id="crearProspecto">Crear Prospecto</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <!--Este script carga jQuery, una biblioteca JavaScript popular que simplifica la manipulación del DOM y la realización de peticiones AJAX.-->
 
 <script>
-    // Función para agregar un nuevo formulario de concepto
-    document.getElementById('add-concepto-form').onclick = function () {
-        // Obtener el índice actual de formularios
-        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
-        // Obtener el template del formulario vacío y reemplazar los marcadores de posición
-        var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
-        formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
-
-        // Agregar el formulario clonado al conjunto de formularios
-        $('#concepto_formset').append(formTemplate);
-
-        // Actualizar los IDs y nombres de los campos en el nuevo formulario clonado
-        $('#concepto_formset .concepto-form:last-child').find(':input').each(function () {
-            var name = $(this).attr('name').replace('__prefix__', formIdx);
-            var id = 'id_' + name;
-            $(this).attr({ 'name': name, 'id': id });
+    $(document).ready(function () {
+        // Función para agregar eventos y Select2 a los selects de servicios
+        function initializeSelect2AndEvents() {
+            $('#concepto_formset .concepto-form').each(function (index, form) {
+                var servicioSelect = $(form).find('select[name$="servicio"]');
+                var servicioDatosId = 'servicio-datos-' + index;
+                var servicioDatos = $(form).find('.servicio-datos');
+                servicioDatos.attr('id', servicioDatosId);
+    
+                if (!servicioSelect.hasClass('select2-hidden-accessible')) {
+                    servicioSelect.select2({
+                        placeholder: "Selecciona un servicio",
+                        allowClear: true
+                    });
+                }
+    
+                // Remueve cualquier manejador de evento anterior para evitar duplicados
+                servicioSelect.off('change').on('change', function () {
+                    obtenerDatosServicio($(this).val(), $('#' + servicioDatosId));
+                });
+            });
+        }
+    
+        // Evento para añadir un nuevo formulario de concepto
+        $('#add-concepto-form').click(function () {
+            var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+            var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
+            formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
+    
+            $('#concepto_formset').append(formTemplate);
+            initializeSelect2AndEvents(); // Re-inicializa Select2 y eventos para el nuevo formulario
+    
+            $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
         });
-
-        // Incrementar el contador de formularios totales
-        $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
-    }
-</script>
-
-<script>
-    // Función para obtener y mostrar datos del cliente seleccionado
-    document.addEventListener("DOMContentLoaded", function () {
-        const clienteSelect = document.querySelector('#id_persona');
-        const clienteDatos = document.getElementById('cliente-datos');
-
-        clienteSelect.addEventListener('change', function () {
-            const clienteId = this.value;
-            if (clienteId) {
-                // Realizar solicitud fetch para obtener datos del cliente
-                fetch(`/obtener_datos_cliente/${clienteId}/`)
+    
+        // Función para obtener y mostrar datos del servicio seleccionado
+        function obtenerDatosServicio(servicioId, outputElement) {
+            if (servicioId) {
+                fetch(`/obtener_datos_servicio/${servicioId}/`)
                     .then(response => response.json())
                     .then(data => {
-                        // Actualizar el contenido de clienteDatos con los datos obtenidos
-                        if (!data.error) {
-                            clienteDatos.innerHTML = `<h5>Cliente <strong> ${data.empresa}</strong></h5>
-                                                    RFC:<code> ${data.rfc}</code><br> 
-                                                    <strong>Representante: </strong>${data.nombre}<br>  
-                                                    <strong>Informacion de contacto: </strong> ${data.correo} / ${data.telefono}`;
-                        } else {
-                            clienteDatos.textContent = 'Datos del cliente no disponibles.';
-                        }
-                    })
-                    .catch(error => {
+                        outputElement.html(`<strong>Servicio:</strong> ${data.nombre}<br>
+                                            <strong>Método: </strong><code>${data.metodo}</code><br>
+                                            <strong>Descripción:</strong> ${data.descripcion}<br>
+                                            <strong>Precio sugerido:</strong> ${data.precio}<br>`);
+                    }).catch(error => {
                         console.error('Error:', error);
-                        clienteDatos.textContent = 'Error al obtener los datos del cliente.';
+                        outputElement.html('Error al obtener los datos del servicio.');
                     });
             } else {
-                clienteDatos.textContent = '';
+                outputElement.html('');
             }
-        });
-    });
-</script>
-
-<script>
-    // Función para agregar formulario de concepto con manejo de servicio asociado
-    document.getElementById('add-concepto-form').onclick = function () {
-        var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
-        var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
-        formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
-
-        $('#concepto_formset').append(formTemplate);
-
-        $('#concepto_formset .concepto-form:last-child').find(':input').each(function () {
-            var name = $(this).attr('name').replace('__prefix__', formIdx);
-            var id = 'id_' + name;
-            $(this).attr({ 'name': name, 'id': id });
-        });
-
-        $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
-
-        // Añadir evento de cambio al nuevo selector de servicio
-        var newServiceSelect = document.querySelector(`#id_conceptos-${formIdx}-servicio`);
-        var newServiceData = document.getElementById(`servicio-datos-${formIdx}`);
-
-        newServiceSelect.addEventListener('change', function () {
-            obtenerDatosServicio(this.value, newServiceData);
-        });
-
-        // Inicializar con el valor seleccionado si ya tiene un valor
-        if (newServiceSelect.value) {
-            obtenerDatosServicio(newServiceSelect.value, newServiceData);
         }
-    }
-
-    // Función para obtener y mostrar datos del servicio seleccionado
-    function obtenerDatosServicio(servicioId, outputElement) {
-        if (servicioId) {
-            // Realizar solicitud fetch para obtener datos del servicio
-            fetch(`/obtener_datos_servicio/${servicioId}/`)
-                .then(response => response.json())
-                .then(data => {
-                    // Actualizar el contenido de outputElement con los datos obtenidos
-                    if (!data.error) {
-                        outputElement.innerHTML = `
-                            <strong>Servicio:</strong> ${data.nombre}<br>
-                            <strong>Método: </strong><code>${data.metodo}</code><br>
-                            <strong>Descripción:</strong> ${data.descripcion}<br>
-                            <strong>Precio sugerido:</strong> ${data.precio}<br>
-                        `;
-                    } else {
-                        outputElement.innerHTML = 'Datos del servicio no disponibles.';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    outputElement.innerHTML = 'Error al obtener los datos del servicio.';
-                });
-        } else {
-            outputElement.innerHTML = '';
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        // Inicializar los selectores de servicio existentes en el formset
-        document.querySelectorAll('.concepto-form').forEach((formDiv, index) => {
-            const servicioSelect = formDiv.querySelector('select[name$="servicio"]');
-            const servicioDatos = document.getElementById(`servicio-datos-${index}`);
-
-            if (servicioSelect) {
-                // Añadir evento de cambio a cada selector de servicio existente
-                servicioSelect.addEventListener('change', function () {
-                    obtenerDatosServicio(this.value, servicioDatos);
-                });
-
-                // Inicializar con el valor seleccionado si ya tiene un valor
-                if (servicioSelect.value) {
-                    obtenerDatosServicio(servicioSelect.value, servicioDatos);
-                }
-            }
-        });
+    
+        // Inicializa los selects y eventos cuando el documento está listo
+        initializeSelect2AndEvents();
     });
-
-</script>
-
-
+    </script>
+    
 {% endblock %}

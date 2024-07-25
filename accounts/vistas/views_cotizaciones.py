@@ -1,9 +1,10 @@
 from datetime import datetime
+import json
 from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
-from accounts.helpers import get_formato_default, get_unica_organizacion
-from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, OrdenTrabajo,Persona, Prospecto, Servicio, Titulo
+from accounts.helpers import  get_unica_organizacion
+from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm
 from django.contrib import messages
 from django.http import FileResponse, Http404, JsonResponse
@@ -29,13 +30,13 @@ def cotizaciones_list(request):
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     # Parámetro de ordenamiento desde la URL
-    order_by = request.GET.get('order_by', 'fecha_solicitud')  # Default order
+    order_by = request.GET.get('order_by', 'id')  # Default order
 
     # Filtrar cotizaciones que no están aceptadas y ordenarlas
-    cotizaciones = Cotizacion.objects.all().order_by(order_by)
+    cotizaciones = Cotizacion.objects.all().order_by('id')
     
     # Paginación
-    paginator = Paginator(cotizaciones, 15)  # Mostrar 15 cotizaciones por página
+    paginator = Paginator(cotizaciones, 10)  # Mostrar 10 cotizaciones por página
     page_number = request.GET.get('page')
     cotizaciones_page = paginator.get_page(page_number)
 
@@ -82,7 +83,10 @@ def obtener_datos_servicio(request, servicio_id):
         return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
 
 # AGREGAR NUEVA COTIZACION
-def cotizacion_form(request):
+def cotizacion_form(request,id):
+    persona = get_object_or_404(Persona, id=id)
+    servicios = list(Servicio.objects.all().values('id', 'nombre_servicio'))  # Asegúrate de ajustar los campos según tu modelo
+    servicios_json = json.dumps(servicios)  # Convertir la lista de diccionarios a JSON
     if request.method == 'POST':
         cotizacion_form = CotizacionForm(request.POST)
         concepto_formset = ConceptoFormSet(request.POST)
@@ -92,6 +96,7 @@ def cotizacion_form(request):
             try:
                 with transaction.atomic():  # Usar una transacción atómica para asegurar la atomicidad
                     cotizacion = cotizacion_form.save(commit=False)
+                    cotizacion.persona = persona
                     cotizacion.id_personalizado = generate_new_id_personalizado()
                     cotizacion.save()
 
@@ -123,27 +128,12 @@ def cotizacion_form(request):
     else:
         cotizacion_form = CotizacionForm()
         concepto_formset = ConceptoFormSet()
-        
-        # Inicializar formularios para crear prospectos
-        titulos = Titulo.objects.all()
-        empresas = Empresa.objects.all()
-        persona_form = PersonaForm()
-        empresa_form = EmpresaForm()
-        prospecto_from = ProspectoForm()
-        
-        context={
-            'cotizaxion_form': cotizacion_form,
-            'concepto_formset': concepto_formset,
-            'titulos': titulos,
-            'empresas': empresas,
-            'persona_form': persona_form,
-            'empresa_form': empresa_form,
-            'prospecto_form': prospecto_from
-        }
 
     return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
+        'cliente': persona,
+        'servicios_json': servicios_json
     })
 
 # VISTA PARA CREAR CLIENTES DESDE MODAL

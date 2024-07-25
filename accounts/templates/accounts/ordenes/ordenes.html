@@ -56,20 +56,19 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <p>Numero de ordenes de trabajo: {{ordenes.count}}</p>
+        </div>
+        <p>Numero de ordenes de trabajo: {{ordenes.count}}</p>
 
-            <div class="pagination">
-                {% if ordenes_page.has_previous %}
-                    <a href="?page=1&order_by={{ request.GET.order_by }}">Primera</a>
-                    <a href="?page={{ ordenes_page.previous_page_number }}&order_by={{ request.GET.order_by }}">Anterior</a>
-                {% endif %}
-                Página {{ ordenes_page.number }} de {{ ordenes_page.paginator.num_pages }}.
-                {% if ordenes_page.has_next %}
-                    <a href="?page={{ ordenes_page.next_page_number }}&order_by={{ request.GET.order_by }}">Siguiente</a>
-                    <a href="?page={{ ordenes_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}">Última</a>
-                {% endif %}
-            </div>
-            
+        <div class="pagination">
+            {% if ordenes_page.has_previous %}
+                <a class="btn btn-light btn-sm" href="?page=1&order_by={{ request.GET.order_by }}">Primera</a>
+                <a class="btn btn-light btn-sm" href="?page={{ ordenes_page.previous_page_number }}&order_by={{ request.GET.order_by }}">Anterior</a>
+            {% endif %}
+            Página {{ ordenes_page.number }} de {{ ordenes_page.paginator.num_pages }}.
+            {% if ordenes_page.has_next %}
+                <a class="btn btn-light btn-sm" href="?page={{ ordenes_page.next_page_number }}&order_by={{ request.GET.order_by }}">Siguiente</a>
+                <a class="btn btn-light btn-sm" href="?page={{ ordenes_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}">Última</a>
+            {% endif %}
         </div>
     </div>
 </div>

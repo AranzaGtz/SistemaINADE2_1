@@ -7,8 +7,8 @@
     <title>{% block title %}{% endblock %}</title>
     {% load static %}
     <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    {% block extra_css %}{% endblock %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script>
         function filterTable(inputId, tableId) {
             var input, filter, table, tr, td, i, j, txtValue;
@@ -32,6 +32,8 @@
             }
         }
     </script>
+    {% block extra_css %}{% endblock %}
+
 </head>
 
 <body>
@@ -42,12 +44,14 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col d-flex align-items-center">
-                        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}" ><img src="{% static 'img/gotalogo.png' %}" alt="Logo"
-                                style="max-height: 40px;" class="mr-2"> INADE Laboratorio Ambiental</a>
+                        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}"><img
+                                src="{% static 'img/gotalogo.png' %}" alt="Logo" style="max-height: 40px;" class="mr-2">
+                            INADE Laboratorio Ambiental</a>
                     </div>
                     <div class="col d-flex align-items-center">
                         <!-- Enlace de Notificaciones -->
-                        <a  class="navbar-brand" href="{% url 'notificaciones' %}" style="max-height: 40px; "> Notificaciones <img src="{% static 'img/campana.svg' %}" alt="">
+                        <a class="navbar-brand" href="{% url 'notificaciones' %}" style="max-height: 40px; ">
+                            Notificaciones <img src="{% static 'img/campana.svg' %}" alt="">
                             {% if notificaciones_no_leidas > 0 %}
                             <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
                             {% endif %}
@@ -57,7 +61,8 @@
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"alt=""></span>
+                    <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"
+                            alt=""></span>
                 </button>
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
                     aria-labelledby="offcanvasNavbarLabel">
@@ -69,41 +74,53 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
+                                <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img
+                                        src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img src="{% static 'img/pencil.svg' %}" alt=""> Cotizaciones</a>
+                                <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img
+                                        src="{% static 'img/pencil.svg' %}" alt=""> Cotizaciones</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}"><img src="{% static 'img/pencil.svg' %}" alt=""> Proyectos</a>
+                                <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}"><img
+                                        src="{% static 'img/pencil.svg' %}" alt=""> Proyectos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'ordenes_list' %}"><img src="{% static 'img/clipboard-data.svg' %}" alt=""> Ordenes de Trabajo</a>
+                                <a class="nav-link" href="{% url 'ordenes_list' %}"><img
+                                        src="{% static 'img/clipboard-data.svg' %}" alt=""> Ordenes de Trabajo</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'servicios_list' %}"><img src="{% static 'img/droplet-half.svg' %}" alt=""> Servicios y Métodos</a>
+                                <a class="nav-link" href="{% url 'servicios_list' %}"><img
+                                        src="{% static 'img/droplet-half.svg' %}" alt=""> Servicios y Métodos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_clientes' %}"><img src="{% static 'img/people-fill.svg' %}"> Clientes</a>
+                                <a class="nav-link" href="{% url 'lista_clientes' %}"><img
+                                        src="{% static 'img/people-fill.svg' %}"> Clientes</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'prospecto_list' %}"><img src="{% static 'img/people.svg' %}"> Prospectos</a>
+                                <a class="nav-link" href="{% url 'prospecto_list' %}"><img
+                                        src="{% static 'img/people.svg' %}"> Prospectos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img src="{% static 'img/building.svg' %}"> Empresas</a>
+                                <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img
+                                        src="{% static 'img/building.svg' %}"> Empresas</a>
                             </li>
                             <hr style="border-color:darkgrey">
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'usuario_list' %}"><img src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
+                                <a class="nav-link" href="{% url 'usuario_list' %}"><img
+                                        src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'editar_organizacion' %}"><img src="{% static 'img/diagram-3-fill.svg' %}"> Organización</a>
+                                <a class="nav-link" href="{% url 'editar_organizacion' %}"><img
+                                        src="{% static 'img/diagram-3-fill.svg' %}"> Organización</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'formatos' %}"><img src="{% static 'img/card-checklist.svg' %}"> Formatos</a>
+                                <a class="nav-link" href="{% url 'formatos' %}"><img
+                                        src="{% static 'img/card-checklist.svg' %}"> Formatos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'img/power.svg' %}"> Salir de sesión</a>
+                                <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'img/power.svg' %}">
+                                    Salir de sesión</a>
                             </li>
                         </ul>
                     </div>
@@ -153,6 +170,10 @@
     </footer>
 
 
+
+
+
+    {% block extra_js %}{% endblock %}
     <!-- Scripts -->
     <!-- Scripts de alertas -->
     <script>
@@ -181,9 +202,10 @@
     <!-- Bootstrap JS (incluye Popper) -->
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <!--    Script para Model cliente registrar -->
-
-
-    {% block extra_js %}{% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <!-- Antes de cerrar el </body> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 </body>
-
 </html>

@@ -117,9 +117,9 @@ def prospecto_delete(request,pk):
 
 
 # AGREGAR NUEVA COTIZACION DESDE PROSPECTOS
-def cotizacion_form_con_cliente(request,persona_id, moneda):
+def cotizacion_form_con_cliente(request,persona_id):
     persona = get_object_or_404(Persona, id=persona_id)
-    cotizacion_form = CotizacionForm(initial={'persona': persona, 'metodo_pago': moneda})
+    cotizacion_form = CotizacionForm(initial={'persona': persona, 'metodo_pago': persona.empresa.moneda})
     concepto_formset = ConceptoFormSet()
     
     return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {

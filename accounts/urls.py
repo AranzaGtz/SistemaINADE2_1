@@ -52,7 +52,7 @@ urlpatterns = [
     path('prospectos/', views_prospectos.prospecto_list, name='prospecto_list'),
     path('prospectos/nuevo/', views_prospectos.prospecto_create, name='prospecto_create'),
     path('prospectos/eliminar/<int:pk>/',  views_prospectos.prospecto_delete, name='prospecto_delete'),
-    path('prospectos/cotizacion/nueva/<persona_id>/<str:moneda>/', views_prospectos.cotizacion_form_con_cliente, name='cotizacion_form_con_cliente'),
+    path('prospectos/cotizacion/nueva/<persona_id>/', views_prospectos.cotizacion_form_con_cliente, name='cotizacion_form_con_cliente'),
 
     #   ---     INTERFAZ EMPRESAS       ---
 
@@ -80,7 +80,7 @@ urlpatterns = [
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
     path('obtener_datos_cliente/<int:cliente_id>/', views_cotizaciones.obtener_datos_cliente, name='obtener_datos_cliente'),
     path('obtener_datos_servicio/<int:servicio_id>/', views_cotizaciones.obtener_datos_servicio, name='obtener_datos_servicio'),
-    path('cotizaciones/nueva/', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
+    path('cotizaciones/nueva/<int:id>', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
     path('cotizaciones/cliente/nueva', views_cotizaciones.cotizaciones_prospecto_create, name='cotizaciones_prospecto_create'),
     path('cotizaciones/editar/<int:pk>/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit'),
     path('cotizaciones/<int:pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
@@ -96,6 +96,7 @@ urlpatterns = [
     
     path('cotizaciones_aceptadas/', views_cotizaciones_aceptadas.cotizaciones_aceptadas_list,name='cotizaciones_aceptadas_list'),
     path('cotizaciones_aceptadas/generar_orden_trabajo/<int:pk>', views_cotizaciones_aceptadas.generar_orden_trabajo , name='generar_orden_trabajo'),
+
     
     #   ---     INTERFAZ ORDENES DE TRABAJO     ---
     

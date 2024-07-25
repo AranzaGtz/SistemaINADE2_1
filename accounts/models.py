@@ -72,7 +72,7 @@ class CustomUser(AbstractUser):
         return f"{self.first_name} {self.last_name} | {self.username}"
 
 #----------------------------------------------------
-# MODELO PARA CLIENTES
+# MODELO PARA NOTIFICACIONES
 #----------------------------------------------------
 
 class Notificacion(models.Model):
@@ -110,8 +110,8 @@ class Empresa(models.Model):
     rfc = models.CharField(max_length=50, null=False, blank=True)
     direccion = models.OneToOneField(Direccion, on_delete=models.CASCADE, null=True, blank=True)
     tipo_moneda = [
-        ('mxn', 'MXN - Moneda Nacional Mexicana'),
-        ('usd', 'USD - Dolar Estadunidense')
+        ('MXN', 'MXN - Moneda Nacional Mexicana'),
+        ('USD', 'USD - Dolar Estadunidense')
     ]
     moneda = models.CharField(max_length=10, choices=tipo_moneda, blank=True, null=True)
     condiciones_pago = models.CharField(max_length=200, null=False, blank=True, default='15')
@@ -236,6 +236,9 @@ class Concepto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return f"{self.cotizacion} - {self.cantidad_servicios} - {self.servicio} - {self.precio} - {self.notas}"
 
 #----------------------------------------------------
 # MODELO PARA ORDENES DE TRABAJO
