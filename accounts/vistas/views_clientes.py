@@ -6,20 +6,23 @@ from accounts.models import Empresa, Persona, InformacionContacto, Titulo
 from django.core.paginator import Paginator
 
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
+
+
 def lista_clientes(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
 
     # Parámetro de ordenamiento desde la URL
-    order_by = request.GET.get('order_by', 'nombre')  # Ordena por 'nombre' como predeterminado
+    # Ordena por 'nombre' como predeterminado
+    order_by = request.GET.get('order_by', 'id')
 
     # Obtiene todas las personas activas y las ordena
-    personas = Persona.objects.filter(activo=True).order_by(order_by)
+    personas = Persona.objects.filter(activo=True).order_by('id')
     poersonas = Persona.objects.all().count
 
     # Paginación
-    paginator = Paginator(personas, 15)  # Muestra 15 personas por página
+    paginator = Paginator(personas, 10)  # Muestra 10 personas por página
     page_number = request.GET.get('page')
     personas_page = paginator.get_page(page_number)
 
@@ -42,16 +45,21 @@ def lista_clientes(request):
         'empresa_form': empresa_form,
         'personas': poersonas,
     }
-    
+
     return render(request, 'accounts/clientes/clientes.html', context)
 
 # VISTA PARA CREAR CLIENTES DESDE MODAL
+
+
 def cliente_create(request):
     if request.method == 'POST':
         # Crea formularios con los datos enviados por el usuario
+        action = request.POST.get('action', 'create')
         persona_form = PersonaForm(request.POST)
-        empresa_form = EmpresaForm(request.POST) if 'crear_empresa_checkbox' in request.POST else None
-        direccion_form = DireccionForm(request.POST) if 'crear_empresa_checkbox' in request.POST else None
+        empresa_form = EmpresaForm(
+            request.POST) if 'crear_empresa_checkbox' in request.POST else None
+        direccion_form = DireccionForm(
+            request.POST) if 'crear_empresa_checkbox' in request.POST else None
 
         if persona_form.is_valid():
             # Guarda la información de contacto primero
@@ -72,7 +80,8 @@ def cliente_create(request):
                     empresa.save()
                 else:
                     # Si hay errores en los formularios, muestra un mensaje de error y renderiza la plantilla con los formularios
-                    messages.error(request, 'Por favor, corrige los errores en el formulario de empresa.')
+                    messages.error(
+                        request, 'Por favor, corrige los errores en el formulario de empresa.')
                     return render(request, 'accounts/clientes/clientes.html', {
                         'persona_form': persona_form,
                         'empresa_form': empresa_form,
@@ -85,7 +94,8 @@ def cliente_create(request):
                 empresa = Empresa.objects.get(id=request.POST['empresa'])
             else:
                 # Si no se selecciona ni crea una empresa, muestra un mensaje de error
-                messages.error(request, 'Por favor, selecciona o crea una empresa.')
+                messages.error(
+                    request, 'Por favor, selecciona o crea una empresa.')
                 return render(request, 'accounts/clientes/clientes.html', {
                     'persona_form': persona_form,
                     'empresa_form': empresa_form,
@@ -99,9 +109,12 @@ def cliente_create(request):
             persona.informacion_contacto = informacion_contacto
             persona.save()
 
-            # Muestra un mensaje de éxito y redirige a la lista de clientes
-            messages.success(request, 'Cliente creado con éxito')
-            return redirect('lista_clientes')
+            if action == 'create_and_quote':
+                return redirect('cotizacion_form', id=persona.id)
+            else:
+                messages.success(request, 'Cliente creado con éxito')
+                return redirect('lista_clientes')
+            
         else:
             # Si hay errores en el formulario de persona, muestra un mensaje de error
             messages.error(request, 'Por favor, corrige los errores en el formulario.')

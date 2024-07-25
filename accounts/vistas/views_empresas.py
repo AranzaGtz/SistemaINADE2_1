@@ -11,13 +11,13 @@ def empresa_cont_list(request):
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
 
     # Parámetro de ordenamiento desde la URL
-    order_by = request.GET.get('order_by', 'id')  # Orden por defecto
+    order_by = request.GET.get('order_by', 'nombre_empresa')  # Orden por defecto
 
     # Obtener todas las empresas y ordenarlas
-    empresas = Empresa.objects.all().order_by(order_by)
+    empresas = Empresa.objects.all().order_by('nombre_empresa')
     
     # Paginación
-    paginator = Paginator(empresas, 15)  # Muestra 15 empresas por página
+    paginator = Paginator(empresas, 10)  # Muestra 15 empresas por página
     page_number = request.GET.get('page')
     empresas_page = paginator.get_page(page_number)
 

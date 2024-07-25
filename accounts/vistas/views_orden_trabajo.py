@@ -16,7 +16,7 @@ def ordenes_list(request):
      ordenes = OrdenTrabajo.objects.filter(estado=False).order_by(order_by)
      
       # Paginación
-     paginator = Paginator(ordenes, 15)  # Mostrar 15 órdenes por página
+     paginator = Paginator(ordenes, 50)  # Mostrar 50 órdenes por página
      page_number = request.GET.get('page')
      ordenes_page = paginator.get_page(page_number)
 

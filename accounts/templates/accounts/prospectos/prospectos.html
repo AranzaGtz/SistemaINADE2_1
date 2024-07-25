@@ -57,7 +57,7 @@
                     <td>{{ p.persona.empresa.nombre_empresa }}</td>
                     <td>{{ p.persona.informacion_contacto.correo_electronico }}</td>
                     <td><a href="{% url 'cliente_edit' p.persona.id %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <!-- <td><a href="{% url 'cotizacion_form_con_cliente' p.persona.id p.persona.empresa.moneda %}" class="btn btn-success btn-sm">Cambiar estado</a></td> -->
+                    <td><a href="{% url 'cotizacion_form_con_cliente' p.persona.id  %}" class="btn btn-success btn-sm">Cambiar estado</a></td> 
                     <td><a href="{% url 'prospecto_delete' p.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}

@@ -166,7 +166,7 @@ class ConceptoForm(forms.ModelForm):
         model = Concepto
         fields = ['servicio', 'cantidad_servicios', 'precio',  'notas']
         widgets = {
-            'servicio': forms.Select(attrs={'class': 'form-control'}),
+            'servicio': forms.Select(attrs={'class': 'form-control', 'list': 'servicios-list', 'autocomplete': 'off'}),
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
             'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales', 'rows': 3}),
@@ -181,8 +181,7 @@ ConceptoFormSet = inlineformset_factory(
 class CotizacionForm(forms.ModelForm):
     class Meta:
         model = Cotizacion
-        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago',
-                  'tasa_iva', 'notas', 'correos_adicionales', 'persona']
+        fields = ['fecha_solicitud', 'fecha_caducidad', 'metodo_pago','tasa_iva', 'notas', 'correos_adicionales']
         widgets = {
             'fecha_solicitud': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_caducidad': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -190,12 +189,8 @@ class CotizacionForm(forms.ModelForm):
             'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).', 'rows': 3}),
             'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)', 'rows': 3}),
-            'persona': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona el cliente', 'id': 'id_persona', 'name': 'persona'}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['persona'].queryset = Persona.objects.filter(activo=True)
 
 #   FORMULARIO PARA CAMBIAR COTIZACION
 class CotizacionChangeForm(forms.ModelForm):
@@ -226,10 +221,7 @@ class OrganizacionForm(forms.ModelForm):
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
 class OrdenPedidoForm(forms.Form):
     archivo = forms.FileField(
-        widget=forms.FileInput(attrs={'class': 'custom-file-input',
-                               'id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),
-        label=''
-    )
+        widget=forms.FileInput(attrs={'class': 'custom-file-input','id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),label='')
 
 #   FORMULARIO PARA ORDEN DE TRABAJO
 class OrdenTrabajoForm(forms.ModelForm):

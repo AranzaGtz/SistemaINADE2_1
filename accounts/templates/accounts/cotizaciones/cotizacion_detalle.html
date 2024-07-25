@@ -20,27 +20,29 @@
         </button>
         <!-- Elementos del dropdown -->
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="{% url 'cotizacion_duplicar' cotizacion.id%}"
-                    class="btn btn-primary mx-1">Duplicar</a></li>
-            <li><a class="dropdown-item" href="{% url 'cotizacion_edit' cotizacion.id%}">Editar</a></li>
-            <li><a class="dropdown-item" href="{% url 'cotizacion_delete' cotizacion.id %}">Borrar</a></li>
+            <li><a class="dropdown-item text-secondary pe-none" href="{% url 'cotizacion_duplicar' cotizacion.id%}" aria-disabled="true">Duplicar</a></li>
+            <li><a class="dropdown-item text-secondary pe-none" href="{% url 'cotizacion_edit' cotizacion.id%}" aria-disabled="true">Editar</a></li>
+            <li><a class="dropdown-item" href="">Borrar</a></li>
             <li><a class="dropdown-item" href="{% url 'seleccionar_correos' cotizacion.id %}">Enviar cotización</a></li>
             <li><a class="dropdown-item" href="{% url 'actualizar_estado' cotizacion.id %}">Actualizar estado</a></li>
             <li><a class="dropdown-item" href="{% url 'cotizacion_pdf' cotizacion.id %}">Ver PDF</a></li>
         </ul>
     </div>
+
     <!-- DATOS DE COTIZACION -->
-    <div class="col mx-auto">
-        <div class="p-4 mb-2">
-            <p><strong>Atención a :</strong> {{ cotizacion.persona.nombre }} {{ cotizacion.persona.apellidos }}</p>
-            <p><strong>Empresa :</strong> {{ cotizacion.persona.empresa.nombre_empresa }}</p>
-            <p><strong>Direccion :</strong> {{ cotizacion.persona.empresa.direccion }}</p>
-            <p><strong>Fecha solicitada: </strong> {{ cotizacion.fecha_solicitud }}</p>
-            <p><strong>Fecha de caducidad: </strong> {{ cotizacion.fecha_caducidad }}</p>
-            <p><strong>Denominación: </strong> {{ cotizacion.metodo_pago }}</p>
-            <p><strong>Tasa IVA: </strong> {{ cotizacion.tasa_iva }}</p>
-            <p><strong>Notas: </strong> {{ cotizacion.notas }}</p>
-            <p><strong>Correos adicionales: </strong> {{ cotizacion.correos_adicionales }}</p>
+    <div class="col-md-8 mx-auto">
+        <div class="border-info p-4 mb-3 rounded shadow-sm">
+            <h4 class="text-info mb-4">Información de la Cotización</h4>
+            <p class="mb-2"><strong>Atención a:</strong> {{ cotizacion.persona.nombre }}
+                {{ cotizacion.persona.apellidos }}</p>
+            <p class="mb-2"><strong>Empresa:</strong> {{ cotizacion.persona.empresa.nombre_empresa }}</p>
+            <p class="mb-2"><strong>Dirección:</strong> {{ cotizacion.persona.empresa.direccion }}</p>
+            <p class="mb-2"><strong>Fecha solicitada:</strong> {{ cotizacion.fecha_solicitud | date:"d M Y" }}</p>
+            <p class="mb-2"><strong>Fecha de caducidad:</strong> {{ cotizacion.fecha_caducidad | date:"d M Y" }}</p>
+            <p class="mb-2"><strong>Denominación:</strong> {{ cotizacion.metodo_pago }}</p>
+            <p class="mb-2"><strong>Tasa IVA:</strong> {{ cotizacion.tasa_iva }}%</p>
+            <p class="mb-2"><strong>Notas:</strong> {{ cotizacion.notas }}</p>
+            <p><strong>Correos adicionales:</strong> {{ cotizacion.correos_adicionales }}</p>
         </div>
     </div>
 
