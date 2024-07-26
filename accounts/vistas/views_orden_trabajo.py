@@ -12,10 +12,13 @@ def ordenes_list(request):
      # Parámetro de ordenamiento desde la URL
      order_by = request.GET.get('order_by', 'id_personalizado')  # Default order by id
      
+     if not order_by:  # Asegura que siempre haya un valor válido para order_by
+        order_by = 'id_personalizado'
+     
      # Filtrar órdenes de trabajo que no están terminadas y ordenarlas
      ordenes = OrdenTrabajo.objects.filter(estado=False).order_by(order_by)
      
-      # Paginación
+     # Paginación
      paginator = Paginator(ordenes, 50)  # Mostrar 50 órdenes por página
      page_number = request.GET.get('page')
      ordenes_page = paginator.get_page(page_number)

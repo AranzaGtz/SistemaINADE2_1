@@ -12,9 +12,12 @@ def empresa_cont_list(request):
 
     # Parámetro de ordenamiento desde la URL
     order_by = request.GET.get('order_by', 'nombre_empresa')  # Orden por defecto
+    
+    if not order_by:  # Asegura que siempre haya un valor válido para order_by
+        order_by = 'nombre_empresa'
 
     # Obtener todas las empresas y ordenarlas
-    empresas = Empresa.objects.all().order_by('nombre_empresa')
+    empresas = Empresa.objects.all().order_by(order_by)
     
     # Paginación
     paginator = Paginator(empresas, 10)  # Muestra 15 empresas por página

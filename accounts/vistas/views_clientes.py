@@ -6,23 +6,24 @@ from accounts.models import Empresa, Persona, InformacionContacto, Titulo
 from django.core.paginator import Paginator
 
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
-
-
 def lista_clientes(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
 
     # Parámetro de ordenamiento desde la URL
-    # Ordena por 'nombre' como predeterminado
+    # Ordena por 'id' como predeterminado
     order_by = request.GET.get('order_by', 'id')
+    
+    if not order_by:  # Asegura que siempre haya un valor válido para order_by
+        order_by = 'id'
 
     # Obtiene todas las personas activas y las ordena
-    personas = Persona.objects.filter(activo=True).order_by('id')
+    personas = Persona.objects.all().order_by(order_by)
     poersonas = Persona.objects.all().count
 
     # Paginación
-    paginator = Paginator(personas, 10)  # Muestra 10 personas por página
+    paginator = Paginator(personas, 50)  # Muestra 50 personas por página
     page_number = request.GET.get('page')
     personas_page = paginator.get_page(page_number)
 
@@ -49,8 +50,6 @@ def lista_clientes(request):
     return render(request, 'accounts/clientes/clientes.html', context)
 
 # VISTA PARA CREAR CLIENTES DESDE MODAL
-
-
 def cliente_create(request):
     if request.method == 'POST':
         # Crea formularios con los datos enviados por el usuario

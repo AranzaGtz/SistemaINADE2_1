@@ -20,11 +20,14 @@ def cotizaciones_aceptadas_list(request):
     # Parámetro de ordenamiento desde la URL
     order_by = request.GET.get('order_by', 'fecha_solicitud')  # Default order
     
+    if not order_by:  # Asegura que siempre haya un valor válido para order_by
+        order_by = 'fecha_solicitud'
+    
     # Filtrar cotizaciones que están aceptadas
     cotizaciones = Cotizacion.objects.filter(estado=True).order_by(order_by)
     
     # Paginación
-    paginator = Paginator(cotizaciones, 15) # Mostrar 15 cotizaciones aceptadas por página
+    paginator = Paginator(cotizaciones, 50) # Mostrar 50 cotizaciones aceptadas por página
     page_number = request.GET.get('page')
     cotizaciones_page = paginator.get_page(page_number)
     
@@ -52,12 +55,11 @@ def generar_orden_trabajo(request, pk):
 
     # Obtener los conceptos asociados a la cotización
     conceptos = Concepto.objects.filter(cotizacion=cotizacion)
-
+    
     if request.method == 'POST':
         # Procesar los formularios enviados
         form = OrdenTrabajoForm(request.POST)
         direccion_form = DireccionForm(request.POST)
-
         if form.is_valid() and direccion_form.is_valid():
             try:
                 with transaction.atomic():
@@ -105,8 +107,6 @@ def generar_orden_trabajo(request, pk):
                     orden_trabajo.save()
                     messages.success(request, 'Orden de trabajo generada exitosamente.')
                     return redirect('cotizacion_detalle', pk=cotizacion.id)
-                
-                
             except IntegrityError:
                 messages.error(
                     request, 'Hubo un error al crear la orden de trabajo. Inténtalo de nuevo.')
@@ -115,7 +115,6 @@ def generar_orden_trabajo(request, pk):
             print(direccion_form.errors)
             messages.error(
                 request, 'Hubo un error en el formulario. Por favor, revisa los campos e intenta nuevamente.')
-    
     else:
         direccion_initial_data = {
             'calle': cotizacion.persona.empresa.direccion.calle,
@@ -127,7 +126,6 @@ def generar_orden_trabajo(request, pk):
         }
         form = OrdenTrabajoForm()
         direccion_form = DireccionForm(initial=direccion_initial_data)
-
     context = {
         'form': form,
         'direccion_form': direccion_form,
