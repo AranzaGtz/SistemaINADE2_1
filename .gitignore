@@ -48,11 +48,6 @@ venv.bak/
 # Sentry
 .sentryclirc
 
-# Static files
-staticfiles/
-static/
-media/
-
 # IDEs
 .idea/
 .vscode/
