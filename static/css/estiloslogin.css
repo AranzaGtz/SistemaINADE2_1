@@ -1,0 +1,164 @@
+/*Colores del sistema
+    - Blanco: #ffff;
+    - Color Fondo transicion y letra: #3d3d3d;
+    - Verde: #8cd147;
+    - Azul: #0582ab;
+    - Color de accion: #0582ab
+    - Color de accion transicion: #4B8C87
+    - Color de Titulos 1: #0582ab
+    - Color de Titulos 2: #8cd147
+*/
+
+/* ETIQUETA PARA EL FONDE DE TODA LA VENTANA*/
+body{
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    color: #3d3d3d;
+    height: 100vh;
+    background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0%;
+}
+
+.error {
+    background-color: #f5f768d7;
+    text-align: center;
+    color: red;
+    font-weight: bold;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logincontent{/* ETIQUETA PARA CONTENEDOR DE LOGIN*/
+    box-shadow: 0 2px 15px #3d3d3d2c;
+    background-color: #ffffff;
+    border-radius: 8px;
+    width: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-between;
+    align-content: center;
+    align-self: center;
+    margin: 2% 2%;
+}
+
+.barra_titulo{ /* ETIQUETA PRIMERA BARRA PARA LOGIN*/
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+    padding: 10px 35px;
+}
+
+.titulo h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0582ab;
+}
+
+.titulo h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    color: #8cd147;
+    align-self: center;
+}
+
+.barra_titulo img{ /* ETIQUETA PARA LOGO DENTRO DE LOGIN*/
+    width: 10vh;
+    height: 10vh;
+}
+
+hr{
+    border: 1px solid #3d3d3da8; /* ETIQUETA LINEA DIVISORA*/
+    border-radius: 4px; /* Cambia el grosor y el color según tus necesidades */
+    margin-left: 6%;
+    margin-right: 6%;
+}
+
+form{
+    display: flex; /* ETIQUETA FORMULARIO*/
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+    padding: 1% 8%;
+    width: 70%;
+}
+
+
+form {
+    display: flex; /* ETIQUETA FORMULARIO*/
+    flex-direction: column;
+    width: 100%;
+    padding: 1% 8%;
+    box-sizing: border-box; /* Asegura que el padding se incluya en el ancho total */
+}
+
+.form-group {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    width: 95%;
+}
+
+input {
+    width: 100%;
+    padding: 10px 10px 10px 5px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    background: none;
+}
+
+label {
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    font-size: 18px;
+    color: #999;
+    transition: 0.2s;
+    pointer-events: none;
+}
+
+input:focus ~ label,
+input:not(:placeholder-shown) ~ label {
+    top: -20px;
+    left: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+input:focus,
+input:not(:placeholder-shown) {
+    border-color: #333;
+}
+
+input::placeholder {
+    color: transparent;
+}
+
+input[type="submit"] {
+    width: 50%;
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 4px;
+    background-color: #5CA9A4;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 4px;
+}
+
+input[type="submit"]:hover {
+    background-color: #4B8C87;
+}
