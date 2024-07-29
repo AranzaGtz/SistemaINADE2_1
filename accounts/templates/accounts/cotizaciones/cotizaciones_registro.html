@@ -296,6 +296,51 @@
         // Inicializa los selects y eventos cuando el documento está listo
         initializeSelect2AndEvents();
     });
-    </script>
+</script>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        // Función para actualizar los totales
+        function actualizarTotales() {
+            let subtotal = 0;
+            const forms = document.querySelectorAll(".concepto-form");
+            const tasaIvaElement = document.querySelector("input[name='tasa_iva']");
+            const tasaIva = parseFloat(tasaIvaElement.value) || 0;
+
+            forms.forEach(form => {
+                const precioElement = form.querySelector("input[name$='-precio']");
+                const cantidadElement = form.querySelector("input[name$='-cantidad_servicios']");
+
+                if (precioElement && cantidadElement) {
+                    const precio = parseFloat(precioElement.value) || 0;
+                    const cantidad = parseInt(cantidadElement.value) || 0;
+                    subtotal += precio * cantidad;
+                }
+            });
+
+            const iva = subtotal * tasaIva;
+            const total = subtotal + iva;
+
+            document.getElementById("subtotal").textContent = `Subtotal: ${subtotal.toFixed(2)}`;
+            document.getElementById("iva").textContent = `IVA: ${iva.toFixed(2)}`;
+            document.getElementById("total").textContent = `Total: ${total.toFixed(2)}`;
+        }
+
+        // Escuchar cambios en los precios, cantidades y tasa de IVA
+        document.getElementById("concepto_formset").addEventListener("input", function(event) {
+            if (event.target.name.includes("precio") || event.target.name.includes("cantidad_servicios") || event.target.name === "tasa_iva") {
+                actualizarTotales();
+            }
+        });
+
+        // Escuchar cambios en la tasa de IVA
+        document.querySelector("input[name='tasa_iva']").addEventListener("input", actualizarTotales);
+
+        // Inicializar totales al cargar la página
+        actualizarTotales();
+    });
+</script>
+
+
+
     
 {% endblock %}
