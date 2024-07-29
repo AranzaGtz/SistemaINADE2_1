@@ -40,9 +40,21 @@ Este es un proyecto Django. Siga las siguientes instrucciones para configurarlo 
 
 3. **Instalar las dependencias**:
 
-   ```sh
-   pip install -r requirements.txt
-   ```
+   - Instalar [Homebrew](https://brew.sh/)::
+
+      ```sh
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      ```
+   - Instalar las dependencias necesarias para WeasyPrint:
+
+      ```sh
+      brew install pango gdk-pixbuf cairo libffi
+      ```
+   - Agregar Dependencias al `requirements.txt`:
+
+      ```sh
+      pip install -r requirements.txt
+      ```
 
 4. **Realizar las migraciones de la base de datos**:
 
