@@ -1,6 +1,6 @@
 # VISTA PARA MODIFICAR NUESTRA INFORMACION DE FORMATO
 from django.shortcuts import  redirect, render
-from accounts.forms import FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm
+from accounts.forms import FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm
 from accounts.models import  FormatoCotizacion, FormatoOrden, Organizacion
 from django.contrib import messages
 
@@ -66,3 +66,17 @@ def formatos(request):
     }
 
     return render(request, 'accounts/organizacion/formatos.html', context)
+
+# VISTA PARA QUEJAS
+def enviar_queja(request):
+    if request.method == 'POST':
+        form = QuejaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('gracias')
+    else:
+        form = QuejaForm()
+    return render(request, 'accounts/organizacion/enviar_queja.html', {'form': form})
+
+def gracias(request):
+    return render(request, 'accounts/organizacion/gracias.html')

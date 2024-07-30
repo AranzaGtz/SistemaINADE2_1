@@ -104,10 +104,6 @@ urlpatterns = [
     path('orden_trabajo/<id_personalizado>/', views_orden_trabajo.detalle_orden_trabajo, name='detalle_orden_trabajo'),
     path('orden_trabajo/<id_personalizado>/pdf', views_orden_trabajo.orden_trabajo_pdf, name= 'orden_trabajo_pdf'),
     
-    #   ---     INTERFAZ TERMINOS Y AVISOS       ---
-
-    path('organizacion/terminos/', views_organizacion.editar_organizacion, name='editar_organizacion'),
-    path('formatos/', views_organizacion.formatos, name='formatos'),
 
     #   ---     ENVIOS DE CORREOS       ---
 
@@ -115,6 +111,13 @@ urlpatterns = [
     path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
     path('formulario_descarga_subida/<int:pk>/', views_correos.formulario_descarga_subida, name='formulario_descarga_subida'),
+    
+        #   ---     ORGANIZACION       ---
+
+    path('organizacion/terminos/', views_organizacion.editar_organizacion, name='editar_organizacion'),
+    path('formatos/', views_organizacion.formatos, name='formatos'),
+    path('queja/', views_organizacion.enviar_queja, name='enviar_queja'),
+    path('gracias/', views_organizacion.gracias, name='gracias'),
 
     # Define otras rutas según las vistas que hayas definido
 ]

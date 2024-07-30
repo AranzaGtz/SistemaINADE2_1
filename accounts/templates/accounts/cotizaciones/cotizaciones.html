@@ -47,7 +47,7 @@
                         <th><a href="?order_by=fecha_caducidad">Expiración</a></th>
                         <th><a href="?order_by=metodo_pago">Moneda</a></th>
                         <th><a href="?order_by=estado">Estado</a></th>
-                        <th colspan="2">Opciones</th>
+                        <th>Opciones</th>
                     </tr>
                 </thead>
                 <!-- CUERPO DE TABLA -->
@@ -62,10 +62,7 @@
                         <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
                         <td>{{ c.metodo_pago }}</td>
                         <td>{% if c.estado %} Aceptado {% else %} No aceptado {% endif %}</td>
-                        <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a>
-                        </td>
-                        <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
+                        <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

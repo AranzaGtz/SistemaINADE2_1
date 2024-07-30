@@ -1,5 +1,5 @@
 from django import forms
-from .models import Concepto, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Servicio, Cotizacion, Titulo
+from .models import Concepto, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -249,7 +249,7 @@ class FormatoCotizacionForm(forms.ModelForm):
             'avisos': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
-
+#   FORMULARIO PARA FORMATOS DE ORDEN DE TRABAJO
 class FormatoOrdenForm(forms.ModelForm):
     class Meta:
         model = FormatoOrden
@@ -259,3 +259,9 @@ class FormatoOrdenForm(forms.ModelForm):
             'version': forms.TextInput(attrs={'class': 'form-control'}),
             'emision': forms.DateInput(attrs={'class': 'form-control'}),
         }
+
+#   FORMULARIO PARA QUEJAS
+class QuejaForm(forms.ModelForm):
+    class Meta:
+        model = Queja
+        fields = ['nombre', 'email', 'asunto', 'mensaje']
