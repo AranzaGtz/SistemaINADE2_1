@@ -1,6 +1,6 @@
 # /accounts/views_prospectos.py
 from django.shortcuts import render, redirect, get_object_or_404
-from accounts.forms import ConceptoFormSet, CotizacionForm, DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm, PersonaForm
+from accounts.forms import ConceptoFormSet, CotizacionForm, DireccionForm, EmpresaForm, InformacionContactoForm, ProspectoForm, PersonaForm, QuejaForm
 from django.contrib import messages
 from accounts.models import Empresa, InformacionContacto, Persona, Prospecto, Titulo
 
@@ -115,7 +115,6 @@ def prospecto_delete(request,pk):
 
     return render(request, 'accounts/clientes/eliminar_cliente.html', {'prospecto': prospecto, 'dp':True})
 
-
 # AGREGAR NUEVA COTIZACION DESDE PROSPECTOS
 def cotizacion_form_con_cliente(request,persona_id):
     persona = get_object_or_404(Persona, id=persona_id)
@@ -126,3 +125,4 @@ def cotizacion_form_con_cliente(request,persona_id):
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
     })
+    
