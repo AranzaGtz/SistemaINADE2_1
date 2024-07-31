@@ -1,4 +1,4 @@
-# SistemaINADE2.1
+# SistemaINADE2
 
 Este es un proyecto Django. Siga las siguientes instrucciones para configurarlo en su máquina local.
 
