@@ -36,7 +36,7 @@ urlpatterns = [
 
     path('usuarios/', views_usuarios.usuario_list, name='usuario_list'),
     path('usuarios/nuevo/', views_usuarios.usuario_create, name='usuario_create'),
-    path('usuarios/eliminar/<username>/',views_usuarios.usuario_delete, name='usuario_delete'),
+    path('usuarios/eliminar/<id>/',views_usuarios.usuario_delete, name='usuario_delete'),
     path('usuarios/editar/<username>/',views_usuarios.usuario_update, name='usuario_edit'),
 
     #   ---     INTERFAZ CLIENTES       ---
@@ -117,7 +117,6 @@ urlpatterns = [
     path('organizacion/terminos/', views_organizacion.editar_organizacion, name='editar_organizacion'),
     path('formatos/', views_organizacion.formatos, name='formatos'),
     path('queja/', views_organizacion.enviar_queja, name='enviar_queja'),
-    path('gracias/', views_organizacion.gracias, name='gracias'),
 
     # Define otras rutas según las vistas que hayas definido
 ]

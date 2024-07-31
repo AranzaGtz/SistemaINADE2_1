@@ -106,7 +106,7 @@ def generar_orden_trabajo(request, pk):
                     orden_trabajo.orden_trabajo_pdf.save(f"orden_trabajo_{orden_trabajo.id_personalizado}.pdf", ContentFile(pdf_data))
                     orden_trabajo.save()
                     messages.success(request, 'Orden de trabajo generada exitosamente.')
-                    return redirect('cotizacion_detalle', pk=cotizacion.id)
+                    return redirect('detalle_orden_trabajo', id_personalizado=orden_trabajo.id_personalizado)
             except IntegrityError:
                 messages.error(
                     request, 'Hubo un error al crear la orden de trabajo. Inténtalo de nuevo.')

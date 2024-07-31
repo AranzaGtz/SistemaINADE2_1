@@ -1,0 +1,10 @@
+
+    .border-custom {
+        border: 1px solid lightgrey;
+        /* Borde gris por defecto */
+    }
+
+    .border-custom-left {
+        border-left: 5px solid dodgerblue;
+        /* Borde izquierdo color bg-info */
+    }

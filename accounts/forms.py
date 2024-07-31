@@ -6,8 +6,6 @@ from django.forms import inlineformset_factory
 # ---      USUARIOS     ---
 
 #   FORMULARIO PARA CREAR USUARIO
-
-
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
@@ -265,3 +263,9 @@ class QuejaForm(forms.ModelForm):
     class Meta:
         model = Queja
         fields = ['nombre', 'email', 'asunto', 'mensaje']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'asunto': forms.TextInput(attrs={'class': 'form-control'}),
+            'mensaje': forms.Textarea(attrs={'class':'form-control'}),
+        }

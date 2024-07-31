@@ -2,14 +2,22 @@
 <html lang="en">
 
 <head>
+    <!-- Configuración de codificación de caracteres y vista -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Título de la página, se puede definir en las plantillas hijas -->
     <title>{% block title %}{% endblock %}</title>
+    <!-- Carga de archivos estáticos de Django -->
     {% load static %}
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
+    <!-- Inclusión de CSS de Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Incluye SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Script para filtrar tablas -->
+    <!-- Script para filtrar tablas -->
     <script>
         function filterTable(inputId, tableId) {
             var input, filter, table, tr, td, i, j, txtValue;
@@ -36,110 +44,107 @@
     {% block extra_css %}{% endblock %}
 
 </head>
-
 <body>
 
     <!-- BARRA DE ENCABEZADO -->
     <header class="">
         <nav class="navbar bg-body-tertiary fixed-top">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col d-flex align-items-center">
-                        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}"><img
-                                src="{% static 'img/gotalogo.png' %}" alt="Logo" style="max-height: 40px;" class="mr-2">
-                            INADE Laboratorio Ambiental</a>
-                    </div>
-                    <div class="col d-flex align-items-center">
-                        <!-- Enlace de Notificaciones -->
-                        <a class="navbar-brand" href="{% url 'notificaciones' %}" style="max-height: 40px; ">
-                            Notificaciones <img src="{% static 'img/campana.svg' %}" alt="">
-                            {% if notificaciones_no_leidas > 0 %}
-                            <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
-                            {% endif %}
-                        </a>
-                    </div>
+            <div class="container-fluid d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                        <img src="{% static 'img/gotalogo.png' %}" alt="Logo" style="max-height: 40px;" class="mr-2">
+                        INADE Laboratorio Ambiental
+                    </a>
                 </div>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"
-                            alt=""></span>
-                </button>
-                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
-                    aria-labelledby="offcanvasNavbarLabel">
-                    <div class="offcanvas-header">
-                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Hola!, {{ user.username|default:'Guest' }}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                    </div>
-                    <div class="offcanvas-body">
-                        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img
-                                        src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img
-                                        src="{% static 'img/pencil.svg' %}" alt=""> Cotizaciones</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}"><img
-                                        src="{% static 'img/pencil.svg' %}" alt=""> Proyectos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'ordenes_list' %}"><img
-                                        src="{% static 'img/clipboard-data.svg' %}" alt=""> Ordenes de Trabajo</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'servicios_list' %}"><img
-                                        src="{% static 'img/droplet-half.svg' %}" alt=""> Servicios y Métodos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'lista_clientes' %}"><img
-                                        src="{% static 'img/people-fill.svg' %}"> Clientes</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'prospecto_list' %}"><img
-                                        src="{% static 'img/people.svg' %}"> Prospectos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img
-                                        src="{% static 'img/building.svg' %}"> Empresas</a>
-                            </li>
-                            <hr style="border-color:darkgrey">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'usuario_list' %}"><img
-                                        src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'editar_organizacion' %}"><img
-                                        src="{% static 'img/diagram-3-fill.svg' %}"> Organización</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'formatos' %}"><img
-                                        src="{% static 'img/card-checklist.svg' %}"> Formatos</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'enviar_queja' %}"><img
-                                        src="{% static 'img/person-raised-hand.svg' %}"> Quejas y sugerencias</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'img/power.svg' %}">
-                                    Salir de sesión</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div class="d-flex align-items-center">
+                    <!-- Enlace de Notificaciones -->
+                    <a class="navbar-brand d-flex align-items-center" href="{% url 'notificaciones' %}"
+                        style="max-height: 40px;">
+                        Notificaciones <img src="{% static 'img/campana.svg' %}" alt="">
+                        {% if notificaciones_no_leidas > 0 %}
+                        <span class="badge bg-danger">{{ notificaciones_no_leidas }}</span>
+                        {% endif %}
+                    </a>
+                    <!-- Botón del Menú -->
+                    <button class="navbar-toggler ms-2" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"
+                                alt=""></span>
+                    </button>
                 </div>
             </div>
         </nav>
-
     </header>
 
-    <div class="content" style="margin-top: 80px;">
+    <!-- Contenido del offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Hola!,
+                {{ user.username|default:'Guest' }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img
+                            src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img src="{% static 'img/pencil.svg' %}"
+                            alt=""> Cotizaciones</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}"><img
+                            src="{% static 'img/pencil.svg' %}" alt=""> Proyectos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'ordenes_list' %}"><img src="{% static 'img/clipboard-data.svg' %}"
+                            alt=""> Ordenes de Trabajo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'servicios_list' %}"><img src="{% static 'img/droplet-half.svg' %}"
+                            alt=""> Servicios y Métodos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'lista_clientes' %}"><img src="{% static 'img/people-fill.svg' %}">
+                        Clientes</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'prospecto_list' %}"><img src="{% static 'img/people.svg' %}">
+                        Prospectos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img src="{% static 'img/building.svg' %}">
+                        Empresas</a>
+                </li>
+                <hr style="border-color:darkgrey">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuario_list' %}"><img
+                            src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'editar_organizacion' %}"><img
+                            src="{% static 'img/diagram-3-fill.svg' %}"> Organización</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'formatos' %}"><img src="{% static 'img/card-checklist.svg' %}">
+                        Formatos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'enviar_queja' %}"><img
+                            src="{% static 'img/person-raised-hand.svg' %}"> Quejas y sugerencias</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'img/power.svg' %}">
+                        Salir de sesión</a>
+                </li>
+            </ul>
+        </div>
+    </div>
 
-        <!-- Alertas -->
-        {% include 'accounts/_alerts.html' %}
-        <!-- CONTENIDO VARIANTE -->
+    <div class="content" style="margin-top: 80px;">
+        <!-- Contenido principal de la página -->
         <main class="container mt-4" style="min-height: 80vh;">
             {% block content %}
             {% endblock %}
@@ -159,6 +164,7 @@
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-right">
+                    <!-- Enlaces a redes sociales y contacto -->
                     <a href="https://wa.me/your-whatsapp-number" class="text-dark mx-2">
                         <img src="{% static 'img/whatsapp.svg' %}" alt="WhatsApp" style="width: 30px; height: 30px;">
                     </a>
@@ -174,43 +180,29 @@
         </div>
     </footer>
 
-
-
-
-
+    <!-- Bloque para JavaScript adicional, definido en plantillas hijas -->
     {% block extra_js %}{% endblock %}
-    <!-- Scripts -->
-    <!-- Scripts de alertas -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var alertList = document.querySelectorAll('.alert');
-            alertList.forEach(function (alert) {
-                setTimeout(function () {
-                    var fadeEffect = setInterval(function () {
-                        if (!alert.style.opacity) {
-                            alert.style.opacity = 1;
-                        }
-                        if (alert.style.opacity > 0) {
-                            alert.style.opacity -= 0.1;
-                        } else {
-                            clearInterval(fadeEffect);
-                            alert.style.display = 'none';
-                        }
-                    }, 50);
-                }, 5000); // Tiempo de espera en milisegundos (5 segundos)
-            });
-        });
-    </script>
     <!-- Scripts de Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
-    <!-- Bootstrap JS (incluye Popper) -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <!--    Script para Model cliente registrar -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <!-- Antes de cerrar el </body> -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <!-- Incluye SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Script para mostrar mensajes de Django con SweetAlert2 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% if messages %}
+            {% for message in messages %}
+            Swal.fire({
+                title: "{% if message.tags %}{{ message.tags|capfirst }}{% else %}Información{% endif %}",
+                text: "{{ message }}",
+                icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'info' %}info{% elif message.tags == 'warning' %}warning{% elif message.tags == 'danger' %}error{% else %}info{% endif %}",
+                confirmButtonText: 'Aceptar'
+            });
+            {% endfor %}
+            {% endif %}
+        });
+        
+    </script>
 </body>
+
 </html>

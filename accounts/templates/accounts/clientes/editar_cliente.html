@@ -36,4 +36,31 @@
     </div>
 </div>
 
+<!-- Script para borrar servicio-->
+<script>
+    // Espera a que el contenido del documento esté completamente cargado antes de ejecutar el script
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtiene la referencia al modal de eliminación de servicio por su ID
+        var deleteServicioModal = document.getElementById('deleteServicioModal');
+        
+        // Agrega un evento cuando el modal de eliminación se muestra
+        deleteServicioModal.addEventListener('show.bs.modal', function (event) {
+            // Obtiene el botón que activó el modal (el botón relacionado)
+            var button = event.relatedTarget;
+            
+            // Obtiene el ID del servicio desde el atributo data-servicio-id del botón
+            var servicioId = button.getAttribute('data-servicio-id');
+            
+            // Obtiene el formulario de eliminación de servicio por su ID
+            var form = document.getElementById('deleteServicioForm');
+            
+            // Obtiene la acción actual del formulario y reemplaza '0' con el servicioId obtenido
+            var action = form.getAttribute('action').replace('0', servicioId);
+            
+            // Actualiza la acción del formulario con la nueva URL que incluye el servicioId
+            form.setAttribute('action', action);
+        });
+    });
+</script>
+
 {% endblock %}

@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Enviar Queja</title>
-</head>
-<body>
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Servicios{% endblock %}
+{% block header %}Servicios{% endblock %}
+{% block content %}
     <h1>Enviar Queja</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Enviar</button>
+        <button type="submit" class="btn btn-success">Enviar queja o sujerencia</button>
     </form>
-</body>
-</html>
+{% endblock %}

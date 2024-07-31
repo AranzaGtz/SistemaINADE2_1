@@ -4,8 +4,8 @@ from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import  get_unica_organizacion
-from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Persona, Prospecto, Servicio, Titulo
-from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, PersonaForm, ProspectoForm
+from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, Persona, Prospecto, Servicio, Titulo
+from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, MetodoForm, PersonaForm, ProspectoForm, ServicioForm
 from django.contrib import messages
 from django.http import FileResponse, Http404, JsonResponse
 from weasyprint import HTML  # type: ignore
@@ -100,6 +100,7 @@ def cotizacion_form(request,id):
                 with transaction.atomic():  # Usar una transacción atómica para asegurar la atomicidad
                     cotizacion = cotizacion_form.save(commit=False)
                     cotizacion.persona = persona
+                        
                     cotizacion.id_personalizado = generate_new_id_personalizado()
                     cotizacion.save()
 
@@ -111,13 +112,17 @@ def cotizacion_form(request,id):
                     cotizacion.subtotal = sum(
                         [c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
                     cotizacion.iva = cotizacion.subtotal * \
-                        (cotizacion.tasa_iva / 100)
+                        (cotizacion.tasa_iva )
                     cotizacion.total = cotizacion.subtotal + cotizacion.iva
                     cotizacion.save()
                     # Generar PDF y guardar en el modelo
                     pdf_data = generar_pdf_cotizacion(request, cotizacion)
                     cotizacion.cotizacion_pdf.save(f"cotizacion_{cotizacion.id_personalizado}.pdf", ContentFile(pdf_data))
                     cotizacion.save()
+                    # Verificar si la persona ya existe en la tabla de prospectos
+                    if not Prospecto.objects.filter(persona=persona).exists():
+                        prospecto = Prospecto(persona=persona)
+                        prospecto.save()
                     messages.success(request, 'Cotización creada con éxito.')
                     return redirect('cotizacion_detalle', pk=cotizacion.id)
             except IntegrityError:
@@ -136,7 +141,10 @@ def cotizacion_form(request,id):
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
         'cliente': persona,
-        'servicios_json': servicios_json
+        'servicios_json': servicios_json,
+        'servicio_form':ServicioForm(),
+        'metodos': Metodo.objects.all(),
+        'metodo_form': MetodoForm(),
     })
 
 # VISTA PARA CREAR CLIENTES DESDE MODAL
@@ -236,11 +244,14 @@ def cotizacion_detalle(request, pk):
     conceptos = cotizacion.conceptos.all()
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
+    
+    tasa_iva = cotizacion.tasa_iva * 100
 
     cotizacion_persona = cotizacion.persona.id
     return render(request, 'accounts/cotizaciones/cotizacion_detalle.html', {
         'cotizacion': cotizacion,
         'conceptos': conceptos,
+        'tasa_iva': tasa_iva,
     })
 
 # INTERFAZ PARA ELIMINAR COTIZACION
@@ -392,6 +403,14 @@ def generar_pdf_cotizacion(request,cotizacion):
 def actualizar_estado(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     cotizacion.estado = True
+    # aqui quiero borrar el prospecto que sea igual a cotizacion.persona
+        # Intenta obtener y borrar el prospecto que coincide con la persona de la cotización
+    prospecto = Prospecto.objects.filter(persona=cotizacion.persona).first()
+    if prospecto:
+        prospecto.delete()
+        messages.success(request, 'El estado de la cotización ha sido actualizado a Aceptado y el prospecto ha sido eliminado.')
+    else:
+        messages.success(request, 'El estado de la cotización ha sido actualizado a Aceptado.')
+    
     cotizacion.save()
-    messages.success(request, 'El estado de la cotización ha sido actualizado a Aceptado.')
     return redirect('cotizacion_detalle', pk=cotizacion.id)
