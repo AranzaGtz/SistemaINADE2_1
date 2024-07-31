@@ -29,11 +29,7 @@ SECRET_KEY = 'django-insecure-9%%ck*j+2bh9m*a5g&dv3ptj6%f=g33&7$s)k-jpjdx31z6#y^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-<<<<<<< HEAD
-ALLOWED_HOSTS = ['54.193.159.14',]
-=======
-ALLOWED_HOSTS = ['54.193.159.14']
->>>>>>> 5d0abe6877b2d5d26efe6b0b0e29a4c341a785fd
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -159,6 +155,8 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+
 
 # settings.py
 

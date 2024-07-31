@@ -11,9 +11,11 @@
 <div class="row mb-3 justify-content-center">
     <div class="col-md-6">
         <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario..." onkeyup="filterTable('searchInput', 'usuariosTable')">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario..."
+                onkeyup="filterTable('searchInput', 'usuariosTable')">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'usuariosTable')">Buscar</button>
+                <button class="btn btn-outline-secondary" type="button"
+                    onclick="filterTable('searchInput', 'usuariosTable')">Buscar</button>
             </div>
         </div>
     </div>
@@ -23,7 +25,8 @@
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
         <!-- Botón para abrir el modal de creación de nuevo cliente -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal"> Añadir Usuario </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal">
+            Añadir Usuario </button>
     </div>
 </div>
 
@@ -52,7 +55,8 @@
                     <td>{{ c.celular }}</td>
                     <td>{{ c.rol }}</td>
                     <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <td><a href="{% url 'usuario_delete' c.username %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    <td><a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">Eliminar</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -88,5 +92,25 @@
         </div>
     </div>
 </div>
-
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function eliminarUsuario(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'No, cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'usuario_delete' 0 %}".replace('0', id);
+            }
+        });
+    }
+</script>
+{% endblock %}
 {% endblock %}

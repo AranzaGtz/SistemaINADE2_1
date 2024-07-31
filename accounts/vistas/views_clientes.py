@@ -19,7 +19,7 @@ def lista_clientes(request):
         order_by = 'id'
 
     # Obtiene todas las personas activas y las ordena
-    personas = Persona.objects.all().order_by(order_by)
+    personas = Persona.objects.all().filter(activo=True).order_by(order_by)
     poersonas = Persona.objects.all().count
 
     # Paginación
@@ -109,9 +109,11 @@ def cliente_create(request):
             persona.save()
 
             if action == 'create_and_quote':
+                messages.success(request, "El cliente ha sido creado!")
                 return redirect('cotizacion_form', id=persona.id)
+                
             else:
-                messages.success(request, 'Cliente creado con éxito')
+                messages.success(request, "El cliente ha sido creado!")
                 return redirect('lista_clientes')
             
         else:
@@ -157,7 +159,7 @@ def cliente_edit(request, pk):
             # Guarda la persona
             persona_form.save()
             # Muestra un mensaje de éxito y redirige a la lista de clientes
-            messages.success(request, 'Cliente actualizado con éxito')
+            messages.success(request, "El cliente se actualizo correctamente!")
             return redirect('lista_clientes')
     else:
         # Si no es un POST, inicializa el formulario con los datos actuales de la persona
@@ -182,13 +184,9 @@ def cliente_edit(request, pk):
 def cliente_delete(request, pk):
     # Obtiene el cliente por su ID o muestra un 404 si no se encuentra
     cliente = get_object_or_404(Persona, pk=pk)
-    if request.method == "POST":
-        # Desactiva el cliente
-        cliente.activo = False
-        cliente.save()
-        # Muestra un mensaje de éxito y redirige a la lista de clientes
-        messages.success(request, 'Cliente desactivado con éxito.')
-        return redirect('lista_clientes')
-    
-    # Renderiza la plantilla de eliminación de cliente con el contexto
-    return render(request, 'accounts/clientes/eliminar_cliente.html', {'cliente': cliente})
+    # Desactiva el cliente
+    cliente.activo = False
+    cliente.save()
+    # Muestra un mensaje de éxito y redirige a la lista de clientes
+    messages.success(request, 'Cliente desactivado con éxito.')
+    return redirect('lista_clientes')

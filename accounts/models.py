@@ -186,7 +186,7 @@ class Cotizacion(models.Model):
         return sum(concepto.cantidad_servicios * concepto.precio for concepto in self.conceptos.all())
 
     def calculate_iva(self):
-        return self.subtotal * (self.tasa_iva / 100)
+        return self.subtotal * self.tasa_iva
 
     def calculate_total(self):
         return self.subtotal + self.iva

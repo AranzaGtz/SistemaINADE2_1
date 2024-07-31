@@ -10,6 +10,7 @@ def editar_organizacion(request):
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     organizacion = Organizacion.objects.first()
+    
     if not organizacion:
         # Si no existe ninguna organización, crea una nueva instancia
         organizacion = Organizacion()
@@ -73,10 +74,10 @@ def enviar_queja(request):
         form = QuejaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('gracias')
+            messages.success(request, 'Queja o sujerencia enviada con exito!')
+            return redirect('home')
     else:
         form = QuejaForm()
     return render(request, 'accounts/organizacion/enviar_queja.html', {'form': form})
 
-def gracias(request):
-    return render(request, 'accounts/organizacion/gracias.html')
+

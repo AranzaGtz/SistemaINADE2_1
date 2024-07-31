@@ -1,29 +1,24 @@
 <!-- Plantilla para la vista de clientes en Django -->
 
-<!-- Extiende la plantilla base del dashboard -->
 {% extends 'accounts/base_dashboard.html' %}
-<!-- Carga las etiquetas estáticas de Django -->
 {% load static %}
-<!-- Bloque para el título de la página -->
-{% block title %}Clientes{% endblock %}
-<!-- Bloque para el encabezado de la página -->
-{% block header %}Clientes{% endblock %}
-<!-- Bloque para el contenido principal de la página -->
-{% block content %}
 
+{% block title %}Clientes{% endblock %}
+{% block header %}Clientes{% endblock %}
+
+{% block content %}
 <div class="row">
     <div class="col">
-        <!-- Título principal de la sección de clientes -->
         <h1 class="text-center">Clientes</h1>
-        <!-- Línea divisoria -->
         <hr class="featurette-divider">
     </div>
 </div>
+
 <!-- BUSCADOR -->
 <div class="row mb-3 justify-content-center">
     <div class="col-md-6">
         <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar cotizaciones..." onkeyup="filterTable('searchInput', 'clientesTable')">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar clientes..." onkeyup="filterTable('searchInput', 'clientesTable')">
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'clientesTable')">Buscar</button>
             </div>
@@ -33,14 +28,14 @@
 
 <div class="row mb-3 justify-content-end">
     <div class="col-auto">
-        <!-- Botón para abrir el modal de creación de nuevo cliente -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClienteModal"> Añadir Cliente </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClienteModal">
+            Añadir Cliente
+        </button>
     </div>
 </div>
 
 <div class="row">
     <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-        <!-- Tabla para mostrar la lista de clientes -->
         <table id="clientesTable" class="table table-hover">
             <thead class="thead-light">
                 <tr>
@@ -52,37 +47,34 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Itera sobre la lista de personas (clientes) y crea una fila para cada una -->
                 {% for persona in personas_page %}
                 <tr>
-                    <td>{{ persona.id }}</td> <!-- Contador de la fila -->
-                    <td>{{ persona.titulo.abreviatura }}</td> <!-- Título del cliente -->
-                    <td>{{ persona.nombre }}</td> <!-- Nombre del cliente -->
-                    <td>{{ persona.apellidos }}</td> <!-- Apellidos del cliente -->
-                    <td>{{ persona.empresa.nombre_empresa }}</td> <!-- Nombre de la empresa del cliente -->
-                    <td>{{ persona.informacion_contacto.correo_electronico }}</td> <!-- Correo electrónico del cliente -->
-                    <!-- Botones de opciones para editar, cotizar y eliminar el cliente -->
+                    <td>{{ persona.id }}</td>
+                    <td>{{ persona.titulo.abreviatura }}</td>
+                    <td>{{ persona.nombre }}</td>
+                    <td>{{ persona.apellidos }}</td>
+                    <td>{{ persona.empresa.nombre_empresa }}</td>
+                    <td>{{ persona.informacion_contacto.correo_electronico }}</td>
                     <td><a href="{% url 'cotizacion_form' persona.id %}" class="btn btn-success btn-sm">Cotizar</a></td>
                     <td><a href="{% url 'cliente_edit' persona.id %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <td><a href="{% url 'cliente_delete' persona.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    <td><a href="#" onclick="eliminarCliente({{ persona.id }})" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 </div>
-<!-- Muestra el número total de clientes -->
+
 <p>Número de clientes: {{ personas }}</p>
 <div class="pagination">
     {% if personas_page.has_previous %}
-        <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-        <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+    <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
     {% endif %}
     <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.</div>
     {% if personas_page.has_next %}
-        <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
-        <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+    <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+    <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
     {% endif %}
 </div>
 
@@ -91,82 +83,81 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <!-- Título del modal -->
                 <h5 class="modal-title" id="createClienteLabel">Crear Nuevo Cliente</h5>
-                <!-- Botón para cerrar el modal -->
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <!-- Formulario para crear un nuevo cliente -->
             <form method="post" action="{% url 'cliente_create' %}">
-                <!-- Token de protección CSRF -->
                 {% csrf_token %}
                 <div class="modal-body">
-                    <!-- Formulario del cliente -->
                     {{ persona_form.as_p }}
-                    <p>
-                        <!-- Checkbox para indicar si se desea crear una nueva empresa -->
-                        Crear empresa:
-                        <input type="checkbox" id="crear_empresa_checkbox" name="crear_empresa_checkbox" placeholder="Crear empresa">
-                    </p>
-
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="crear_empresa_checkbox" name="crear_empresa_checkbox">
+                        <label class="form-check-label" for="crear_empresa_checkbox">Crear empresa</label>
+                    </div>
                     <div class="mb-3" id="select_empresa_div">
-                        <!-- Selección de empresa existente -->
                         <label for="empresaSelect" class="form-label">Empresa:</label>
                         <select class="form-select" id="empresaSelect" name="empresa">
                             <option value="">Selecciona una empresa o crea una nueva</option>
-                            <!-- Itera sobre la lista de empresas y crea una opción para cada una -->
                             {% for empresa in empresas %}
                             <option value="{{ empresa.id }}">{{ empresa.nombre_empresa }}</option>
                             {% endfor %}
                         </select>
                     </div>
-
                     <div class="mb-3" id="form_empresa_div" style="display: none;">
-                        <!-- Formulario para crear una nueva empresa y dirección -->
                         {{ empresa_form.as_p }}
                         {{ direccion_form.as_p }}
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" name="action" value="create" class="btn btn-success">Crear Cliente</button>
-                        <button type="submit" name="action" value="create_and_quote" class="btn btn-primary">Crear y Cotizar</button>
-                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="action" value="create" class="btn btn-success">Crear Cliente</button>
+                    <button type="submit" name="action" value="create_and_quote" class="btn btn-primary">Crear y Cotizar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    function eliminarCliente(id) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'No, cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{% url 'cliente_delete' 0 %}".replace('0', id);
+            }
+        });
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
         const checkbox = document.getElementById('crear_empresa_checkbox');
         const selectEmpresaDiv = document.getElementById('select_empresa_div');
         const formEmpresaDiv = document.getElementById('form_empresa_div');
         const empresaFormFields = formEmpresaDiv.querySelectorAll('input, select, textarea');
 
-        checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function () {
             if (checkbox.checked) {
                 selectEmpresaDiv.style.display = 'none';
                 formEmpresaDiv.style.display = 'block';
-                empresaFormFields.forEach(field => {
-                    field.removeAttribute('disabled');
-                });
+                empresaFormFields.forEach(field => field.removeAttribute('disabled'));
             } else {
                 selectEmpresaDiv.style.display = 'block';
                 formEmpresaDiv.style.display = 'none';
-                empresaFormFields.forEach(field => {
-                    field.setAttribute('disabled', 'disabled');
-                });
+                empresaFormFields.forEach(field => field.setAttribute('disabled', 'disabled'));
             }
         });
 
-        // Inicialmente deshabilitar los campos del formulario de empresa
-        empresaFormFields.forEach(field => {
-            field.setAttribute('disabled', 'disabled');
-        });
+        empresaFormFields.forEach(field => field.setAttribute('disabled', 'disabled'));
     });
 </script>
-
+{% endblock %}
 {% endblock %}

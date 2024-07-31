@@ -39,7 +39,7 @@ def usuario_create(request):
 
             user.save()  # Guarda el usuario en la base de datos.
             
-            messages.success(request, 'Usuario registrado!.')
+            messages.success(request, 'El usuario se ha registrado!.')
             
             return redirect("usuario_list")  # Redirige al usuario a login
     else:
@@ -58,7 +58,7 @@ def usuario_update(request,username):
             # Guarda la usuario
             usuario_form.save()
             # Muestra un mensaje de éxito y redirige a la lista de usuarios
-            messages.success(request, 'Usuario actualizado con éxito')
+            messages.success(request, 'Usuario actualizado con éxito!')
             return redirect('usuario_list')
     else:
 
@@ -75,13 +75,11 @@ def usuario_update(request,username):
     return render(request, 'accounts/usuarios/editar_usuario.html', context)
  
 # VISTA PARA ELIMINAR usuario
-def usuario_delete(request, username):
-    usuario = get_object_or_404(CustomUser, username=username)
-    if request.method == "POST":
-        usuario.delete()
-        messages.success(request, 'Usuario Eliminado!.')
-        # Redirigir a la lista de cotizaciones después de la eliminación
-        return redirect('usuario_list')
-    return render(request, 'accounts/usuarios/eliminar_usuario.html', {'usuario': usuario})
+def usuario_delete(request, id):
+    usuario = get_object_or_404(CustomUser, id=id)
+    usuario.delete()
+    messages.success(request, 'Usuario Eliminado!.')
+    # Redirigir a la lista de cotizaciones después de la eliminación
+    return redirect('usuario_list')
 
 
