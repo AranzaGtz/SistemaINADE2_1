@@ -11,7 +11,7 @@ def enviar_cotizacion(request, pk, destinatarios):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     
     # Construir la URL de confirmación
-    form_url = request.build_absolute_uri(reverse('formulario_descarga_subida', args=[cotizacion.id]))
+    form_url = request.build_absolute_uri(reverse('formulario_descarga_subida', args=[cotizacion.id,request.user.username]))
 
     # Prepara el asunto y mensaje del correo electrónico
     subject = f'Cotización {cotizacion.id_personalizado}'
@@ -107,16 +107,25 @@ def confirmacion_recepcion(request):
 # ---       CORREOS     ---
 
 #   FORMULARIO PARA ORDEN DE PEDIDOS DE LOS USUARIO
-def formulario_descarga_subida(request, pk):
+def formulario_descarga_subida(request, pk, usuario):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
+    # Intentar obtener el usuario
+    try:
+        usuario_obj = CustomUser.objects.get(username=usuario)
+    except CustomUser.DoesNotExist:
+        messages.error(request, 'El usuario no existe. Verifique el enlace proporcionado.')
+        return redirect('login')  # Redirigir al inicio de sesión o a una página adecuada
+
     if request.method == 'POST':
         form = OrdenPedidoForm(request.POST, request.FILES)
         if form.is_valid():
             archivo = form.cleaned_data['archivo']
             cotizacion.orden_pedido_pdf.save(archivo.name, archivo)  # Guardar el archivo correctamente
             cotizacion.save()
+
+            # Crear la notificación con el usuario objeto
             Notificacion.objects.create(
-                usuario=request.user,
+                usuario=usuario_obj,  # Utiliza el objeto de usuario
                 tipo='orden_trabajo_subida',
                 mensaje=f'Se ha subido la orden de trabajo para la cotización {cotizacion.id}',
                 enlace=reverse('cotizacion_detalle', args=[cotizacion.id])
@@ -125,4 +134,4 @@ def formulario_descarga_subida(request, pk):
             return redirect('confirmacion_recepcion')
     else:
         form = OrdenPedidoForm()
-    return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})
+    return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})    

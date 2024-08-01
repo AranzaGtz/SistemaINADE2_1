@@ -110,7 +110,7 @@ urlpatterns = [
     path('cotizacion/<int:pk>/seleccionar_correos/', views_correos.seleccionar_correos, name='seleccionar_correos'),
     path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
-    path('formulario_descarga_subida/<int:pk>/', views_correos.formulario_descarga_subida, name='formulario_descarga_subida'),
+    path('formulario_descarga_subida/<int:pk>/<usuario>/', views_correos.formulario_descarga_subida, name='formulario_descarga_subida'),
     
         #   ---     ORGANIZACION       ---
 

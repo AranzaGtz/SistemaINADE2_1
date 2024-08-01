@@ -76,7 +76,7 @@ class CustomUser(AbstractUser):
 #----------------------------------------------------
 
 class Notificacion(models.Model):
-    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True )
     tipo = models.CharField(max_length=100)
     mensaje = models.TextField()
     enlace = models.URLField()
