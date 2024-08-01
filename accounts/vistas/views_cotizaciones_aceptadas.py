@@ -3,7 +3,7 @@ from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import DireccionForm, OrdenTrabajoForm
 from accounts.helpers import get_unica_organizacion
-from accounts.models import Concepto, Cotizacion, Direccion, OrdenTrabajoConcepto
+from accounts.models import Concepto, Cotizacion, Direccion, OrdenTrabajo, OrdenTrabajoConcepto
 from django.contrib import messages
 from accounts.forms import OrdenTrabajoForm, DireccionForm
 from django.template.loader import render_to_string
@@ -18,26 +18,33 @@ def cotizaciones_aceptadas_list(request):
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     # Parámetro de ordenamiento desde la URL
-    order_by = request.GET.get('order_by', 'fecha_solicitud')  # Default order
+    order_by = request.GET.get('order_by', 'id')  # Default order
     
     if not order_by:  # Asegura que siempre haya un valor válido para order_by
-        order_by = 'fecha_solicitud'
+        order_by = 'id'
     
-    # Filtrar cotizaciones que están aceptadas
-    cotizaciones = Cotizacion.objects.filter(estado=True).order_by(order_by)
+    # Filtrar cotizaciones que están aceptadas y prefetch de órdenes de trabajo
+    cotizaciones = Cotizacion.objects.filter(estado=True).prefetch_related('orden_trabajo').order_by(order_by)
     
     # Paginación
     paginator = Paginator(cotizaciones, 50) # Mostrar 50 cotizaciones aceptadas por página
     page_number = request.GET.get('page')
     cotizaciones_page = paginator.get_page(page_number)
     
+    # Preparar la estructura de cotizaciones y órdenes
+    cotizaciones_ordenes = []
+    for cotizacion in cotizaciones_page:
+        ordenes = cotizacion.orden_trabajo.all()  # Utiliza el related_name definido en el modelo
+        cotizaciones_ordenes.append({
+            'cotizacion': cotizacion,
+            'ordenes': ordenes
+        })
+        
     context = {
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
-        'cotizaciones': cotizaciones,
+        'cotizaciones_ordenes': cotizaciones_ordenes,
         'cotizaciones_page': cotizaciones_page,  
-        
-        
     }
     return render(request, "accounts/cotizacionesAceptadas/cotizaciones_aceptadas.html", context)
 
