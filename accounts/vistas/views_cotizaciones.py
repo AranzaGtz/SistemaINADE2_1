@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import  get_unica_organizacion
-from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, Persona, Prospecto, Servicio, Titulo
+from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, MetodoForm, PersonaForm, ProspectoForm, ServicioForm
 from django.contrib import messages
 from django.http import FileResponse, Http404, JsonResponse
@@ -246,12 +246,14 @@ def cotizacion_detalle(request, pk):
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
     
     tasa_iva = cotizacion.tasa_iva * 100
-
-    cotizacion_persona = cotizacion.persona.id
+    # Obtener las órdenes de trabajo relacionadas con la cotización
+    ordenes_trabajo = OrdenTrabajo.objects.filter(cotizacion=cotizacion) 
+    
     return render(request, 'accounts/cotizaciones/cotizacion_detalle.html', {
         'cotizacion': cotizacion,
         'conceptos': conceptos,
         'tasa_iva': tasa_iva,
+        'ordenes_trabajo': ordenes_trabajo,
     })
 
 # INTERFAZ PARA ELIMINAR COTIZACION

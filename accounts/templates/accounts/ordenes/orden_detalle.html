@@ -38,7 +38,7 @@
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion %}">Ir a cotización</a></li>
             <li><a class="dropdown-item" href="#">Actualizar estado</a></li>
-            <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}">Ver PDF</a></li>
+            <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" target="_blank">Ver PDF</a></li>
         </ul>
     </div>
 
@@ -51,7 +51,7 @@
     <p><strong>Cliente:</strong> {{ orden_trabajo.cotizacion.persona.empresa.nombre_empresa }}</p>
     <p><strong>Receptor:</strong> {{ orden_trabajo.receptor }}</p>
     <p><strong>Dirección:</strong> {{ orden_trabajo.direccion }}</p>
-    <p><strong>Estado:</strong> {{ orden_trabajo.estado }}</p>
+    <p><strong>Estado:</strong>{% if orden_trabajo.estado %} Terminado {% else %} Pendiente {% endif %}</p>
 
     <h2>Conceptos Asociados</h2>
     <!-- DETALLES DE CONCEPTOS -->
