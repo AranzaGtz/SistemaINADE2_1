@@ -29,6 +29,7 @@
         <a href="{% url 'cotizaciones_list' %}" class="btn btn-info mb-3">Ver Cotizaciones</a>
     </div>
 </div>
+
 <!-- TABLA -->
 <div class="row">
     <div class="col">
@@ -37,29 +38,37 @@
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
                     <tr>
-                        <th><a href="?order_by=id_personalizado">Cotización</a></th>
-                        <th><a href="?order_by=persona__empresa__nombre_empresa">Empresa</a></th>
-                        <th colspan="2">Contacto</th>
-                        <th><a href="?order_by=fecha_solicitud">Solicitud</a></th>
-                        <th><a href="?order_by=fecha_caducidad">Expiración</a></th>
-                        <th><a href="?order_by=metodo_pago">Moneda</a></th>
-                        <th colspan="3">Opciones</th>
+                        <th><a href="?order_by=id_personalizado" class="link-secondary">Cotización</a></th>
+                        <th><a href="?order_by=persona__empresa__nombre_empresa" class="link-secondary">Empresa</a></th>
+                        <th colspan="3"><a href="?order_by=persona" class="link-secondary">Contacto</a> </th>
+                        <th><a href="?order_by=fecha_solicitud" class="link-secondary">Solicitud</a></th>
+                        <th class="link-secondary">Ordenes</th>
+                        <th colspan="3" class="link-secondary"></th>
                     </tr>
                 </thead>
                 <!-- CUERPO DE TABLA -->
                 <tbody>
-                    {% for c in cotizaciones_page %}
+                    {% for item in cotizaciones_ordenes %}
                     <tr>
-                        <td>{{ c.id_personalizado }}</td>
-                        <td>{{ c.persona.empresa.nombre_empresa }}</td>
-                        <td>{{ c.persona.nombre }} </td>
-                        <td>{{ c.persona.apellidos }}</td>
-                        <td>{{ c.fecha_solicitud|date:"d/m/Y" }}</td>
-                        <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
-                        <td>{{ c.metodo_pago }}</td>
-                        <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a></td>
-                        <td><a href="{% url 'generar_orden_trabajo' c.id %}" class="btn btn-primary btn-sm auto">Crea Orden</a></td>
-                        <td><a href="{% url 'cotizacion_delete' c.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                        <td><a href="{% url 'cotizacion_detalle' item.cotizacion.id %}" class="link-success">{{ item.cotizacion.id_personalizado }}</a></td>
+                        <td>{{ item.cotizacion.persona.empresa.nombre_empresa }}</td>
+                        <td>{{ item.cotizacion.persona.titulo }} </td>
+                        <td>{{ item.cotizacion.persona.nombre }} </td>
+                        <td>{{ item.cotizacion.persona.apellidos }}</td>
+                        <td>{{ item.cotizacion.fecha_solicitud|date:"d/m/Y" }}</td>
+                        <td>
+                            <ul>
+                                {% for orden in item.ordenes %}
+                                    <li>
+                                        <a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}" class="link-success">ID: {{ orden.id_personalizado }} Estado: {{ orden.estado|yesno:"Terminado,No Terminado" }}</a> <br>
+                                    </li>
+                                {% empty %}
+                                    <li>No hay órdenes de trabajo asociadas.</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        
+                        <td><a href="{% url 'generar_orden_trabajo' item.cotizacion.id %}" class="btn btn-primary btn-sm auto">Crea Orden</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

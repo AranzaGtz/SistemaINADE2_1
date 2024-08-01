@@ -25,7 +25,7 @@
             <li><a class="dropdown-item" href="{% url 'cotizacion_delete' cotizacion.id %}">Borrar</a></li>
             <li><a class="dropdown-item" href="{% url 'seleccionar_correos' cotizacion.id %}">Enviar cotización</a></li>
             <li><a class="dropdown-item" href="{% url 'actualizar_estado' cotizacion.id %}">Actualizar estado</a></li>
-            <li><a class="dropdown-item" href="{% url 'cotizacion_pdf' cotizacion.id %}">Ver PDF</a></li>
+            <li><a class="dropdown-item" href="{% url 'cotizacion_pdf' cotizacion.id %}" target="_blank">Ver PDF</a></li>
         </ul>
     </div>
 
