@@ -79,7 +79,8 @@ urlpatterns = [
     path('servicios/delete/<int:pk>/', views_servicios.servicio_delete, name='servicio_delete'),
 
     #   ---     INTERFAZ COTIZACIONES       ---
-
+    path('agregar-servicio/', views_cotizaciones.agregar_servicio, name='agregar_servicio'),
+    
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
     path('obtener_datos_cliente/<int:cliente_id>/', views_cotizaciones.obtener_datos_cliente, name='obtener_datos_cliente'),
     path('obtener_datos_servicio/<int:servicio_id>/', views_cotizaciones.obtener_datos_servicio, name='obtener_datos_servicio'),
@@ -98,8 +99,9 @@ urlpatterns = [
     path('cotizacion/pdf', views_cotizaciones.generar_pdf_cotizacion, name='generar_pdf_cotizacion'),
     path('cotizacion/<int:pk>/actualizar_estado/', views_cotizaciones.actualizar_estado, name='actualizar_estado'),
     
+    path('agregar-receptor/', views_cotizaciones_aceptadas.agregar_receptor, name='agregar_receptor'),
     path('cotizaciones_aceptadas/', views_cotizaciones_aceptadas.cotizaciones_aceptadas_list,name='cotizaciones_aceptadas_list'),
-    path('cotizaciones_aceptadas/generar_orden_trabajo/<int:pk>', views_cotizaciones_aceptadas.generar_orden_trabajo , name='generar_orden_trabajo'),
+    path('cotizaciones_aceptadas/generar_orden_trabajo/<pk>', views_cotizaciones_aceptadas.generar_orden_trabajo , name='generar_orden_trabajo'),
 
     
     #   ---     INTERFAZ ORDENES DE TRABAJO     ---

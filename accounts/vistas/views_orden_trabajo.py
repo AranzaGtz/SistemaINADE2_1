@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from accounts.models import OrdenTrabajo, OrdenTrabajoConcepto
 from django.core.paginator import Paginator
 
+
 #    VISTA PARA ORDENES DE TRABAJO
 def ordenes_list(request):
      # Notificación

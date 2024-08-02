@@ -59,8 +59,18 @@
      <div>
           <h2 class="mt-3 mb-3">Receptor</h2>
           <label for="{{ form.receptor.id_for_label }}">{{ form.receptor.label }}</label>
-          {{ form.receptor }}
+          <div class="row">
+               <div class="col">
+                    {{ form.receptor }}
+               </div>
+               <div class="col col-2">
+                    <a href="#" class="btn"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a>
+                    <a href="#" class="btn" onclick="abrirVentanaReceptor()"><img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20"></a>
+               </div>
+          </div>
+          
      </div>
+
      <div>
           <h2 class="mt-3 mb-3">Dirección</h2>
           <div class="mt-2 text-end" style="text-align: right;">
@@ -171,4 +181,18 @@
           });
      });
 </script>
+<script>
+     function abrirVentanaReceptor() {
+         const url = "{% url 'agregar_receptor' %}";
+         const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
+         window.open(url, 'Agregar Receptor', options);
+     }
+ 
+     function actualizarSelectReceptor(nuevoReceptor) {
+         const select = document.querySelector('select[name="receptor"]');
+         const option = new Option(nuevoReceptor.nombre, nuevoReceptor.id);
+         select.add(option);
+         select.value = nuevoReceptor.id;  // Select the newly added receptor
+     }
+ </script>
 {% endblock %}

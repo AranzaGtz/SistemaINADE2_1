@@ -1,7 +1,8 @@
 from datetime import datetime
 from django.db import IntegrityError, transaction
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from accounts.forms import DireccionForm, OrdenTrabajoForm
+from accounts.forms import CustomUserCreationForm, DireccionForm, OrdenTrabajoForm
 from accounts.helpers import get_unica_organizacion
 from accounts.models import Concepto, Cotizacion, Direccion, OrdenTrabajo, OrdenTrabajoConcepto
 from django.contrib import messages
@@ -10,6 +11,23 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
+
+# VISTA PARA GENERAR NUEVO RECEPTOR
+def agregar_receptor(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            receptor = form.save()
+            return HttpResponse(f"""
+                <script>
+                    window.opener.actualizarSelectReceptor({{ id: {receptor.id}, nombre: '{receptor.first_name} {receptor.last_name}' }});
+                    window.close();
+                </script>
+            """)
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'accounts/usuarios/agregar_receptor.html', {'form': form})
 
 # VISTA PRA DIRIGIR A INTERFAZ DE COTIZACIONES ACEPTADAS
 def cotizaciones_aceptadas_list(request):
