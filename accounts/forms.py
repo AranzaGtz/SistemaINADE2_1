@@ -163,6 +163,18 @@ class ServicioForm(forms.ModelForm):
 
         }
 
+#   FORMULARIO PARA SERVICIO
+class ServicioForm2(forms.ModelForm):
+    class Meta:
+        model = Servicio
+        fields = ['metodo', 'nombre_servicio', 'precio_sugerido', 'descripcion']
+        widgets = {
+            'metodo': forms.Select(attrs={'class': 'form-control'}),
+            'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio'}),
+            'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio'}),
+        }
+
 #   FORMULARIO PARA CONCEPTO
 class ConceptoForm(forms.ModelForm):
     class Meta:

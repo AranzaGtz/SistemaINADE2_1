@@ -5,14 +5,32 @@ from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import  get_unica_organizacion
 from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
-from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, MetodoForm, PersonaForm, ProspectoForm, ServicioForm
+from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, MetodoForm, PersonaForm, ProspectoForm, ServicioForm, ServicioForm2
 from django.contrib import messages
-from django.http import FileResponse, Http404, JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from weasyprint import HTML  # type: ignore
 from django.template.loader import render_to_string
 from django.db import IntegrityError, transaction
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
+
+# VISTA PARA AGREGAR UN SERVICIO
+def agregar_servicio(request):
+    if request.method == 'POST':
+        form = ServicioForm2(request.POST)
+        if form.is_valid():
+            servicio = form.save()
+            # Devuelve un script para cerrar la ventana y actualizar el campo select
+            return HttpResponse(f"""
+                <script>
+                    window.opener.actualizarSelectServicio({{ id: {servicio.id}, nombre: '{servicio.nombre_servicio}' }});
+                    window.close();
+                </script>
+            """)
+    else:
+        form = ServicioForm2()
+
+    return render(request, 'accounts/servicios/agregar_servicio.html', {'form': form})
 
 # VISTA PARA GENERAD ID PERSONALIZADO
 def generate_new_id_personalizado():

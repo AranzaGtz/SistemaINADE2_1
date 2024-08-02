@@ -45,6 +45,7 @@
             <p class="mb-2"><strong>Notas:</strong> {{ cotizacion.notas }}</p>
             <p><strong>Correos adicionales:</strong> {{ cotizacion.correos_adicionales }}</p>
         </div>
+        {% if cotizacion.estado %}
         {% if ordenes_trabajo %}
         <div class="col col-md-3 border-info p-4 mb-3 rounded shadow-sm">
             <h4 class="text-info mb-4">Ordenes de trabajo</h4>
@@ -52,13 +53,14 @@
             <li><a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}" class="link-success">{{ orden.id_personalizado }} {{ orden.estado|yesno:"Terminado,No Terminado" }}</a></li>
             {% endfor %}
             <br>
-            <a href="{% url 'generar_orden_trabajo' cotizacion.id_personalizado %}" class="btn btn-success btn-sm mt-2">Crea nueva orden de trabajo</a>
+            <a href="{% url 'generar_orden_trabajo' cotizacion.id %}" class="btn btn-success btn-sm mt-2">Crea nueva orden de trabajo</a>
         </div>
         {% else %}
         <div class="col col-md-3 border-info p-4 mb-3 rounded shadow-sm">
-            <a href="{% url 'generar_orden_trabajo' cotizacion.id_personalizado %}" class="btn btn-success btn-sm mt-2">Crea nueva orden de trabajo</a>
+            <a href="{% url 'generar_orden_trabajo' cotizacion.id %}" class="btn btn-success btn-sm mt-2">Crea nueva orden de trabajo</a>
         </div>
         
+        {% endif %}
         {% endif %}
     </div>
 
