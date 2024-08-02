@@ -4,7 +4,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
 # ---      USUARIOS     ---
-
 #   FORMULARIO PARA CREAR USUARIO
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -37,7 +36,9 @@ class CustomUserChangeForm(forms.ModelForm):
             'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
         }
 
-# ---      EMPRESAS     ---
+#----------------------------------------------------
+# MODELO PARA CLIENTES
+#----------------------------------------------------
 
 #   FORMULARIO PARA DIRECCION DE EMPRESA
 class DireccionForm(forms.ModelForm):
@@ -56,18 +57,12 @@ class DireccionForm(forms.ModelForm):
 #   FORMULARIO PARA EMPRESA
 class EmpresaForm(forms.ModelForm):
     # Campos de Direccion
-    calle = forms.CharField(max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Calle'}))
-    numero = forms.CharField(max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Número'}))
-    colonia = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
-    ciudad = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
-    codigo = forms.CharField(max_length=6, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
-    estado = forms.CharField(max_length=100, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Estado'}))
+    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
+    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
+    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
+    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
+    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
+    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
 
     class Meta:
         model = Empresa
@@ -88,36 +83,46 @@ class InformacionContactoForm(forms.ModelForm):
         model = InformacionContacto
         fields = ['correo_electronico', 'telefono', 'celular', 'fax']
         widgets = {
-            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electronico', 'required': 'True'}),
-            'telefono': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Telefono', 'required': 'False', 'pattern': "[0-9]{10}"}),
-            'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}),
-            'fax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Fax', 'required': 'False'}),
+            'correo_electronico':   forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electronico', 'required': 'True'}),
+            'telefono':             forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Telefono', 'required': 'False', 'pattern': "[0-9]{10}"}),
+            'celular':              forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}),
+            'fax':                  forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Fax'}),
+        }
+
+class TituloForm(forms.ModelForm):
+    class Meta:
+        model = Titulo
+        fields = ['abreviatura','titulo']
+        widgets = {
+            'abreviatura': forms.TextInput(attrs={'class':'form-control', 'placeholder': 'Abreviatura'}),
+            'titulo': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Titulo'})
         }
 
 #   FORMULARIO PARA PERSONA
 class PersonaForm(forms.ModelForm):
-
     titulo = forms.ModelChoiceField(
         queryset=Titulo.objects.all(),
         required=False,
-
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     # Campos de InformacionContactoForm
-    correo_electronico = forms.EmailField(widget=forms.EmailInput(
-        attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}))
-    telefono = forms.CharField(widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Teléfono', 'required': 'False'}))
-    celular = forms.CharField(widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}))
-    fax = forms.CharField(widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Fax', 'required': 'False'}))
+    correo_electronico = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'})
+    )
+    telefono = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'})
+    )
+    celular = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular'})
+    )
+    fax = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Fax'})
+    )
 
     class Meta:
         model = Persona
-        fields = ['nombre', 'apellidos', 'titulo',
-                  'correo_electronico', 'telefono', 'celular', 'fax']
+        fields = ['nombre', 'apellidos', 'titulo', 'correo_electronico', 'telefono', 'celular', 'fax']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Nombre del método', 'required': 'True'}),
             'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ambos apellidos', 'required': 'True'}),

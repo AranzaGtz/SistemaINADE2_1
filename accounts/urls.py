@@ -40,6 +40,9 @@ urlpatterns = [
     path('usuarios/editar/<username>/',views_usuarios.usuario_update, name='usuario_edit'),
 
     #   ---     INTERFAZ CLIENTES       ---
+    path('agregar-titulo/', views_clientes.agregar_titulo, name='agregar_titulo'),
+    path('cerrar-ventana/', views_clientes.cerrar_ventana, name='cerrar_ventana'),
+    path('obtener-titulos/', views_clientes.obtener_titulos, name='obtener_titulos'),
 
     path('clientes/', views_clientes.lista_clientes, name='lista_clientes'),
     path('clientes/nuevo/', views_clientes.cliente_create, name='cliente_create'),
@@ -80,7 +83,8 @@ urlpatterns = [
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
     path('obtener_datos_cliente/<int:cliente_id>/', views_cotizaciones.obtener_datos_cliente, name='obtener_datos_cliente'),
     path('obtener_datos_servicio/<int:servicio_id>/', views_cotizaciones.obtener_datos_servicio, name='obtener_datos_servicio'),
-    path('cotizaciones/nueva/<int:id>', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
+    path('cotizaciones/nueva/<int:persona_id>', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
+    path('persona/<int:persona_id>/cotizacion/<int:cotizacion_id>/', views_cotizaciones.cotizacion_form, name='edit_cotizacion'),
     path('cotizaciones/cliente/nueva', views_cotizaciones.cotizaciones_prospecto_create, name='cotizaciones_prospecto_create'),
     path('cotizaciones/editar/<int:pk>/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit'),
     path('cotizaciones/<int:pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
