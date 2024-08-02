@@ -86,57 +86,68 @@ def obtener_datos_servicio(request, servicio_id):
         return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
 
 # AGREGAR NUEVA COTIZACION
-def cotizacion_form(request,id):
-    persona = get_object_or_404(Persona, id=id)
+def cotizacion_form(request,persona_id, cotizacion_id=None):
+    persona = get_object_or_404(Persona, id=persona_id)
+    
+    if cotizacion_id:
+        cotizacion = get_object_or_404(Cotizacion, id=cotizacion_id, persona=persona)
+    else:
+        cotizacion = None
     servicios = list(Servicio.objects.all().values('id', 'nombre_servicio'))  # Asegúrate de ajustar los campos según tu modelo
     servicios_json = json.dumps(servicios)  # Convertir la lista de diccionarios a JSON
     if request.method == 'POST':
-        cotizacion_form = CotizacionForm(request.POST)
-        concepto_formset = ConceptoFormSet(request.POST)
         
-
-        if cotizacion_form.is_valid() and concepto_formset.is_valid():
-            try:
-                with transaction.atomic():  # Usar una transacción atómica para asegurar la atomicidad
-                    cotizacion = cotizacion_form.save(commit=False)
-                    cotizacion.persona = persona
-                        
-                    cotizacion.id_personalizado = generate_new_id_personalizado()
-                    cotizacion.save()
-
-                    conceptos = concepto_formset.save(commit=False)
-                    for concepto in conceptos:
-                        concepto.cotizacion = cotizacion
-                        concepto.save()
-
-                    cotizacion.subtotal = sum(
-                        [c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
-                    cotizacion.iva = cotizacion.subtotal * \
-                        (cotizacion.tasa_iva )
-                    cotizacion.total = cotizacion.subtotal + cotizacion.iva
-                    cotizacion.save()
-                    # Generar PDF y guardar en el modelo
-                    pdf_data = generar_pdf_cotizacion(request, cotizacion)
-                    cotizacion.cotizacion_pdf.save(f"cotizacion_{cotizacion.id_personalizado}.pdf", ContentFile(pdf_data))
-                    cotizacion.save()
-                    # Verificar si la persona ya existe en la tabla de prospectos
-                    if not Prospecto.objects.filter(persona=persona).exists():
-                        prospecto = Prospecto(persona=persona)
-                        prospecto.save()
-                    messages.success(request, 'Cotización creada con éxito.')
-                    return redirect('cotizacion_detalle', pk=cotizacion.id)
-            except IntegrityError:
-                messages.error(
-                    request, 'Hubo un error al crear la cotización. Inténtalo de nuevo.')
+        if cotizacion:
+            cotizacion_form=CotizacionForm(request.POST, instance=cotizacion)
+            concepto_formset=ConceptoFormSet(request.POST, instance=cotizacion)
         else:
-            print(cotizacion_form.errors)
-            print(concepto_formset.errors)
-            messages.error(
-                request, 'Hubo un error en el formulario. Por favor, revisa los campos e intenta nuevamente.')
-    else:
-        cotizacion_form = CotizacionForm()
-        concepto_formset = ConceptoFormSet()
+            cotizacion_form = CotizacionForm(request.POST)
+            concepto_formset = ConceptoFormSet(request.POST)
+            if cotizacion_form.is_valid() and concepto_formset.is_valid():
+                try:
+                    with transaction.atomic():  # Usar una transacción atómica para asegurar la atomicidad
+                        cotizacion = cotizacion_form.save(commit=False)
+                        cotizacion.persona = persona
+                            
+                        cotizacion.id_personalizado = generate_new_id_personalizado()
+                        cotizacion.save()
 
+                        conceptos = concepto_formset.save(commit=False)
+                        for concepto in conceptos:
+                            concepto.cotizacion = cotizacion
+                            concepto.save()
+
+                        cotizacion.subtotal = sum(
+                            [c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
+                        cotizacion.iva = cotizacion.subtotal * \
+                            (cotizacion.tasa_iva )
+                        cotizacion.total = cotizacion.subtotal + cotizacion.iva
+                        cotizacion.save()
+                        # Generar PDF y guardar en el modelo
+                        pdf_data = generar_pdf_cotizacion(request, cotizacion)
+                        cotizacion.cotizacion_pdf.save(f"cotizacion_{cotizacion.id_personalizado}.pdf", ContentFile(pdf_data))
+                        cotizacion.save()
+                        # Verificar si la persona ya existe en la tabla de prospectos
+                        if not Prospecto.objects.filter(persona=persona).exists():
+                            prospecto = Prospecto(persona=persona)
+                            prospecto.save()
+                        messages.success(request, 'Cotización creada con éxito.')
+                        return redirect('cotizacion_detalle', pk=cotizacion.id)
+                except IntegrityError:
+                    messages.error(
+                        request, 'Hubo un error al crear la cotización. Inténtalo de nuevo.')
+            else:
+                print(cotizacion_form.errors)
+                print(concepto_formset.errors)
+                messages.error(
+                    request, 'Hubo un error en el formulario. Por favor, revisa los campos e intenta nuevamente.')
+    else:
+        if cotizacion:
+            cotizacion_form = CotizacionForm(instance=cotizacion)
+            concepto_formset = ConceptoFormSet(instance=cotizacion)
+        else:
+            cotizacion_form = CotizacionForm()
+            concepto_formset = ConceptoFormSet()
     return render(request, 'accounts/cotizaciones/cotizaciones_registro.html', {
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
@@ -382,6 +393,7 @@ def generar_pdf_cotizacion(request,cotizacion):
     
     current_date = datetime.now().strftime("%Y/%m/%d")
     logo_url = request.build_absolute_uri('/static/img/logo.png')  # Necesitas obtener este request de alguna manera, o ajustar para no usar request aquí
+    marca = request.build_absolute_uri('/static/img/Imagen 21.jpg')
 
     context = {
         'org': org,
@@ -391,6 +403,7 @@ def generar_pdf_cotizacion(request,cotizacion):
         'conceptos': conceptos,
         'current_date': current_date,
         'logo_url': logo_url,
+        'marca':marca,
     }
 
     html_string = render_to_string(

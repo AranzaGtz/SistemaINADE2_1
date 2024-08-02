@@ -1,9 +1,36 @@
 # views_personas.py
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
-from accounts.forms import DireccionForm, EmpresaForm, PersonaForm
+from accounts.forms import DireccionForm, EmpresaForm, PersonaForm, TituloForm
 from accounts.models import Empresa, Persona, InformacionContacto, Titulo
 from django.core.paginator import Paginator
+
+# VISTA PARA CREAR TITULO
+def agregar_titulo(request):
+    if request.method == 'POST':
+        form = TituloForm(request.POST)
+        if form.is_valid():
+            titulo = form.save()
+            # Devuelve un script para cerrar la ventana y actualizar el campo select
+            return HttpResponse(f"""
+                <script>
+                    window.opener.actualizarSelectTitulo({{ id: {titulo.id}, titulo: '{titulo.titulo}' }});
+                    window.close();
+                </script>
+            """)
+    else:
+        form = TituloForm()
+
+    return render(request, 'accounts/clientes/agregar_titulo.html', {'form': form})
+
+# VISTA PARA CERRAR VENTAS
+def cerrar_ventana(request):
+    return HttpResponse('<script>window.close();</script>')
+
+def obtener_titulos(request):
+    titulos = Titulo.objects.all().values('id', 'titulo')
+    return JsonResponse(list(titulos), safe=False)
 
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
 def lista_clientes(request):

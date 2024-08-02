@@ -20,8 +20,9 @@
         </button>
         <!-- Elementos del dropdown -->
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
             <li><a class="dropdown-item text-secondary pe-none" href="{% url 'cotizacion_duplicar' cotizacion.id%}" aria-disabled="true">Duplicar</a></li>
-            <li><a class="dropdown-item text-secondary pe-none" href="{% url 'cotizacion_edit' cotizacion.id%}" aria-disabled="true">Editar</a></li>
+            <li><a class="dropdown-item text-secondary" href="{% url 'edit_cotizacion' cotizacion.persona.id cotizacion.id_personalizado %}">Editar</a></li>
             <li><a class="dropdown-item" href="{% url 'cotizacion_delete' cotizacion.id %}">Borrar</a></li>
             <li><a class="dropdown-item" href="{% url 'seleccionar_correos' cotizacion.id %}">Enviar cotización</a></li>
             <li><a class="dropdown-item" href="{% url 'actualizar_estado' cotizacion.id %}">Actualizar estado</a></li>

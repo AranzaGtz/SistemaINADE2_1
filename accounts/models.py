@@ -74,7 +74,6 @@ class CustomUser(AbstractUser):
 #----------------------------------------------------
 # MODELO PARA NOTIFICACIONES
 #----------------------------------------------------
-
 class Notificacion(models.Model):
     usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True )
     tipo = models.CharField(max_length=100)
@@ -89,7 +88,6 @@ class Notificacion(models.Model):
 #----------------------------------------------------
 # MODELO PARA EMPRESAS
 #----------------------------------------------------
-
 # MODELO PARA DIRECCION
 class Direccion(models.Model):
     id = models.AutoField(primary_key=True)
@@ -107,7 +105,7 @@ class Direccion(models.Model):
 class Empresa(models.Model):
     id = models.AutoField(primary_key=True)
     nombre_empresa = models.CharField(max_length=100, null=False, blank=False)
-    rfc = models.CharField(max_length=50, null=False, blank=True)
+    rfc = models.CharField(max_length=50, null=True, blank=True)
     direccion = models.OneToOneField(Direccion, on_delete=models.CASCADE, null=True, blank=True)
     tipo_moneda = [
         ('MXN', 'MXN - Moneda Nacional Mexicana'),
@@ -115,11 +113,13 @@ class Empresa(models.Model):
     ]
     moneda = models.CharField(max_length=10, choices=tipo_moneda, blank=True, null=True)
     condiciones_pago = models.CharField(max_length=200, null=False, blank=True, default='15')
+    
+    def __str__(self):
+        return self.nombre_empresa
 
 #----------------------------------------------------
 # MODELO PARA CLIENTES
 #----------------------------------------------------
-
 # MODELO DE TITULOS
 class Titulo(models.Model):
     id = models.AutoField(primary_key=True)

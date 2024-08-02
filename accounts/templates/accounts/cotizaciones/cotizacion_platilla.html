@@ -23,6 +23,16 @@
                }
           }
 
+          body {
+               font-family: Arial, sans-serif;
+               font-size: 15px;
+               background-image: url('{{ marca }}'); /* Añade tu URL de la imagen de fondo */
+               background-size: cover; /* Cubre toda el área disponible sin perder proporciones */
+               background-repeat: no-repeat; /* Evita que la imagen se repita */
+               background-position: center center; /* Centra la imagen en la página */
+               background-attachment: fixed; /* Hace que la imagen de fondo sea fija en la vista del usuario */
+          }
+
           /* Estilos CSS para manejar saltos de página */
           .page-break {
                page-break-before: always;
