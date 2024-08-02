@@ -88,7 +88,7 @@ urlpatterns = [
     path('persona/<int:persona_id>/cotizacion/<int:cotizacion_id>/', views_cotizaciones.cotizacion_form, name='edit_cotizacion'),
     path('cotizaciones/cliente/nueva', views_cotizaciones.cotizaciones_prospecto_create, name='cotizaciones_prospecto_create'),
     path('cotizaciones/editar/<int:pk>/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit'),
-    path('cotizaciones/<int:pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
+    path('cotizaciones/<pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
     path('cotizaciones/<int:pk>/delete/', views_cotizaciones.cotizacion_delete, name='cotizacion_delete'),
 
     path('cotizacion/<int:pk>/pdf/', views_cotizaciones.cotizacion_pdf, name='cotizacion_pdf'),

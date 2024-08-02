@@ -36,7 +36,7 @@
         </button>
         <!-- Elementos del dropdown -->
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion %}">Ir a cotización</a></li>
+            <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion.id %}">Ir a cotización</a></li>
             <li><a class="dropdown-item" href="#">Actualizar estado</a></li>
             <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" target="_blank">Ver PDF</a></li>
         </ul>
