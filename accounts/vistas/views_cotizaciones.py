@@ -269,6 +269,10 @@ def cotizaciones_prospecto_create(request):
 
 # INTERFAZ DE DETALLES DE CADA COTIZACION
 def cotizacion_detalle(request, pk):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     conceptos = cotizacion.conceptos.all()
     for concepto in conceptos:
@@ -279,6 +283,8 @@ def cotizacion_detalle(request, pk):
     ordenes_trabajo = OrdenTrabajo.objects.filter(cotizacion=cotizacion) 
     
     return render(request, 'accounts/cotizaciones/cotizacion_detalle.html', {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizacion': cotizacion,
         'conceptos': conceptos,
         'tasa_iva': tasa_iva,

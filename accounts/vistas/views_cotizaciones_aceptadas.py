@@ -189,6 +189,7 @@ def generar_pdf_orden_trabajo(request, orden_trabajo):
         'logo_url': request.build_absolute_uri('/static/img/logo.png'),
         'orden_trabajo': orden_trabajo,
         'conceptos_data': conceptos_data,
+        'marca':request.build_absolute_uri('/static/img/Imagen 21.jpg')
     }
 
     html_string = render_to_string(
