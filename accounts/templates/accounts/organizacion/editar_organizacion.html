@@ -58,7 +58,13 @@
         cancelButtonColor: '#d33',
         confirmButtonText: "Si, seguro!",
         cancelButtonText: "No, cancelar!",
-    })
+    }).then((result) => {
+        if (result.isConfirmed) {
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // Redirigir a la página de inicio cuando se cancela
+            window.location.href = "{% url 'home' %}"; // Cambia esta URL por la de tu página de inicio
+        }
+   });
 </script>
 {% endblock %}
 {% endblock %}

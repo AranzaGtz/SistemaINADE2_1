@@ -70,6 +70,10 @@ def formatos(request):
 
 # VISTA PARA QUEJAS
 def enviar_queja(request):
+    # Notificación
+    notificaciones = request.user.notificacion_set.all()
+    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
+    
     if request.method == 'POST':
         form = QuejaForm(request.POST)
         if form.is_valid():
@@ -78,6 +82,11 @@ def enviar_queja(request):
             return redirect('home')
     else:
         form = QuejaForm()
-    return render(request, 'accounts/organizacion/enviar_queja.html', {'form': form})
+        context={
+            'notificaciones': notificaciones,
+            'notificaciones_no_leidas': notificaciones_no_leidas,
+            'form':form
+        }
+    return render(request, 'accounts/organizacion/enviar_queja.html', context)
 
 
