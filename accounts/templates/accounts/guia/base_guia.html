@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <!-- Configuración de codificación de caracteres y vista -->
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <!-- Título de la página, se puede definir en las plantillas hijas -->
+     <title>{% block title %}{% endblock %}</title>
+     <!-- Carga de archivos estáticos de Django -->
+     {% load static %}
+     <!-- Favicon -->
+     <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
+     <!-- Inclusión de CSS de Bootstrap -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+     <!-- BARRA DE ENCABEZADO -->
+     <header class="">
+          <nav class="navbar bg-body-tertiary fixed-top">
+               <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                         <a class="navbar-brand d-flex align-items-center" href="{% url 'guia_operaciones' %}">
+                              <img src="{% static 'img/chevron-double-left.svg' %}" alt="Logo" style="max-height: 40px; min-height: 32px;"
+                                   class="mr-2">
+                         </a>
+                    </div>
+               </div>
+          </nav>
+     </header>
+
+     <div class="content" style="margin-top: 80px;">
+          <!-- Contenido principal de la página -->
+          <main class="container mt-4" style="min-height: 80vh;">
+               {% block content %}
+               {% endblock %}
+          </main>
+     </div>
+
+     <!-- PIE DE PAGINA -->
+     <footer class="bg-light text-dark py-4 mt-auto">
+          <div class="container">
+               <hr class="border-dark">
+               <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
+                         <p class="mb-0">
+                              <a href="https://www.inade.mx/" class="text-dark">&copy; 2024 INADE Servicios
+                                   Ambientales</a>
+                              <br>
+                              Ingeniería y Administración Estratégica, S.A. de C.V.
+                         </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-right">
+                         <!-- Enlaces a redes sociales y contacto -->
+                         <a href="https://wa.me/your-whatsapp-number" class="text-dark mx-2">
+                              <img src="{% static 'img/whatsapp.svg' %}" alt="WhatsApp"
+                                   style="width: 30px; height: 30px;">
+                         </a>
+                         <a href="https://www.facebook.com/p/Ingenier%C3%ADa-y-Administraci%C3%B3n-Estrat%C3%A9gica-SA-de-CV-100067820710003/"
+                              class="text-dark mx-2">
+                              <img src="{% static 'img/facebook.svg' %}" alt="Facebook"
+                                   style="width: 30px; height: 30px;">
+                         </a>
+                         <a href="mailto:inade@inade.mx" class="text-dark mx-2">
+                              <img src="{% static 'img/gmail.svg' %}" alt="Gmail" style="width: 30px; height: 30px;">
+                         </a>
+                    </div>
+               </div>
+          </div>
+     </footer>
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+<!-- templates/editar_organizacion.html -->
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Organización{% endblock %}
+{% block header %}Organización{% endblock %}
+{% block content %}
+<style>
+     .help-section {
+          width: 90%;
+          margin: auto;
+          font-family: 'Arial', sans-serif;
+        }
+        
+        .category {
+          margin-bottom: 30px;
+        }
+        
+        h3 {
+          color: #333;
+          margin-top: 30px;
+        }
+        
+        ul {
+          list-style-type: none;
+          padding: 0;
+        }
+        
+        li {
+          margin: 5px 0;
+        }
+        
+        a {
+          text-decoration: none;
+          color: #007bff;
+        }
+        
+        a:hover {
+          text-decoration: underline;
+        }
+        
+        #search {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 30px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+        
+</style>
+<div class="help-section">
+     <input type="text" id="search" placeholder="Busca con palabras clave...">
+
+     <div class="category">
+          <h3>Gestión de Usuarios</h3>
+          <ul>
+               <li><a href="{% url 'guia_add_u' %}">¿Cómo puedo agregar un nuevo usuario al sistema?</a></li>
+               <li><a href="#remove-user">¿Cómo eliminar un usuario?</a></li>
+               <li><a href="#edit-user">¿Cómo puedo editar la información de un usuario existente?</a></li>
+               <li><a href="#consult-user">¿Cómo consultar la lista de usuarios?</a></li>
+          </ul>
+     </div>
+
+     <div class="category">
+          <h3>Cotizaciones</h3>
+          <ul>
+               <li><a href="#create-quote">¿Cómo crear una nueva cotización?</a></li>
+               <li><a href="#send-quote">¿Cómo enviar una cotización por correo electrónico?</a></li>
+               <li><a href="#notify-reception">¿Cómo puedo notificarme cuando un cliente recibe un correo?</a></li>
+               <li><a href="#view-quote-pdf">¿Cómo ver el documento PDF de la cotización?</a></li>
+          </ul>
+     </div>
+
+     <div class="category">
+          <h3>Órdenes de Trabajo</h3>
+          <ul>
+               <li><a href="#generate-order">¿Cómo genero una orden de trabajo?</a></li>
+               <li><a href="#view-order-pdf">¿Cómo puedo ver el PDF de una orden de trabajo?</a></li>
+          </ul>
+     </div>
+
+     <div class="category">
+          <h3>Gestión de Plantillas y Organización</h3>
+          <ul>
+               <li><a href="#edit-org-info">¿Cómo edito la información de la organización?</a></li>
+               <li><a href="#edit-quote-template">¿Cómo puedo modificar los términos en la plantilla PDF de
+                         cotización?</a></li>
+               <li><a href="#edit-order-template">¿Cómo modificar los términos en la plantilla PDF de la orden de
+                         trabajo?</a></li>
+          </ul>
+     </div>
+</div>
+{% block extra_js %}
+<script>
+     document.getElementById('search').addEventListener('input', function() {
+          var query = this.value.toLowerCase();
+          document.querySelectorAll('.category').forEach(function(category) {
+            var matches = false;
+            category.querySelectorAll('li').forEach(function(item) {
+              if (item.textContent.toLowerCase().includes(query)) {
+                item.style.display = 'block';
+                matches = true;
+              } else {
+                item.style.display = 'none';
+              }
+            });
+            category.style.display = matches ? 'block' : 'none';
+          });
+        });        
+</script>
+{% endblock %}
+{% endblock %}

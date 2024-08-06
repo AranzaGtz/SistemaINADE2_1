@@ -1,7 +1,7 @@
 from django.urls import path
 from accounts import views
 from accounts.views import notificaciones, marcar_notificacion_leida, borrar_notificacion
-from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_orden_trabajo, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
+from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_guia, views_orden_trabajo, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
 from accounts.vistas.views_autenticacion import CustomPasswordResetView
 
@@ -118,11 +118,16 @@ urlpatterns = [
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
     path('formulario_descarga_subida/<int:pk>/<usuario>/', views_correos.formulario_descarga_subida, name='formulario_descarga_subida'),
     
-        #   ---     ORGANIZACION       ---
+    #   ---     ORGANIZACION       ---
 
     path('organizacion/terminos/', views_organizacion.editar_organizacion, name='editar_organizacion'),
     path('formatos/', views_organizacion.formatos, name='formatos'),
     path('queja/', views_organizacion.enviar_queja, name='enviar_queja'),
+
+    
+    #   ---     GUIA DE OPERACIONES       ---
+    path('guia_operaciones/', views_guia.guia_operaciones, name='guia_operaciones'),
+    path('guia_operaciones/usuarios', views_guia.guia_add_u, name='guia_add_u'),
 
     # Define otras rutas según las vistas que hayas definido
 ]
