@@ -1,11 +1,8 @@
-<!-- Plantilla para la vista de clientes en Django -->
-
+<!-- templates/editar_organizacion.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-
 {% block title %}Clientes{% endblock %}
 {% block header %}Clientes{% endblock %}
-
 {% block content %}
 <div class="row">
     <div class="col">
@@ -121,8 +118,11 @@
                             </div>
                         </div>
                         <div class="col col-2">
-                            <button class="btn " type="button" onclick="abrirVentana()"><img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20"></button>
+                            <button class="btn btn-success" type="button" onclick="abrirVentana()">
+                                <img src="{% static 'img/person-plus-fill.svg' %}" width="20" height="20" style="filter: invert(1);">
+                            </button>
                         </div>
+                        
                     </div>
 
                     <!-- Campo Correo Electrónico -->
