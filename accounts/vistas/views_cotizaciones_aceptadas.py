@@ -114,14 +114,10 @@ def generar_orden_trabajo(request, pk):
                     conceptos_orden_trabajo = []
                     for concepto in Concepto.objects.filter(cotizacion=cotizacion):
                         if f'usar_concepto_{concepto.id}' in request.POST:
-                            # El concepto ha sido seleccionado para incluirse en la orden de trabajo
-                            usar_otra_descripcion = request.POST.get(f'usar_otra_descripcion_{concepto.id}', 'off') == 'on'
-                            descripcion_personalizada = request.POST.get(f'otra_descripcion_{concepto.id}', '').strip() if usar_otra_descripcion else None
                             
                             OrdenTrabajoConcepto.objects.create(
                                 orden_de_trabajo=orden_trabajo,
                                 concepto=concepto,
-                                descripcion_personalizada=descripcion_personalizada
                             )
                             conceptos_orden_trabajo.append(concepto)
                             
@@ -167,17 +163,19 @@ def generar_pdf_orden_trabajo(request, orden_trabajo):
     conceptos = Concepto.objects.filter(cotizacion=orden_trabajo.cotizacion)
     org = get_unica_organizacion()
     # Suponiendo que conceptos_seleccionados ya contiene los conceptos correctos con su descripción personalizada
-    conceptos_data = [
-        {
+    conceptos_data = []
+
+    for ctp in conceptos_orden_trabajo:
+        # Primero, imprime las notas
+        print(ctp.concepto.notas)
+        # Luego, agrega el diccionario a la lista
+        conceptos_data.append({
             'nombre': ctp.concepto.servicio.nombre_servicio,
             'metodo': ctp.concepto.servicio.metodo,
             'descripcion': ctp.concepto.servicio.descripcion,
             'cantidad': ctp.concepto.cantidad_servicios,
-            'descripcion_personalizada': ctp.descripcion_personalizada if ctp.descripcion_personalizada else ctp.concepto.notas,
-            'nota': ctp.concepto.notas,
-        } 
-        for ctp in conceptos_orden_trabajo
-    ]
+            'nota': ctp.concepto.notas
+        })
 
     context = {
         'org': get_unica_organizacion(),

@@ -137,7 +137,7 @@ def cliente_create(request):
 
             if action == 'create_and_quote':
                 messages.success(request, "El cliente ha sido creado!")
-                return redirect('cotizacion_form', id=persona.id)
+                return redirect('cotizacion_form', persona_id=persona.id)
                 
             else:
                 messages.success(request, "El cliente ha sido creado!")

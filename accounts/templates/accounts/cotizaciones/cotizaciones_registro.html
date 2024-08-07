@@ -133,7 +133,11 @@
                         </div>
                     </div>
                     <div class="col col-1">
-                        <div><a href="#" class="btn" onclick="abrirVentanaServicio()" clas="text-end"><img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20" clas="text-end"></a></div>
+                        <div>
+                            <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" clas="text-end">
+                                <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" clas="text-end" style="filter: invert(1);" >
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -193,7 +197,11 @@
                 </div>
             </div>
             <div class="col col-1">
-                <div><a href="#" class="btn" onclick="abrirVentanaServicio()" clas="text-end"><img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20" clas="text-end"></a></div>
+                <div>
+                    <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" clas="text-end">
+                        <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" clas="text-end" style="filter: invert(1);" >
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -371,7 +379,6 @@
         const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
         window.open(url, 'Agregar Servicio', options);
     }
-
     function actualizarSelectServicio(nuevoServicio) {
         const selects = document.querySelectorAll('select[name$="servicio"]');
         selects.forEach(select => {

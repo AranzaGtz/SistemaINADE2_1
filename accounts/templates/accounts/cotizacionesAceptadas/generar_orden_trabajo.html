@@ -65,7 +65,7 @@
                </div>
                <div class="col col-2">
                     <a href="#" class="btn"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a>
-                    <a href="#" class="btn" onclick="abrirVentanaReceptor()"><img src="/static/admin/img/icon-addlink.svg" alt="" width="20" height="20"></a>
+                    <a href="#" class="btn btn-success" onclick="abrirVentanaReceptor()"><img src="{% static 'img/person-plus-fill.svg' %}" width="20" height="20" style="filter: invert(1);"></a>
                </div>
           </div>
           
@@ -145,18 +145,6 @@
                          Elejir este concepto
                     </label>
                </div>
-               <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="usar_otra_descripcion_{{ concepto.id }}"
-                         id="usar_otra_descripcion_{{ concepto.id }}" data-target="#textarea_{{ concepto.id }}">
-                    <label class="form-check-label" for="usar_otra_descripcion_{{ concepto.id }}">
-                         Usar otra descripción para este dato
-                    </label>
-               </div>
-               <div id="textarea_{{ concepto.id }}" style="display: none;">
-                    <textarea class="form-control mt-2" name="otra_descripcion_{{ concepto.id }}" rows="3"
-                         placeholder="Ingrese otra descripción"></textarea>
-               </div>
-
           </div>
           {% endfor %}
      </div>
