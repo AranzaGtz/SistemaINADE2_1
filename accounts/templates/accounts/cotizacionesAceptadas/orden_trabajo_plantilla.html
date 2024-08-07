@@ -253,7 +253,7 @@
           <p class="m-1"><strong>Método de referencia:</strong> {{ concepto.metodo }}</p>
           <p class="m-1"><strong>Descripción:</strong> {{ concepto.descripcion }}</p>
           <p class="m-1" style="margin-top: 15pt;"><strong>Cantidad o número de muestras autorizadas:</strong> {{ concepto.cantidad }}</p>
-          <p class="m-1" style="padding-left: 15px;"> {% if concepto.descripcion_personalizada %} {{ concepto.descripcion_personalizada }} {% else %} {{concepto.notas}} {% endif %}</p>
+          <p class="m-1" style="padding-left: 15px;"> {{concepto.nota}}</p>
 
           {% endfor %}
      </div>

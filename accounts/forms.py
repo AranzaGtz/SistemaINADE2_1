@@ -69,10 +69,10 @@ class EmpresaForm(forms.ModelForm):
         fields = ['nombre_empresa', 'rfc', 'moneda', 'condiciones_pago',
                   'calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
-            'nombre_empresa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa el Nombre de la Empresa', 'required': 'True'}),
-            'rfc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa RFC', 'required': 'False', 'pattern': r"[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}"}),
+            'nombre_empresa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa el Nombre de la Empresa ', 'required': 'True'}),
+            'rfc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa RFC ', 'required': 'False', 'pattern': r"[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}"}),
             'moneda': forms.Select(attrs={'class': 'form-control'}),
-            'condiciones_pago': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Días de pago'}),
+            'condiciones_pago': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Días de pago '}),
         }
 
 # ---      CLIENTES     ---
@@ -86,8 +86,9 @@ class InformacionContactoForm(forms.ModelForm):
             'correo_electronico':   forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electronico', 'required': 'True'}),
             'telefono':             forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Telefono', 'required': 'False', 'pattern': "[0-9]{10}"}),
             'celular':              forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'True'}),
-            'fax':                  forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Fax'}),
+            'fax':                  forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Fax','required': 'False'}),
         }
+        optional = ['telefono', 'fax']
 
 class TituloForm(forms.ModelForm):
     class Meta:
@@ -108,26 +109,27 @@ class PersonaForm(forms.ModelForm):
 
     # Campos de InformacionContactoForm
     correo_electronico = forms.EmailField(
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'})
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'})
     )
     telefono = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'})
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'})
     )
     celular = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Celular'})
     )
     fax = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Fax'})
+        required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Fax'})
     )
 
     class Meta:
         model = Persona
         fields = ['nombre', 'apellidos', 'titulo', 'correo_electronico', 'telefono', 'celular', 'fax']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Nombre del método', 'required': 'True'}),
-            'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ambos apellidos', 'required': 'True'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Nombre del cliente', 'required': 'True'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Ambos apellidos del cliente', 'required': 'True'}),
             'titulo': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona un título', 'required': 'False'}),
         }
+    optional = ['telefono', 'fax', 'titulo']
 
 #   FORMULARIO PARA PROSPECTO
 class ProspectoForm(forms.ModelForm):

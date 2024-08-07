@@ -133,9 +133,9 @@ class Titulo(models.Model):
 class InformacionContacto(models.Model):
     id = models.AutoField(primary_key=True)
     correo_electronico = models.EmailField(null=False, blank=False)
-    telefono = models.CharField(max_length=120, blank=True)  # Agregando blank=True
-    celular = models.CharField(max_length=20, blank=True)  # Agregando blank=True
-    fax = models.CharField(max_length=20, blank=True)  # Agregando blank=True
+    telefono = models.CharField(max_length=120, null=True, blank=True)  # Agregando blank=True
+    celular = models.CharField(max_length=20, null=True, blank=True)  # Agregando blank=True
+    fax = models.CharField(max_length=20,null=True, blank=True)  # Agregando blank=True
     
     def __str__(self):
         return f"{self.correo_electronico} - {self.telefono} / {self.celular}"
@@ -171,7 +171,7 @@ class Cotizacion(models.Model):
         ('USD', 'USD - Dolar Estadunidense')
     ]
     metodo_pago = models.CharField(max_length=100, choices=tipo_moneda)
-    tasa_iva = models.DecimalField(max_digits=4, decimal_places=2, default=0.16)
+    tasa_iva = models.DecimalField(max_digits=4, decimal_places=2, default=0.08)
     notas = models.TextField(blank=True, null=True)
     correos_adicionales = models.TextField(blank=True, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -236,6 +236,7 @@ class Concepto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
+    subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
     
     def __str__(self):
         return f"{self.cotizacion} - {self.cantidad_servicios} - {self.servicio} - {self.precio} - {self.notas}"
@@ -272,7 +273,6 @@ class OrdenTrabajo(models.Model):
 class OrdenTrabajoConcepto(models.Model):
     orden_de_trabajo = models.ForeignKey(OrdenTrabajo, related_name='conceptos', on_delete=models.CASCADE)
     concepto = models.ForeignKey(Concepto, on_delete=models.CASCADE)
-    descripcion_personalizada = models.TextField(null=True, blank=True)
 
 #----------------------------------------------------
 # MODELO PARA MI ORGANIZACIÓN
