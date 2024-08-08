@@ -5,35 +5,155 @@
 {% block header %}Guia Usuarios{% endblock %}
 {% block content %}
 <h1>Gestion de Usuarios</h1>
-<p>1. Para poder crear un usuario, puedes hacerlo de varias maneras...</p>
+
 <div class="container mt-2">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-5 video-container">
-            <video class="w-100" autoplay loop muted playsinline>
-                <source src="{% static 'videos/1.user.modal.mov' %}" type="video/mp4">
-                <source src="{% static 'videos/1.user.modal.mov' %}" type="video/webm">
-                <source src="{% static 'videos/1.user.modal.mov' %}" type="video/ogg">
-                Tu navegador no soporta la etiqueta de video.
-            </video>
-        </div>
-    </div>
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-             <a class="nav-link active" href="#crearUsuario" data-bs-toggle="tab">Cotizaciones</a>
-        </li>
-        <li class="nav-item">
-             <a class="nav-link" href="#eliminarUsuario" data-bs-toggle="tab">Órdenes de Trabajo</a>
-        </li>
-   </ul>
+     <div class="row justify-content-center">
+          <div class="col-md-5 col-lg-5 video-container">
+          </div>
+     </div>
+     <ul class="nav nav-tabs">
+          <li class="nav-item">
+               <a class="nav-link active" href="#crearUsuario" data-bs-toggle="tab">Cotizaciones</a>
+          </li>
+          <li class="nav-item">
+               <a class="nav-link" href="#eliminarUsuario" data-bs-toggle="tab">Eliminar cliente</a>
+          </li>
+          <li class="nav-item">
+               <a class="nav-link" href="#editarUsuario" data-bs-toggle="tab">Editar cliente</a>
+          </li>
+     </ul>
 
-   <div class="tab-content">
-        <div class="tab-pane fade show active" id="crearUsuario">
-             <h2 class="mt-3">Crear Usuario</h2>
-        </div>
+     <div class="tab-content mt-5">
 
-        <div class="tab-pane fade" id="eliminarUsuario">
-             <h2 class="mt-3">Eliminar Usuario</h2>
-        </div>
-   </div>
+          <div class="tab-pane fade show active" id="crearUsuario">
+               <h2 class="mt-3">Crear Usuario</h2>
+               <p>Para poder crear un usuario, puedes hacerlo de varias maneras...</p>
+               <ol>
+                    <!-- Acceder desde Home -->
+                    <li class="mt-2">
+                         <div class="row">
+                              <div class="col">
+                                   Acceder desde Home
+                                   <ol>
+                                        <li>
+                                             En la sección de Home, dirígete al botón Clientes y haz clic.
+                                        </li>
+                                        <li>
+                                             En la sección de Clientes, haz clic en el botón azul en la parte superior derecha
+                                             llamado Añadir Cliente.
+                                        </li>
+                                   </ol>
+                              </div>
+                              <div class="col text-center shadow p-0 m-0">
+                                   <video class="" autoplay loop muted playsinline style="width: 100%;">
+                                        <source src="{% static 'videos/1.user.modal.mov' %}" type="video/mp4">
+                                        <source src="{% static 'videos/1.user.modal.mov' %}" type="video/webm">
+                                        <source src="{% static 'videos/1.user.modal.mov' %}" type="video/ogg">
+                                        Tu navegador no soporta la etiqueta de video.
+                                   </video>
+                              </div>
+                         </div>
+
+                    </li>
+
+                    <!-- Acceder desde Menu -->
+                    <li class="mt-5"> 
+                         <div class="row">
+                              <div class="col">
+                                   Acceder desde Menu
+                                   <ol>
+                                        <li>
+                                             Has click en el icono de menu, se encuentra en la esquina superior derecha.
+                                        </li>
+                                        <li>
+                                             Dirigete a la segunda seccion y has click en Guia de operaciones.
+                                        </li>
+                                        <li>
+                                             En la sección de Clientes, haz clic en el botón azul en la parte superior derecha llamado Añadir Cliente.
+                                        </li>
+                                   </ol>
+                              </div>
+                              <div class="col text-center shadow p-0 m-0">
+                                   <video class="" autoplay loop muted playsinline style="width: 100%;">
+                                        <source src="{% static 'videos/1.user_menu.mov' %}" type="video/mp4">
+                                        <source src="{% static 'videos/1.user_menu.mov' %}" type="video/webm">
+                                        <source src="{% static 'videos/1.user_menu.mov' %}" type="video/ogg">
+                                        Tu navegador no soporta la etiqueta de video.
+                                   </video>
+                              </div>
+                         </div>
+                    </li>
+
+               </ol>
+          </div>
+
+          <div class="tab-pane fade" id="eliminarUsuario">
+               <h2 class="mt-3">Eliminar Usuario</h2>
+               <p>Para poder eliminar usuario, puedes hacerlo de la siguiente manera...</p>
+               <ol>
+                    <!-- Elimina cliente -->
+                    <li class="mt-2">
+                         <div class="row">
+                              <div class="col">
+                                   
+                                   Dirigete a la seccion de clientes
+                                   <ol>
+                                        <li>
+                                             En la sección de Clientes, puedes buacar o elejir algun cliente que se desee aliminar.
+                                        </li>
+                                        <li>
+                                             Has click en el coton aliminar.
+                                        </li>
+                                   </ol>
+                              </div>
+                              <div class="col text-center shadow p-0 m-0">
+                                   <video class="" autoplay loop muted playsinline style="width: 100%;">
+                                        <source src="{% static 'videos/1.user_eliminar.mov' %}" type="video/mp4">
+                                        <source src="{% static 'videos/1.user_eliminar.mov' %}" type="video/webm">
+                                        <source src="{% static 'videos/1.user_eliminar.mov' %}" type="video/ogg">
+                                        Tu navegador no soporta la etiqueta de video.
+                                   </video>
+                              </div>
+                         </div>
+
+                    </li>
+
+               </ol>
+          </div>
+
+          <div class="tab-pane fade" id="editarUsuario">
+               <h2 class="mt-3">Editar Usuario</h2>
+               <p>Para poder editar usuario, puedes hacerlo de la siguiente manera...</p>
+               <ol>
+                    <!-- Elimina cliente -->
+                    <li class="mt-2">
+                         <div class="row">
+                              <div class="col">
+                                   Dirigete a la seccion de clientes
+                                   <ol>
+                                        <li>
+                                             En la sección de Clientes, puedes buacar o elejir algun cliente que se desee modificar.
+                                        </li>
+                                        <li>
+                                             Has click en el coton aliminar.
+                                        </li>
+                                   </ol>
+                              </div>
+                              <div class="col text-center shadow p-0 m-0">
+                                   <video class="" autoplay loop muted playsinline style="width: 100%;">
+                                        <source src="{% static 'videos/1.user_edit.mov' %}" type="video/mp4">
+                                        <source src="{% static 'videos/1.user_edit.mov' %}" type="video/webm">
+                                        <source src="{% static 'videos/1.user_edit.mov' %}" type="video/ogg">
+                                        Tu navegador no soporta la etiqueta de video.
+                                   </video>
+                              </div>
+                         </div>
+
+                    </li>
+
+               </ol>
+          </div>
+
+     </div>
 </div>
 {% endblock %}
