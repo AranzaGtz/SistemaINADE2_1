@@ -51,7 +51,7 @@
                 {% for p in prospectos %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ p.persona.titulo }}</td>
+                    <td>{{ p.persona.titulo.abreviatura }}</td>
                     <td>{{ p.persona.nombre }}</td>
                     <td>{{ p.persona.apellidos }}</td>
                     <td>{{ p.persona.empresa.nombre_empresa }}</td>

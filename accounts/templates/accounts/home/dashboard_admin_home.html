@@ -14,6 +14,7 @@
     .card-icon {
         font-size: 5rem;
     }
+
 </style>
 
 <div class="container mt-4">
@@ -28,7 +29,8 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Clientes</h5>
-                    <p class="card-text">"Registra nuevos clientes fácilmente para mejorar la gestión y el seguimiento de tus interacciones. ¡Empieza ahora!"</p>
+                    <p class="card-text">"Registra nuevos clientes fácilmente para mejorar la gestión y el seguimiento
+                        de tus interacciones. ¡Empieza ahora!"</p>
                 </div>
             </div>
         </a>
@@ -41,7 +43,8 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Servicios</h5>
-                    <p class="card-text">"Explora nuestros servicios de análisis y muestreo ambiental. Precisión y calidad para responder a tus necesidades."</p>
+                    <p class="card-text">"Explora nuestros servicios de análisis y muestreo ambiental. Precisión y
+                        calidad para responder a tus necesidades."</p>
                 </div>
             </div>
         </a>
@@ -54,7 +57,8 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Cotizar</h5>
-                    <p class="card-text">"Inicia el proceso para crear cotizaciones completas: registra datos, selecciona servicios y envía el PDF final por correo. ¡Comienza ahora!"</p>
+                    <p class="card-text">"Inicia el proceso para crear cotizaciones completas: registra datos,
+                        selecciona servicios y envía el PDF final por correo. ¡Comienza ahora!"</p>
                 </div>
             </div>
         </a>
@@ -67,7 +71,8 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Generar Orden de Trabajo</h5>
-                    <p class="card-text">Inicia el proceso para formalizar una orden de trabajo: registra los detalles necesarios, asigna recursos y agenda la ejecución. ¡Optimiza tu flujo de trabajo ahora!</p>
+                    <p class="card-text">Inicia el proceso para formalizar una orden de trabajo: registra los detalles
+                        necesarios, asigna recursos y agenda la ejecución. ¡Optimiza tu flujo de trabajo ahora!</p>
                 </div>
             </div>
         </a>
@@ -80,7 +85,8 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Empresas</h5>
-                    <p class="card-text">"Consulta la información de las empresas que han sido parte de nuestros procesos y gestiona la información"</p>
+                    <p class="card-text">"Consulta la información de las empresas que han sido parte de nuestros
+                        procesos y gestiona la información"</p>
                 </div>
             </div>
         </a>
@@ -119,10 +125,63 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Formatos</h5>
-                    <p class="card-text">"Consulta los formatos que maneja la organización para generar las cotizaciones y órdenes de trabajo."</p>
+                    <p class="card-text">"Consulta los formatos que maneja la organización para generar las cotizaciones
+                        y órdenes de trabajo."</p>
                 </div>
             </div>
         </a>
     </div>
+    <div class="container mt-4 mb-4">
+        <h4 class="mb-4">Cotizaciones</h4>
+    
+        <div class="progress mb-3" style="height: 30px;">
+            <div class="progress-bar progress-bar-striped bg-success" 
+                 role="progressbar" 
+                 style="width: 0%;" 
+                 id="progressBar">
+                0%
+            </div>
+        </div>
+    
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total de Cotizaciones:
+                        <span class="badge bg-primary rounded-pill">{{ total_cotizaciones }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Cotizaciones Aceptadas:
+                        <span class="badge bg-success rounded-pill">{{ cotizaciones_aceptadas }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Obtener los datos desde el contexto de Django
+        const totalCotizaciones = parseInt("{{ total_cotizaciones }}", 10) || 0;
+        const cotizacionesAceptadas = parseInt("{{ cotizaciones_aceptadas }}", 10) || 0;
+        
+        // Calcular el porcentaje de cotizaciones aceptadas
+        const porcentajeAceptadas = totalCotizaciones > 0 ? (cotizacionesAceptadas / totalCotizaciones) * 100 : 0;
+        
+        // Actualizar la barra de progreso
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = `${porcentajeAceptadas}%`;
+        progressBar.textContent = `${porcentajeAceptadas.toFixed(2)}%`;
+        
+        // Añadir una clase para animar la barra de progreso si es mayor que cero
+        if (porcentajeAceptadas > 0) {
+            progressBar.classList.add('progress-bar-animated');
+        } else {
+            progressBar.classList.remove('progress-bar-animated');
+        }
+    });
+    
+</script>
 {% endblock %}
