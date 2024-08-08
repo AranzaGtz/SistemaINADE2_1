@@ -13,7 +13,6 @@ urlpatterns = [
     path('', views_autenticacion.dashboard, name='dashboard'),
     path('login/', views_autenticacion.login_view, name='login'),
     path('logout/', views_autenticacion.logout_view, name='logout'),
-    path('mostrar_CustomUser/', views_autenticacion.mostrar_CustomUser,name='mostrar_CustomUser'),
 
     #   ---     RECUPERACIÓN DE CONTRASEÑA       ---
 
@@ -43,12 +42,10 @@ urlpatterns = [
     path('agregar-titulo/', views_clientes.agregar_titulo, name='agregar_titulo'),
     path('cerrar-ventana/', views_clientes.cerrar_ventana, name='cerrar_ventana'),
     path('obtener-titulos/', views_clientes.obtener_titulos, name='obtener_titulos'),
-
     path('clientes/', views_clientes.lista_clientes, name='lista_clientes'),
     path('clientes/nuevo/', views_clientes.cliente_create, name='cliente_create'),
     path('clientes/editar/<int:pk>/', views_clientes.cliente_edit, name='cliente_edit'),
     path('clientes/eliminar/<int:pk>/', views_clientes.cliente_delete, name='cliente_delete'),
-
 
     #   ---     INTERFAZ PROSPECTOS       ---
 
@@ -79,26 +76,21 @@ urlpatterns = [
     path('servicios/delete/<int:pk>/', views_servicios.servicio_delete, name='servicio_delete'),
 
     #   ---     INTERFAZ COTIZACIONES       ---
-    path('agregar-servicio/', views_cotizaciones.agregar_servicio, name='agregar_servicio'),
     
+    path('agregar-servicio/', views_cotizaciones.agregar_servicio, name='agregar_servicio'),
     path('cotizaciones/', views_cotizaciones.cotizaciones_list, name='cotizaciones_list'),
     path('obtener_datos_cliente/<int:cliente_id>/', views_cotizaciones.obtener_datos_cliente, name='obtener_datos_cliente'),
     path('obtener_datos_servicio/<int:servicio_id>/', views_cotizaciones.obtener_datos_servicio, name='obtener_datos_servicio'),
     path('cotizaciones/nueva/<int:persona_id>', views_cotizaciones.cotizacion_form, name='cotizacion_form'),
     path('persona/<int:persona_id>/cotizacion/<int:cotizacion_id>/', views_cotizaciones.cotizacion_form, name='edit_cotizacion'),
-    path('cotizaciones/cliente/nueva', views_cotizaciones.cotizaciones_prospecto_create, name='cotizaciones_prospecto_create'),
-    path('cotizaciones/editar/<int:pk>/', views_cotizaciones.cotizacion_edit, name='cotizacion_edit'),
     path('cotizaciones/<pk>/detalle', views_cotizaciones.cotizacion_detalle, name='cotizacion_detalle'),
     path('cotizaciones/<int:pk>/delete/', views_cotizaciones.cotizacion_delete, name='cotizacion_delete'),
-
     path('cotizacion/<int:pk>/pdf/', views_cotizaciones.cotizacion_pdf, name='cotizacion_pdf'),
-    # esta vista de abajo aun no es funcional
-    # path('cotizacion/<int:pk>/ver_orden_pedido/', views_cotizaciones.ver_orden_pedido, name='ver_orden_pedido'),
-    # ESTA SIENDO DUP`LICADA PORQUE SE UNA EN LA CREACION DE COTIZACIÓN LA DE ARRIBA SE USA SOLO PARA VER
-    path('cotizaciones/<int:pk>/duplicar/', views_cotizaciones.cotizacion_duplicar, name='cotizacion_duplicar'),
     path('cotizacion/pdf', views_cotizaciones.generar_pdf_cotizacion, name='generar_pdf_cotizacion'),
     path('cotizacion/<int:pk>/actualizar_estado/', views_cotizaciones.actualizar_estado, name='actualizar_estado'),
     
+    #   ---     INTERFAZ COTIZACIONES ACEPTADAS      ---
+        
     path('agregar-receptor/', views_cotizaciones_aceptadas.agregar_receptor, name='agregar_receptor'),
     path('cotizaciones_aceptadas/', views_cotizaciones_aceptadas.cotizaciones_aceptadas_list,name='cotizaciones_aceptadas_list'),
     path('cotizaciones_aceptadas/generar_orden_trabajo/<pk>', views_cotizaciones_aceptadas.generar_orden_trabajo , name='generar_orden_trabajo'),

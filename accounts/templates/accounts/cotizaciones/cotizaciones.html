@@ -42,7 +42,7 @@
                     <tr>
                         <th><a href="?order_by=id_personalizado" class="link-secondary">Cotización</a></th>
                         <th><a href="?order_by=persona__empresa__nombre_empresa" class="link-secondary">Empresa</a></th>
-                        <th colspan="2">Contacto</th>
+                        <th colspan="3">Contacto</th>
                         <th><a href="?order_by=fecha_solicitud" class="link-secondary">Solicitud</a></th>
                         <th><a href="?order_by=fecha_caducidad" class="link-secondary">Expiración</a></th>
                         <th><a href="?order_by=metodo_pago" class="link-secondary">Moneda</a></th>
@@ -56,6 +56,7 @@
                     <tr>
                         <td><a href="{% url 'cotizacion_detalle' c.id %}" class="link-success">{{ c.id_personalizado }}</a></td>
                         <td>{{ c.persona.empresa.nombre_empresa }}</td>
+                        <td>{{ c.persona.titulo.abreviatura }} </td>
                         <td>{{ c.persona.nombre }} </td>
                         <td>{{ c.persona.apellidos }}</td>
                         <td>{{ c.fecha_solicitud|date:"d/m/Y" }}</td>
