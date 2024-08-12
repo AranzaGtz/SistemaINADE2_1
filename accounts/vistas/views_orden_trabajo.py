@@ -52,10 +52,14 @@ def detalle_orden_trabajo(request, id_personalizado):
      
 #    VISTA PARA VER ARCHIVO PDF ORDEN DE TRABAJO
 def orden_trabajo_pdf(request, id_personalizado):
-     orden_trabajo = get_object_or_404(OrdenTrabajo, id_personalizado = id_personalizado)
-     # Verificar si el archivo PDF existe
-     if OrdenTrabajo.orden_trabajo_pdf:
-          # Retornar el archivo PDF guardado
-          return FileResponse(orden_trabajo.orden_trabajo_pdf.open(), content_type='application/pdf')
-     else:
-          raise Http404("El archivo PDF no se encuentra.")
+     try:
+          orden_trabajo = get_object_or_404(OrdenTrabajo, id_personalizado = id_personalizado)
+          # Verificar si el archivo PDF existe
+          if OrdenTrabajo.orden_trabajo_pdf:
+               # Retornar el archivo PDF guardado
+               return FileResponse(orden_trabajo.orden_trabajo_pdf.open(), content_type='application/pdf')
+          else:
+               raise Http404("El archivo PDF no se encuentra.")
+     except FileNotFoundError:
+          raise Http404("El archivo PDF no se encuentra disponible.")
+     
