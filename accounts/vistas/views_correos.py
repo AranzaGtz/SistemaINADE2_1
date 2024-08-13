@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.mail import EmailMessage
-from accounts.models import Cotizacion, Notificacion, CustomUser, Persona
+from accounts.models import Cotizacion, Notificacion, CustomUser, OrdenTrabajo, Persona
 from accounts.forms import OrdenPedidoForm
 from django.contrib import messages
 from django.urls import reverse
@@ -135,3 +135,41 @@ def formulario_descarga_subida(request, pk, usuario):
     else:
         form = OrdenPedidoForm()
     return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})    
+
+#   VISTA PARA  ENVIAR CORREO A MUESTREADOR
+def enviar_orden(request, pk, receptor):
+    orden = get_object_or_404(OrdenTrabajo, id_personalizado=pk)
+    
+    # Prepara el asunto del mensaje del correo electrónico
+    subject = f'Orden de Trabajo {orden.id_personalizado}'
+    message = f'''
+    Estimado trabajador,
+    
+    Adjunto a este correo encontrará la orden de trabajo asignada a usted con el ID {orden.id_personalizado}.
+    Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nosotros a través de este correo.
+    Agradecemos su atención y esperamos poder colaborar con usted.
+    
+    Atentamente,
+    El equipo de INADE Servicios Ambientales
+    
+    ___
+    Este es un correo generado automáticamente, por favor no responda a este mensaje.
+    '''
+    
+    # Crea el objeto EmailMessage, adjunta el PDF y envía el correo a los destinatarios proporcionados
+    email = EmailMessage(
+        subject, message, 'proyectos.inade@icloud.com', [receptor]
+    )
+    
+    # Adjuntar el PDF guardado en la base de datos
+    if orden.orden_trabajo_pdf:
+        email.attach_file(orden.orden_trabajo_pdf.path)
+    
+    # Enviar el correo electrónico
+    email.send()
+    
+    # Mostrar mensaje de éxito
+    messages.success(request, 'Orden de Trabajo enviada por correo.')
+    
+    # Redirigir al usuario a la página de detalles de órdenes de trabajo
+    return redirect('detalle_orden_trabajo', orden.id_personalizado)

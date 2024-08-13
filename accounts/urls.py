@@ -101,6 +101,7 @@ urlpatterns = [
     path('ordenes_de_trabajo/', views_orden_trabajo.ordenes_list, name='ordenes_list'),
     path('orden_trabajo/<id_personalizado>/', views_orden_trabajo.detalle_orden_trabajo, name='detalle_orden_trabajo'),
     path('orden_trabajo/<id_personalizado>/pdf', views_orden_trabajo.orden_trabajo_pdf, name= 'orden_trabajo_pdf'),
+
     
 
     #   ---     ENVIOS DE CORREOS       ---
@@ -109,6 +110,7 @@ urlpatterns = [
     path('cotizacion/<int:pk>/confirmar_recepcion/', views_correos.confirmar_recepcion, name='confirmar_recepcion'),
     path('cotizacion/terminada', views_correos.confirmacion_recepcion, name='confirmacion_recepcion'),
     path('formulario_descarga_subida/<int:pk>/<usuario>/', views_correos.formulario_descarga_subida, name='formulario_descarga_subida'),
+    path('orden_trabajo/envio/<pk>/<receptor>/', views_correos.enviar_orden, name = 'enviar_orden'),
     
     #   ---     ORGANIZACION       ---
 
