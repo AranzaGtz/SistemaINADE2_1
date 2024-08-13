@@ -1,6 +1,6 @@
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, render
-from accounts.models import OrdenTrabajo, OrdenTrabajoConcepto
+from accounts.models import CustomUser, OrdenTrabajo, OrdenTrabajoConcepto
 from django.core.paginator import Paginator
 
 
@@ -41,7 +41,7 @@ def detalle_orden_trabajo(request, id_personalizado):
     
      orden_trabajo = get_object_or_404(OrdenTrabajo, id_personalizado = id_personalizado)
      conceptos = OrdenTrabajoConcepto.objects.filter(orden_de_trabajo=orden_trabajo.id_personalizado)
-     
+
      context = {
           'notificaciones': notificaciones,
           'notificaciones_no_leidas': notificaciones_no_leidas,

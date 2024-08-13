@@ -39,6 +39,7 @@
             <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion.id %}">Ir a cotización</a></li>
             <li><a class="dropdown-item" href="#">Actualizar estado</a></li>
             <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" target="_blank">Ver PDF</a></li>
+            <li><a href="{% url 'enviar_orden' orden_trabajo.id_personalizado orden_trabajo.receptor.email %}" class="dropdown-item">Enviar Orden de Trabajo</a></li>
         </ul>
     </div>
 
