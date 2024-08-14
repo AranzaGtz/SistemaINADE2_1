@@ -253,7 +253,40 @@ def cotizacion_edit(request, pk):
     }
     return render(request, 'accounts/cotizaciones/cotizaciones_editar.html', context)
 
+# Vista para duplicar una cotización
+def cotizacion_duplicar(request, pk):
+    cotizacion_original = get_object_or_404(Cotizacion, id=pk)
+    
+    # Crear una nueva instancia de Cotizacion con los mismos datos que la original
+    cotizacion_nueva = Cotizacion.objects.create(
+        persona=cotizacion_original.persona,
+        fecha_solicitud=cotizacion_original.fecha_solicitud,
+        fecha_caducidad=cotizacion_original.fecha_caducidad,
+        metodo_pago=cotizacion_original.metodo_pago,
+        tasa_iva=cotizacion_original.tasa_iva,
+        notas=cotizacion_original.notas,
+        correos_adicionales=cotizacion_original.correos_adicionales,
+        subtotal=cotizacion_original.subtotal,
+        iva=cotizacion_original.iva,
+        total=cotizacion_original.total,
+        estado=False  # Estado inicial como "No Aceptado"
+    )
+    cotizacion_nueva.id_personalizado = cotizacion_nueva.generate_new_id_personalizado()
+    cotizacion_nueva.save()
 
+    # Duplicar los conceptos asociados
+    conceptos_originales = Concepto.objects.filter(cotizacion=cotizacion_original)
+    for concepto in conceptos_originales:
+        Concepto.objects.create(
+            cotizacion=cotizacion_nueva,
+            servicio=concepto.servicio,
+            cantidad_servicios=concepto.cantidad_servicios,
+            precio=concepto.precio,
+            notas=concepto.notas
+        )
+
+    messages.success(request, 'Cotización duplicada con éxito.')
+    return redirect('cotizacion_detalle', pk=cotizacion_nueva.id)
 
 # VISTA PARA VER ARCHIVO PDF COTIZACION
 def cotizacion_pdf(request, pk):
