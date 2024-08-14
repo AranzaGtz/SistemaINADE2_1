@@ -9,17 +9,14 @@
 <style>
     .border-custom {
         border: 1px solid lightgrey;
-        /* Borde gris por defecto */
     }
 
     .border-custom-left {
         border-left: 5px solid dodgerblue;
-        /* Borde izquierdo color bg-info */
     }
 </style>
 <script type="text/javascript">
-    // Asegúrate de que los datos de servicios se cargan en una variable de JavaScript
-    var servicios = {{ servicios_json| safe }};
+    var servicios = {{ servicios_json | safe }};
 </script>
 
 <h1 class="text-center">Registro de cotización</h1>
@@ -29,14 +26,11 @@
     {% csrf_token %}
 
     <div class="form-group mt-4">
-        <!-- Alerta aviso de registro -->
         <div class="alert alert-primary mb-4">
             <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
-            Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de
-            correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
+            Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
         </div>
 
-        <!-- Alerta para mostrar la información del cliente elegido en select -->
         <div class="container mt-3">
             <div class="row justify-content-center">
                 <div class="col-md-8">
@@ -60,7 +54,6 @@
             </div>
         </div>
 
-        <!-- Fechas -->
         <div class="row">
             <div class="col-md-6 mt-2">
                 <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
@@ -72,25 +65,24 @@
             </div>
         </div>
 
-        <!-- Nota para fechas -->
         <div class="mt-2 text-end">
-            <span class="text-primary">Por favor, ingresa las fechas en el formato correcto (por ejemplo:
-                2024-07-28).</span>
+            <span class="text-primary">Por favor, ingresa las fechas en el formato correcto (por ejemplo: 2024-07-28).</span>
         </div>
 
-        <!-- Denominación e IVA -->
         <div class="row">
             <div class="col-md-6 mt-2">
                 <label for="{{ cotizacion_form.metodo_pago.id_for_label }}">Denominación</label>
-                {{ cotizacion_form.metodo_pago}}
+                {{ cotizacion_form.metodo_pago }}
             </div>
             <div class="col-md-6 mt-2">
-                <label for="{{ cotizacion_form.tasa_iva.id_for_label }}">Tasa del IVA actual</label>
-                {{ cotizacion_form.tasa_iva }}
+                <label for="tasa_iva">Tasa del IVA actual</label>
+                <select name="tasa_iva" id="tasa_iva" class="form-select">
+                    <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%</option>
+                    <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%</option>
+                </select>
             </div>
         </div>
 
-        <!-- Registro de nota -->
         <div class="row mt-2">
             <div class="col-12">
                 <label for="{{ cotizacion_form.notas.id_for_label }}">Notas</label>
@@ -98,7 +90,6 @@
             </div>
         </div>
 
-        <!-- Registro de correos adicionales -->
         <div class="row mt-2">
             <div class="col-12">
                 <label for="{{ cotizacion_form.correos_adicionales.id_for_label }}">Correos Adicionales</label>
@@ -108,19 +99,13 @@
 
         <br>
 
-        <!-- Conceptos -->
         <h4>Agregar Conceptos</h4>
         <div class="mt-2 text-end">
-            <span class="text-primary">Por favor, ingresa los conceptos necesarios ingresando la información solicitada.
-                <br>
-                Si has creado un concepto que no deseas, marca la casilla de eliminar para no tomar en cuenta ese
-                concepto.</span>
+            <span class="text-primary">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deseas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
         </div>
 
-        <!-- Formset administrador de conceptos -->
         {{ concepto_formset.management_form }}
 
-        <!-- Formset de conceptos -->
         <div id="concepto_formset">
             {% for form in concepto_formset %}
             <div class="concepto-form border-custom border-custom-left p-3 bg-light mt-5">
@@ -134,8 +119,8 @@
                     </div>
                     <div class="col col-1">
                         <div>
-                            <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" clas="text-end">
-                                <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" clas="text-end" style="filter: invert(1);" >
+                            <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" class="text-end">
+                                <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" class="text-end" style="filter: invert(1);" >
                             </a>
                         </div>
                     </div>
@@ -165,27 +150,23 @@
             {% endfor %}
         </div>
 
-        <!-- Sección de botones del formulario concepto -->
         <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir Concepto</button>
 
-        <!-- Sección para mostrar totales -->
         <div id="totales-section" class="mt-4">
             <h4>Totales:</h4>
             <div id="subtotal">Subtotal: {{ cotizacion.subtotal }}</div>
             <div id="iva">IVA: {{ cotizacion.iva }}</div>
             <div id="total">Total: {{ cotizacion.total }}</div>
+            <div id="moneda">Moneda: MXN</div>
         </div>
     </div>
 
-    <!-- Sección de botones del formulario cotizaciones -->
     <div class="form-group text-right mt-4">
-        <input type="submit" class="btn btn-success"
-            value="{% if cotizacion %}Actualizar Cotización{% else %}Crear Cotización{% endif %}" />
+        <input type="submit" class="btn btn-success" value="{% if cotizacion %}Actualizar Cotización{% else %}Crear Cotización{% endif %}" />
         <a href="{% url 'cotizaciones_list' %}" class="btn btn-secondary">Cancelar</a>
     </div>
 </form>
 
-<!-- Plantilla para nuevos conceptos -->
 <div id="empty_form" style="display: none;">
     <div class="concepto-form border-custom border-custom-left p-3 bg-light mt-5">
         <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
@@ -198,8 +179,8 @@
             </div>
             <div class="col col-1">
                 <div>
-                    <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" clas="text-end">
-                        <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" clas="text-end" style="filter: invert(1);" >
+                    <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" class="text-end">
+                        <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" class="text-end" style="filter: invert(1);" >
                     </a>
                 </div>
             </div>
@@ -209,8 +190,7 @@
             <p id="servicio-datos-__prefix__" class="alert-primary mt-2"></p>
         </div>
         <div class="mt-2">
-            <label for="{{ concepto_formset.empty_form.cantidad_servicios.id_for_label }}">Cantidad de
-                servicios:</label>
+            <label for="{{ concepto_formset.empty_form.cantidad_servicios.id_for_label }}">Cantidad de servicios:</label>
             {{concepto_formset.empty_form.cantidad_servicios}}
         </div>
         <div class="mt-2">
@@ -232,7 +212,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Función para agregar eventos y Select2 a los selects de servicios
         function initializeSelect2AndEvents() {
             $('#concepto_formset .concepto-form').each(function (index, form) {
                 var servicioSelect = $(form).find('select[name$="servicio"]');
@@ -247,26 +226,23 @@
                     });
                 }
 
-                // Remueve cualquier manejador de evento anterior para evitar duplicados
                 servicioSelect.off('change').on('change', function () {
                     obtenerDatosServicio($(this).val(), $('#' + servicioDatosId));
                 });
             });
         }
 
-        // Evento para añadir un nuevo formulario de concepto
         $('#add-concepto-form').click(function () {
             var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
             var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
             formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
 
             $('#concepto_formset').append(formTemplate);
-            initializeSelect2AndEvents(); // Re-inicializa Select2 y eventos para el nuevo formulario
+            initializeSelect2AndEvents();
 
             $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
         });
 
-        // Función para obtener y mostrar datos del servicio seleccionado
         function obtenerDatosServicio(servicioId, outputElement) {
             if (servicioId) {
                 fetch(`/obtener_datos_servicio/${servicioId}/`)
@@ -281,7 +257,7 @@
                                     <strong>Precio sugerido:</strong> ${data.precio}<br>
                                 </div>
                                 <div class="col col-1">
-                                    <div><a href="#" class="btn" clas="text-end"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a></div>
+                                    <div><a href="#" class="btn" class="text-end"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a></div>
                                 </div>
                             </div>`);
                     }).catch(error => {
@@ -293,76 +269,61 @@
             }
         }
 
-        // Inicializa los selects y eventos cuando el documento está listo
         initializeSelect2AndEvents();
     });
 
-    // Espera a que todo el contenido del DOM esté completamente cargado antes de ejecutar la función
     document.addEventListener("DOMContentLoaded", function () {
-        // Función para actualizar los totales de la cotización
         function actualizarTotales() {
-            // Inicializa el subtotal a cero
             let subtotal = 0;
-            // Selecciona todos los formularios de conceptos en la página
             const forms = document.querySelectorAll(".concepto-form");
-            // Encuentra el elemento de entrada para la tasa de IVA
-            const tasaIvaElement = document.querySelector("input[name='tasa_iva']");
-            // Obtiene el valor de la tasa de IVA del elemento de entrada, convertido a flotante
+            const tasaIvaElement = document.querySelector("select[name='tasa_iva']");
             const tasaIva = parseFloat(tasaIvaElement.value) || 0;
+            const metodoPagoElement = document.querySelector("select[name='metodo_pago']");
+            const metodoPago = metodoPagoElement.value;
+            const tipoCambio = 18;  // Ejemplo de tipo de cambio USD a MXN
 
-            // Itera sobre cada formulario de concepto para calcular el subtotal
             forms.forEach(form => {
-                // Encuentra el elemento de entrada para el precio dentro del formulario actual
                 const precioElement = form.querySelector("input[name$='-precio']");
-                // Encuentra el elemento de entrada para la cantidad dentro del formulario actual
                 const cantidadElement = form.querySelector("input[name$='-cantidad_servicios']");
-                // Verifica que ambos elementos de entrada existan
                 if (precioElement && cantidadElement) {
-                    // Obtiene el valor del precio, convertido a flotante
-                    const precio = parseFloat(precioElement.value) || 0;
-                    // Obtiene el valor de la cantidad, convertido a entero
+                    let precio = parseFloat(precioElement.value) || 0;
                     const cantidad = parseInt(cantidadElement.value) || 0;
-                    // Calcula el total para el concepto actual y lo suma al subtotal
+
+                    if (metodoPago === 'USD') {
+                        precio *= tipoCambio;
+                    }
+
                     subtotal += precio * cantidad;
                 }
             });
 
-            // Calcula el IVA usando el subtotal y la tasa de IVA
             const iva = subtotal * tasaIva;
-            // Calcula el total sumando el subtotal y el IVA
             const total = subtotal + iva;
 
-            // Actualiza el contenido de texto de los elementos con ID "subtotal", "iva" y "total" para mostrar los nuevos totales
-            document.getElementById("subtotal").textContent = `Subtotal: ${subtotal.toFixed(2)}`;
-            document.getElementById("iva").textContent = `IVA: ${iva.toFixed(2)}`;
-            document.getElementById("total").textContent = `Total: ${total.toFixed(2)}`;
+            document.getElementById("subtotal").textContent = `Subtotal: ${subtotal.toFixed(2)} MXN`;
+            document.getElementById("iva").textContent = `IVA: ${iva.toFixed(2)} MXN`;
+            document.getElementById("total").textContent = `Total: ${total.toFixed(2)} MXN`;
         }
 
-        // Añade un evento 'input' al conjunto de formularios de concepto
-        // Escucha por cambios en cualquier entrada relacionada con precios, cantidades o la tasa de IVA
         document.getElementById("concepto_formset").addEventListener("input", function (event) {
             if (event.target.name.includes("precio") || event.target.name.includes("cantidad_servicios") || event.target.name === "tasa_iva") {
-                // Llama a actualizarTotales cuando se detecta un cambio relevante
                 actualizarTotales();
             }
         });
 
-        // Añade un evento 'input' específicamente al elemento de entrada de la tasa de IVA
-        // Asegura que cualquier cambio en la tasa de IVA también actualice los totales
-        document.querySelector("input[name='tasa_iva']").addEventListener("input", actualizarTotales);
+        document.querySelector("select[name='tasa_iva']").addEventListener("input", actualizarTotales);
+        document.querySelector("select[name='metodo_pago']").addEventListener("change", actualizarTotales);
 
-        // Llama a actualizarTotales al cargar la página para asegurar que los totales iniciales sean correctos
         actualizarTotales();
     });
 
-
     document.addEventListener("DOMContentLoaded", function () {
-        const fechaSolicitudInput = document.getElementById("id_fecha_solicitud");  // Reemplaza "id_fecha_solicitud" con el ID correcto
-        const fechaCaducidadInput = document.getElementById("id_fecha_caducidad");  // Reemplaza "id_fecha_caducidad" con el ID correcto
+        const fechaSolicitudInput = document.getElementById("id_fecha_solicitud");
+        const fechaCaducidadInput = document.getElementById("id_fecha_caducidad");
 
         fechaSolicitudInput.addEventListener("change", function () {
             const fechaSolicitud = new Date(fechaSolicitudInput.value);
-            if (!isNaN(fechaSolicitud.getTime())) {  // Verifica si la fecha es válida
+            if (!isNaN(fechaSolicitud.getTime())) {
                 const fechaCaducidad = new Date(fechaSolicitud);
                 fechaCaducidad.setDate(fechaSolicitud.getDate() + 32);
                 const year = fechaCaducidad.getFullYear();
@@ -379,12 +340,13 @@
         const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
         window.open(url, 'Agregar Servicio', options);
     }
+
     function actualizarSelectServicio(nuevoServicio) {
         const selects = document.querySelectorAll('select[name$="servicio"]');
         selects.forEach(select => {
             const option = new Option(nuevoServicio.nombre, nuevoServicio.id);
             select.add(option);
-            select.value = nuevoServicio.id;  // Selecciona el nuevo servicio agregado
+            select.value = nuevoServicio.id;
         });
     }
 </script>
