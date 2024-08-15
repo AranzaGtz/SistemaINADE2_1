@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
@@ -162,16 +163,22 @@ class Prospecto(models.Model):
 #----------------------------------------------------
 
 # MODELO DE COTIZACION
+TIPO_DE_CAMBIO = Decimal('18.0')
+
 class Cotizacion(models.Model):
     id_personalizado = models.CharField(max_length=4, unique=True, null=True, blank=True)
-    fecha_solicitud = models.DateField()
-    fecha_caducidad = models.DateField()
+    fecha_solicitud = models.DateField(null=True, blank=True)
+    fecha_caducidad = models.DateField(null=True, blank=True)
     tipo_moneda = [
         ('MXN', 'MXN - Moneda Nacional Mexicana'),
         ('USD', 'USD - Dolar Estadunidense')
     ]
     metodo_pago = models.CharField(max_length=100, choices=tipo_moneda)
-    tasa_iva = models.DecimalField(max_digits=4, decimal_places=2, default=0.08)
+    opciones_iva = [
+        ('0.08', '8%'),
+        ('0.16', '16%')
+    ]
+    tasa_iva = models.CharField(max_length=4, choices=opciones_iva, default='0.08')
     notas = models.TextField(blank=True, null=True)
     correos_adicionales = models.TextField(blank=True, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -180,21 +187,35 @@ class Cotizacion(models.Model):
     # CLIENTE
     persona = models.ForeignKey(Persona, on_delete=models.PROTECT, blank=True, null=True)
     estado = models.BooleanField(default=False)  # False para "No Aceptado", True para "Aceptado"
-    cotizacion_pdf = models.FileField(upload_to='cotizaciones_pdfs/',null=True,blank=True)
+    cotizacion_pdf = models.FileField(upload_to='cotizaciones_pdfs/', null=True, blank=True)
     orden_pedido_pdf = models.FileField(upload_to='ordenes_pedido_pdfs/', null=True, blank=True)
-    
+
     def calculate_subtotal(self):
-        return sum(concepto.cantidad_servicios * concepto.precio for concepto in self.conceptos.all())
+        factor = Decimal('1.0') if self.metodo_pago == 'MXN' else TIPO_DE_CAMBIO
+        return sum(Decimal(concepto.cantidad_servicios) * Decimal(concepto.precio) * factor for concepto in self.conceptos.all())
 
     def calculate_iva(self):
-        return self.subtotal * self.tasa_iva
+        # Convert tasa_iva to Decimal before multiplying
+        tasa_iva_decimal = Decimal(self.tasa_iva)
+        return self.subtotal * tasa_iva_decimal
 
     def calculate_total(self):
         return self.subtotal + self.iva
-    
+
     def save(self, *args, **kwargs):
         if not self.id_personalizado:
             self.id_personalizado = self.generate_new_id_personalizado()
+        if not self.fecha_solicitud:
+            self.fecha_solicitud = timezone.now()
+        if not self.fecha_caducidad:
+            self.fecha_caducidad = self.fecha_solicitud + timezone.timedelta(days=1)
+        # Save the instance first to get the primary key
+        super(Cotizacion, self).save(*args, **kwargs)
+        # Now that the instance has a primary key, calculate the derived values
+        self.subtotal = self.calculate_subtotal()
+        self.iva = self.calculate_iva()
+        self.total = self.calculate_total()
+        # Save again to update the calculated values
         super(Cotizacion, self).save(*args, **kwargs)
 
     def generate_new_id_personalizado(self):
@@ -204,7 +225,7 @@ class Cotizacion(models.Model):
         last_id = last_cotizacion.id_personalizado
         new_id = int(last_id) + 1
         return str(new_id).zfill(4)
-   
+
     def __str__(self):
         return self.id_personalizado
     
@@ -226,6 +247,11 @@ class Servicio(models.Model):
     descripcion = models.TextField()#MUESTRA UNA DESCRIPCION DEL SERVICIO
     subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
     acreditado = models.BooleanField(default=True) # False para "No acreditado", Ture para "Acreditado"
+
+    def save(self, *args, **kwargs):
+        if self.precio_sugerido <= 0:
+            self.precio_sugerido = 1
+        super(Servicio, self).save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.nombre_servicio} / {self.metodo}"
@@ -237,7 +263,15 @@ class Concepto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
+    subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
     
+    def save(self, *args, **kwargs):
+        if self.precio <= 0:
+            self.precio = self.servicio.precio_sugerido
+        if self.cantidad_servicios <= 0:
+            self.cantidad_servicios = 1
+        super(Concepto, self).save(*args, **kwargs)
+        
     def __str__(self):
         return f"{self.cotizacion} - {self.cantidad_servicios} - {self.servicio} - {self.precio} - {self.notas}"
 

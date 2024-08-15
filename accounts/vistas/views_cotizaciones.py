@@ -1,7 +1,8 @@
 from datetime import datetime
+from decimal import Decimal
 import json
 from django.db import IntegrityError
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, inlineformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import  get_unica_organizacion
 from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
@@ -136,9 +137,8 @@ def cotizacion_form(request,persona_id, cotizacion_id=None):
                             concepto.save()
 
                         cotizacion.subtotal = sum(
-                            [c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all()])
-                        cotizacion.iva = cotizacion.subtotal * \
-                            (cotizacion.tasa_iva )
+                        c.cantidad_servicios * c.precio for c in cotizacion.conceptos.all())
+                        cotizacion.iva = cotizacion.subtotal * Decimal(cotizacion.tasa_iva)
                         cotizacion.total = cotizacion.subtotal + cotizacion.iva
                         cotizacion.save()
                         # Generar PDF y guardar en el modelo
@@ -212,48 +212,92 @@ def cotizacion_delete(request, pk):
 # Vista para editar cotización
 def cotizacion_edit(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
+    ConceptoFormSet = inlineformset_factory(Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
+    servicios = list(Servicio.objects.all().values('id', 'nombre_servicio'))  # Asegúrate de ajustar los campos según tu modelo
+    servicios_json = json.dumps(servicios)  # Convertir la lista de diccionarios a JSON
 
     if request.method == 'POST':
         cotizacion_form = CotizacionChangeForm(request.POST, instance=cotizacion)
         concepto_formset = ConceptoFormSet(request.POST, instance=cotizacion)
 
         if cotizacion_form.is_valid() and concepto_formset.is_valid():
-            # Guardar la instancia de cotización y los conceptos asociados
-            cotizacion = cotizacion_form.save()
-            concepto_formset.save()
+            try:
+                with transaction.atomic():
+                    cotizacion = cotizacion_form.save(commit=False)
+                    cotizacion.save()
 
-            # Recalcular subtotal, iva y total de todos los conceptos relacionados con esta cotización
-            with transaction.atomic():
-                conceptos = cotizacion.conceptos.all()
-                subtotal = sum([concepto.cantidad_servicios * concepto.precio for concepto in conceptos])
-                iva = subtotal * (cotizacion.tasa_iva / 100)
-                total = subtotal + iva
+                    concepto_formset.save()
 
-                # Actualizar los valores en la instancia de cotización
-                cotizacion.subtotal = subtotal
-                cotizacion.iva = iva
-                cotizacion.total = total
-                cotizacion.save()
+                    # Recalcular subtotal, iva y total de todos los conceptos relacionados con esta cotización
+                    conceptos = cotizacion.conceptos.all()
+                    subtotal = sum([concepto.cantidad_servicios * concepto.precio for concepto in conceptos])
+                    tasa_iva_decimal = Decimal(cotizacion.tasa_iva)
+                    iva = subtotal * tasa_iva_decimal
+                    total = subtotal + iva
 
-            messages.info(request, 'Cotización editada exitosamente.')
-            return redirect('cotizacion_detalle', pk=cotizacion.id)
+                    # Actualizar los valores en la instancia de cotización
+                    cotizacion.subtotal = subtotal
+                    cotizacion.iva = iva
+                    cotizacion.total = total
+                    cotizacion.save()
+
+                    messages.info(request, 'Cotización editada exitosamente.')
+                    return redirect('cotizacion_detalle', pk=cotizacion.id)
+            except IntegrityError:
+                messages.error(request, 'Hubo un error al editar la cotización. Inténtalo de nuevo.')
+        else:
+            messages.error(request, 'Hubo un error en el formulario. Por favor, revisa los campos e intenta nuevamente.')
     else:
         cotizacion_form = CotizacionChangeForm(instance=cotizacion)
         concepto_formset = ConceptoFormSet(instance=cotizacion)
-        
+
     context = {
         'cotizacion_form': cotizacion_form,
         'concepto_formset': concepto_formset,
         'cotizacion': cotizacion,
-        'persona': cotizacion.persona.nombre,
-        'empresa': cotizacion.persona.empresa.nombre_empresa,
-        'rfc': cotizacion.persona.empresa.rfc,
-        'informacionContacto': cotizacion.persona.informacion_contacto,
+        'cliente': cotizacion.persona,
+        'servicios_json': servicios_json,
+        'servicio_form': ServicioForm(),
+        'metodos': Metodo.objects.all(),
+        'metodo_form': MetodoForm(),
         'edit': True  # Esta bandera se puede usar para ajustar la interfaz según si es edición o creación
     }
     return render(request, 'accounts/cotizaciones/cotizaciones_editar.html', context)
 
+# Vista para duplicar una cotización
+def cotizacion_duplicar(request, pk):
+    cotizacion_original = get_object_or_404(Cotizacion, id=pk)
+    
+    # Crear una nueva instancia de Cotizacion con los mismos datos que la original
+    cotizacion_nueva = Cotizacion.objects.create(
+        persona=cotizacion_original.persona,
+        fecha_solicitud=cotizacion_original.fecha_solicitud,
+        fecha_caducidad=cotizacion_original.fecha_caducidad,
+        metodo_pago=cotizacion_original.metodo_pago,
+        tasa_iva=cotizacion_original.tasa_iva,
+        notas=cotizacion_original.notas,
+        correos_adicionales=cotizacion_original.correos_adicionales,
+        subtotal=cotizacion_original.subtotal,
+        iva=cotizacion_original.iva,
+        total=cotizacion_original.total,
+        estado=False  # Estado inicial como "No Aceptado"
+    )
+    cotizacion_nueva.id_personalizado = cotizacion_nueva.generate_new_id_personalizado()
+    cotizacion_nueva.save()
 
+    # Duplicar los conceptos asociados
+    conceptos_originales = Concepto.objects.filter(cotizacion=cotizacion_original)
+    for concepto in conceptos_originales:
+        Concepto.objects.create(
+            cotizacion=cotizacion_nueva,
+            servicio=concepto.servicio,
+            cantidad_servicios=concepto.cantidad_servicios,
+            precio=concepto.precio,
+            notas=concepto.notas
+        )
+
+    messages.success(request, 'Cotización duplicada con éxito.')
+    return redirect('cotizacion_detalle', pk=cotizacion_nueva.id)
 
 # VISTA PARA VER ARCHIVO PDF COTIZACION
 def cotizacion_pdf(request, pk):
