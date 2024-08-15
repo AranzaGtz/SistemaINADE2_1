@@ -62,7 +62,7 @@
                     <p class="mb-2"><strong>Fecha de caducidad:</strong> {{ cotizacion.fecha_caducidad | date:"d M Y" }}
                     </p>
                     <p class="mb-2"><strong>Denominación:</strong> {{ cotizacion.metodo_pago }}</p>
-                    <p class="mb-2"><strong>Tasa IVA:</strong> {{ tasa_iva }}%</p>
+                    <p class="mb-2"><strong>Tasa IVA:</strong> {{ cotizacion.tasa_iva }}%</p>
                     <p class="mb-2"><strong>Notas:</strong> {{ cotizacion.notas }}</p>
                     <p><strong>Correos adicionales:</strong> {{ cotizacion.correos_adicionales }}</p>
                 </div>

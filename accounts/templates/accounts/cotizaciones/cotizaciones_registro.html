@@ -71,8 +71,11 @@
 
         <div class="row">
             <div class="col-md-6 mt-2">
-                <label for="{{ cotizacion_form.metodo_pago.id_for_label }}">Denominación</label>
-                {{ cotizacion_form.metodo_pago }}
+                <label for="metodo_pago">Denominación</label>
+                <select name="metodo_pago" id="metodo_pago" class="form-select">
+                    <option value="MXN" {% if cotizacion_form.metodo_pago.value == 'MXN' %}selected{% endif %}>MXN</option>
+                    <option value="USD" {% if cotizacion_form.metodo_pago.value == 'USD' %}selected{% endif %}>USD</option>
+                </select>
             </div>
             <div class="col-md-6 mt-2">
                 <label for="tasa_iva">Tasa del IVA actual</label>
@@ -80,7 +83,7 @@
                     <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%</option>
                     <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%</option>
                 </select>
-            </div>
+            </div>            
         </div>
 
         <div class="row mt-2">
