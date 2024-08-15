@@ -1,0 +1,28 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}CONFIGURACIÓN DEL SISTEMA{% endblock %}
+{% block header %}CONFIGURACIÓN DEL SISTEMA{% endblock %}
+{% block content %}
+
+<!-- SECCIÓN DE TÍTULO ENCABEZANDO CONFIGURACIÓN DEL SISTEMA -->
+     <div class="container mt-5">
+         <h1 class="mb-4">Editar Configuración del Sistema</h1>
+         <form method="post" novalidate>
+             {% csrf_token %}
+             <div class="mb-3">
+                 <label for="moneda_predeterminada" class="form-label">Moneda Predeterminada</label>
+                 {{ form.moneda_predeterminada }}
+             </div>
+             <div class="mb-3">
+                 <label for="tasa_iva_default" class="form-label">Tasa de IVA Predeterminada</label>
+                 {{ form.tasa_iva_default }}
+             </div>
+             <div class="mb-3">
+                 <label for="formato_numero_cotizacion" class="form-label">Formato de Número de Cotización</label>
+                 {{ form.formato_numero_cotizacion }}
+             </div>
+             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+         </form>
+     </div>
+
+{% endblock %}

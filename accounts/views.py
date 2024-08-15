@@ -1,9 +1,28 @@
 from django.http import JsonResponse
 from django.views.generic.list import ListView
 from django.utils import timezone
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from accounts.forms import ConfiguracionSistemaForm
+from accounts.models import  ConfiguracionSistema, Notificacion
+from .utils import obtener_configuracion
+from django.contrib import messages
 
-from accounts.models import  Notificacion
+
+#   VISTA PARA IR A LA CONFIGURACIÓN DEL SISTEMA
+def editar_configuracion_sistema(request):
+    # Obtén la primera instancia de ConfiguracionSistema o crea una si no existe
+    configuracion, created = ConfiguracionSistema.objects.get_or_create(id=1)
+    
+    if request.method == 'POST':
+        form = ConfiguracionSistemaForm(request.POST, instance=configuracion)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'La configuración del sistema se ha actualizado correctamente.')
+            return redirect('editar_configuracion_sistema')  # Redirige a la misma página o a otra
+    else:
+        form = ConfiguracionSistemaForm(instance=configuracion)
+    
+    return render(request, 'accounts/sistema/editar_configuracion_sistema.html', {'form': form})
 
 #   VISTA PARA NOTIFICACIONES DE RECEPCION DE COTIZACIÓN A USUARIO
 def notificaciones(request):

@@ -1,5 +1,8 @@
 from django import forms
-from .models import Concepto, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Titulo
+
+# accounts/forms.py
+from .utils import obtener_configuracion
+from .models import Concepto, ConfiguracionSistema, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -209,7 +212,12 @@ class CotizacionForm(forms.ModelForm):
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).', 'rows': 3}),
             'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)', 'rows': 3}),
         }
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        configuracion = obtener_configuracion()
+        if configuracion:
+            self.fields['metodo_pago'].initial = configuracion.moneda_predeterminada
+            self.fields['tasa_iva'].initial = configuracion.tasa_iva_default
 
 #   FORMULARIO PARA CAMBIAR COTIZACION
 class CotizacionChangeForm(forms.ModelForm):
@@ -229,12 +237,14 @@ class CotizacionChangeForm(forms.ModelForm):
 class OrganizacionForm(forms.ModelForm):
     class Meta:
         model = Organizacion
-        fields = ['nombre', 'direccion', 'telefono', 'pagina_web']
+        fields = ['nombre','slogan', 'direccion', 'telefono', 'pagina_web', 'logo']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'slogan': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'pagina_web': forms.URLInput(attrs={'class': 'form-control'}),
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),  # Widget para manejar la subida de imágenes
         }
 
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
@@ -289,4 +299,15 @@ class QuejaForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'asunto': forms.TextInput(attrs={'class': 'form-control'}),
             'mensaje': forms.Textarea(attrs={'class':'form-control'}),
+        }
+
+# ---       SISTEMA     ---
+class ConfiguracionSistemaForm(forms.ModelForm):
+    class Meta:
+        model = ConfiguracionSistema
+        fields = ['moneda_predeterminada', 'tasa_iva_default', 'formato_numero_cotizacion']
+        widgets = {
+            'moneda_predeterminada': forms.Select(attrs={'class': 'form-control'}),
+            'tasa_iva_default': forms.Select(attrs={'class': 'form-control'}),
+            'formato_numero_cotizacion': forms.Select(attrs={'class': 'form-control'}),
         }
