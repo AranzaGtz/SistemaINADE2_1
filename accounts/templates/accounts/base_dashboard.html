@@ -45,6 +45,7 @@
     {% block extra_css %}{% endblock %}
 
 </head>
+
 <body>
 
     <!-- BARRA DE ENCABEZADO -->
@@ -53,8 +54,10 @@
             <div class="container-fluid d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-                        <img src="{% static 'img/gotalogo.png' %}" alt="Logo" style="max-height: 40px;" class="mr-2">
-                        INADE Laboratorio Ambiental
+                        {% if organizacion.logo %}
+                        <img src="{{ organizacion.logo.url }}" alt="Logo de {{ organizacion.nombre }}" style="max-height: 40px;" class="mr-2">
+                        {% endif %}
+                        {{ organizacion.nombre }}
                     </a>
                 </div>
                 <div class="d-flex align-items-center">
@@ -68,7 +71,8 @@
                     </a>
                     <!-- Botón del Menú -->
                     <button class="navbar-toggler ms-2" type="button" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                        data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar"
+                        aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"
                                 alt=""></span>
                     </button>
@@ -116,13 +120,14 @@
                         Prospectos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img src="{% static 'img/building.svg' %}">
+                    <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img
+                            src="{% static 'img/building.svg' %}">
                         Empresas</a>
                 </li>
                 <hr style="border-color:darkgrey">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuario_list' %}"><img
-                            src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
+                    <a class="nav-link" href="{% url 'usuario_list' %}"><img src="{% static 'img/person-hearts.svg' %}">
+                        Usuarios</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'editar_organizacion' %}"><img
@@ -137,11 +142,13 @@
                             src="{% static 'img/person-raised-hand.svg' %}"> Quejas y sugerencias</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'guia_operaciones' %}"><img src="{% static 'img/question-circle.svg' %}">
+                    <a class="nav-link" href="{% url 'guia_operaciones' %}"><img
+                            src="{% static 'img/question-circle.svg' %}">
                         Guía de operaciones</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'editar_configuracion_sistema' %}"><img src="{% static 'img/question-circle.svg' %}">
+                    <a class="nav-link" href="{% url 'editar_configuracion_sistema' %}"><img
+                            src="{% static 'img/gear.svg' %}">
                         Configuración del sistema</a>
                 </li>
                 <li class="nav-item">
@@ -192,7 +199,8 @@
     <!-- Bloque para JavaScript adicional, definido en plantillas hijas -->
     {% block extra_js %}{% endblock %}
     <!-- Scripts de Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
     <!-- Incluye SweetAlert2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Script para mostrar mensajes de Django con SweetAlert2 -->
@@ -209,7 +217,7 @@
             {% endfor %}
             {% endif %}
         });
-        
+
     </script>
 </body>
 

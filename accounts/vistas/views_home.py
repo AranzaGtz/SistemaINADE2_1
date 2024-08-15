@@ -1,10 +1,11 @@
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from accounts.models import Cotizacion, Notificacion
+from accounts.models import Cotizacion, Notificacion, Organizacion
 
 @login_required
 def home(request):
+    organizacion = Organizacion.objects.first()  # Asume que solo hay una organización
     # Obtener todas las notificaciones del usuario
     notificaciones = request.user.notificacion_set.all()
     
@@ -20,4 +21,6 @@ def home(request):
         'notificaciones_no_leidas': notificaciones_no_leidas,
         'total_cotizaciones': total_cotizaciones,
         'cotizaciones_aceptadas': cotizaciones_aceptadas,
+        'organizacion': organizacion,
     })
+    
