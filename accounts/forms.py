@@ -186,8 +186,8 @@ class ConceptoForm(forms.ModelForm):
         fields = ['servicio', 'cantidad_servicios', 'precio',  'notas']
         widgets = {
             'servicio': forms.Select(attrs={'class': 'form-control', 'list': 'servicios-list', 'autocomplete': 'off'}),
-            'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad'}),
-            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+            'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad', 'min': 1}),
+            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido', 'min': 1, 'step': 1.00}), # subir peso a peso
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales', 'rows': 3}),
         }
 
