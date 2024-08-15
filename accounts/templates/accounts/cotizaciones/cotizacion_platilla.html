@@ -208,6 +208,7 @@
                <tr>
                     <th class="w-30">Concepto</th>
                     <th class="w-30">Metodo</th>
+                    <th>Licencia</th>
                     <th>Cant.</th>
                     <th class="w-20">Precio Unitario</th>
                     <th class="w-20">Total</th>
@@ -216,8 +217,9 @@
           <tbody>
                {% for concepto in conceptos %}
                <tr>
-                    <td><strong>{{ concepto.servicio.nombre_servicio }}</strong> <br> {{ concepto.notas }}</td>
+                    <td><strong>{{ concepto.servicio.nombre_servicio }}</strong> <br> {{ concepto.notas }}{% if concepto.servicio.subcontrato %} <br> Sub contratado{% endif %}</td>
                     <td>{{ concepto.servicio.metodo }}</td>
+                    <td>{% if concepto.servicio.acreditado %}Acreditado{% else %}No acreditado{% endif %}</td>
                     <td>{{ concepto.cantidad_servicios }}</td>
                     <td class="text-end">$ {{ concepto.precio }}</td>
                     <td class="text-end">$ {{ concepto.subtotal }}</td>

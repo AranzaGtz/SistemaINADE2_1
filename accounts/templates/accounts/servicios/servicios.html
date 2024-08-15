@@ -35,7 +35,7 @@
 <!-- TABLA DE SERVICIOS -->
 <div class="row">
     <div class="col">
-        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+        <div class="table-responsive" style="max-height: 90vh; overflow-y: auto;">
             <table id="serviciosTable" class="table table-hover">
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
@@ -45,6 +45,7 @@
                         <th><a class="link-secondary" href="?order_by=metodo__metodo">Método</a></th>
                         <th><a class="link-secondary" href="?order_by=descripcion">Descripción</a></th>
                         <th><a class="link-secondary" href="?order_by=precio_sugerido">Precio sugerido</a></th>
+                        <th><a class="link-secondary" href="?order_by=acreditado">Acreditado</a></th>
                         <th colspan="2" class="col-md-1"></th>
                     </tr>
                 </thead>
@@ -57,6 +58,7 @@
                         <td>{{ s.metodo.metodo }}</td>
                         <td>{{ s.descripcion }}</td>
                         <td>{{ s.precio_sugerido }}</td>
+                        <td>{% if s.acreditado %}Acreditado{% else %}No Acreditado{% endif %}</td>
                         <td>
                             <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
                         </td>

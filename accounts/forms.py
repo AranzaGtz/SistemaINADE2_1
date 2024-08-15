@@ -155,26 +155,28 @@ class MetodoForm(forms.ModelForm):
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['nombre_servicio', 'descripcion',
-                  'precio_sugerido']
+        fields = ['nombre_servicio', 'descripcion','precio_sugerido','subcontrato','acreditado']
         widgets = {
 
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto', 'rows': 2}),
             'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
-
+            'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
+            'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'})
         }
 
 #   FORMULARIO PARA SERVICIO
 class ServicioForm2(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['metodo', 'nombre_servicio', 'precio_sugerido', 'descripcion']
+        fields = ['metodo', 'nombre_servicio', 'precio_sugerido', 'descripcion','subcontrato','acreditado']
         widgets = {
             'metodo': forms.Select(attrs={'class': 'form-control'}),
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio'}),
             'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio'}),
+            'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
+            'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'})
         }
 
 #   FORMULARIO PARA CONCEPTO

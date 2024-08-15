@@ -177,6 +177,7 @@ class Cotizacion(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    # CLIENTE
     persona = models.ForeignKey(Persona, on_delete=models.PROTECT, blank=True, null=True)
     estado = models.BooleanField(default=False)  # False para "No Aceptado", True para "Aceptado"
     cotizacion_pdf = models.FileField(upload_to='cotizaciones_pdfs/',null=True,blank=True)
@@ -203,8 +204,7 @@ class Cotizacion(models.Model):
         last_id = last_cotizacion.id_personalizado
         new_id = int(last_id) + 1
         return str(new_id).zfill(4)
-
-        
+   
     def __str__(self):
         return self.id_personalizado
     
@@ -224,6 +224,8 @@ class Servicio(models.Model):
     nombre_servicio = models.CharField(max_length=100)# REPRESENTA EL NOMBRE DEL SERVICIO
     precio_sugerido = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()#MUESTRA UNA DESCRIPCION DEL SERVICIO
+    subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
+    acreditado = models.BooleanField(default=True) # False para "No acreditado", Ture para "Acreditado"
     
     def __str__(self):
         return f"{self.nombre_servicio} / {self.metodo}"
@@ -231,12 +233,10 @@ class Servicio(models.Model):
 # MODELO PARA CONCEPTO
 class Concepto(models.Model):
     cotizacion = models.ForeignKey(Cotizacion, related_name='conceptos', on_delete=models.CASCADE)
-    
     cantidad_servicios = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
-    subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
     
     def __str__(self):
         return f"{self.cotizacion} - {self.cantidad_servicios} - {self.servicio} - {self.precio} - {self.notas}"
