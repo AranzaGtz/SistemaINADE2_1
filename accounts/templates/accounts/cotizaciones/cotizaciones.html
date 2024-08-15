@@ -35,7 +35,7 @@
 <!-- TABLA -->
 <div class="row">
     <div class="col">
-        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+        <div class="table-responsive" style="min-height: 75vh; overflow-y: auto;">
             <table id="cotizacionesTable" class="table table-hover">
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
@@ -73,12 +73,12 @@
         <p>Número de cotizaciones: {{cotizaciones.count}}</p>
         <div class="pagination">
             {% if cotizaciones_page.has_previous %}
-                <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-                <a href="?page={{ cotizaciones_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+                <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm mr-2">Primera</a>
+                <a href="?page={{ cotizaciones_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm mr-2">Anterior</a>
             {% endif %}
-            <div class="m-1">Página {{ cotizaciones_page.number }} de {{ cotizaciones_page.paginator.num_pages }}.</div> 
+            <div class="m-1 mr-2">Página {{ cotizaciones_page.number }} de {{ cotizaciones_page.paginator.num_pages }}.</div> 
             {% if cotizaciones_page.has_next %}
-                <a href="?page={{ cotizaciones_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+                <a href="?page={{ cotizaciones_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm mr-2">Siguiente</a>
                 <a href="?page={{ cotizaciones_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
             {% endif %}
         </div>

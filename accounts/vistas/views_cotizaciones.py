@@ -48,16 +48,16 @@ def cotizaciones_list(request):
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     # Parámetro de ordenamiento desde la URL
-    order_by = request.GET.get('order_by', 'id')  # Default order
+    order_by = request.GET.get('order_by', '-id')  # Default order
     
     if not order_by:  # Asegura que siempre haya un valor válido para order_by
-        order_by = 'id'
+        order_by = '-id'
 
     # Filtrar cotizaciones que no están aceptadas y ordenarlas
     cotizaciones = Cotizacion.objects.all().order_by(order_by)
     
     # Paginación
-    paginator = Paginator(cotizaciones, 50)  # Mostrar 50 cotizaciones por página
+    paginator = Paginator(cotizaciones, 10)  # Mostrar 10 cotizaciones por página
     page_number = request.GET.get('page')
     cotizaciones_page = paginator.get_page(page_number)
 
