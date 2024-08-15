@@ -30,6 +30,11 @@ env/
 local_settings.py
 db.sqlite3
 
+/cotizaciones_pdfs/
+/ordenes_pedido_pdfs/
+/ordenes_trabajo_pdfs/
+
+
 # Jupyter Notebook
 .ipynb_checkpoints
 

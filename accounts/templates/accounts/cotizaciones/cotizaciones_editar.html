@@ -1,0 +1,73 @@
+<!-- Plantilla para la vista de edición de cotizaciones en Django -->
+
+<!-- Extiende la plantilla base del dashboard -->
+{% extends 'accounts/base_dashboard.html' %}
+<!-- Carga las etiquetas estáticas de Django -->
+{% load static %}
+<!-- Bloque para el título de la página -->
+{% block title %}Editar Cotización{% endblock %}
+<!-- Bloque para el encabezado de la página -->
+{% block header %}Editar Cotización{% endblock %}
+<!-- Bloque para el contenido principal de la página -->
+{% block content %}
+
+<div class="row">
+    <div class="col">
+        <!-- Título principal de la sección de edición de cotización -->
+        <h1 class="text-center">Editar Cotización</h1>
+        <!-- Línea divisoria -->
+        <hr class="featurette-divider">
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <!-- Formulario para editar la cotización -->
+        <form method="post">
+            <!-- Token de protección CSRF -->
+            {% csrf_token %}
+            <!-- Formulario de la cotización con campos renderizados automáticamente -->
+            {{ cotizacion_form.as_p }}
+            <!-- Formset de conceptos -->
+            {{ concepto_formset.management_form }}
+            {% for form in concepto_formset %}
+                <div class="formset-row">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+            <!-- Botón para guardar los cambios -->
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <!-- Enlace para cancelar la edición y volver a la lista de cotizaciones -->
+            <a href="{% url 'cotizacion_detalle' cotizacion.id %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+<!-- Script para borrar cotización-->
+<script>
+    // Espera a que el contenido del documento esté completamente cargado antes de ejecutar el script
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtiene la referencia al modal de eliminación de cotización por su ID
+        var deleteCotizacionModal = document.getElementById('deleteCotizacionModal');
+        
+        // Agrega un evento cuando el modal de eliminación se muestra
+        deleteCotizacionModal.addEventListener('show.bs.modal', function (event) {
+            // Obtiene el botón que activó el modal (el botón relacionado)
+            var button = event.relatedTarget;
+            
+            // Obtiene el ID de la cotización desde el atributo data-cotizacion-id del botón
+            var cotizacionId = button.getAttribute('data-cotizacion-id');
+            
+            // Obtiene el formulario de eliminación de cotización por su ID
+            var form = document.getElementById('deleteCotizacionForm');
+            
+            // Obtiene la acción actual del formulario y reemplaza '0' con el cotizacionId obtenido
+            var action = form.getAttribute('action').replace('0', cotizacionId);
+            
+            // Actualiza la acción del formulario con la nueva URL que incluye el cotizacionId
+            form.setAttribute('action', action);
+        });
+    });
+</script>
+
+{% endblock %}
