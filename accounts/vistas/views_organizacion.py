@@ -1,4 +1,5 @@
 # VISTA PARA MODIFICAR NUESTRA INFORMACION DE FORMATO
+import os
 from django.shortcuts import  redirect, render
 from accounts.forms import FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm
 from accounts.models import  FormatoCotizacion, FormatoOrden, Organizacion
@@ -9,7 +10,7 @@ def editar_organizacion(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
-    organizacion = Organizacion.objects.first()
+    organizacion = Organizacion.objects.first() # Asume que solo hay una organización
     
     if not organizacion:
         # Si no existe ninguna organización, crea una nueva instancia
@@ -17,17 +18,24 @@ def editar_organizacion(request):
         organizacion.save()
 
     if request.method == 'POST':
-        form = OrganizacionForm(request.POST, instance=organizacion)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Organización actualizada correctamente!.')
-            return redirect('home')  # Redirige a la página de inicio o a la página adecuada
+        form = OrganizacionForm(request.POST,request.FILES, instance=organizacion)
+        # Verifica si el logo ha cambiado
+        if 'logo' in form.changed_data:
+            if organizacion.logo:
+                # Borra el logo antiguo si existe
+                if os.path.isfile(organizacion.logo.path):
+                    os.remove(organizacion.logo.path)
+        form.save()
+        messages.success(request, 'Organización actualizada correctamente!.')
+        return redirect('editar_organizacion')  # Redirige a la página actual
+
     else:
         form = OrganizacionForm(instance=organizacion)
     context={
         'form':form,
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
+        'organizacion':organizacion
     }
     return render(request, 'accounts/organizacion/editar_organizacion.html',context)
 
@@ -88,5 +96,3 @@ def enviar_queja(request):
             'form':form
         }
     return render(request, 'accounts/organizacion/enviar_queja.html', context)
-
-

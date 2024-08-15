@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
+from django.utils.translation import gettext_lazy as _
 
 #----------------------------------------------------
 # MODELO PARA CLIENTES
@@ -178,7 +179,7 @@ class Cotizacion(models.Model):
         ('0.08', '8%'),
         ('0.16', '16%')
     ]
-    tasa_iva = models.CharField(max_length=4, choices=opciones_iva, default='0.08')
+    tasa_iva = models.CharField(max_length=4, choices=opciones_iva)
     notas = models.TextField(blank=True, null=True)
     correos_adicionales = models.TextField(blank=True, null=True)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -218,16 +219,40 @@ class Cotizacion(models.Model):
         # Save again to update the calculated values
         super(Cotizacion, self).save(*args, **kwargs)
 
-    def generate_new_id_personalizado(self):
+    def generate_new_id_personalizado(self, formato):
         last_cotizacion = Cotizacion.objects.order_by('id').last()
-        if not last_cotizacion:
-            return '0001'
-        last_id = last_cotizacion.id_personalizado
-        new_id = int(last_id) + 1
-        return str(new_id).zfill(4)
+        new_id = '0001' if not last_cotizacion else str(int(last_cotizacion.id_personalizado) + 1).zfill(4)
+        year = timezone.now().year
+        return formato.format(year=year, seq=new_id)
+
+    def save(self, *args, **kwargs):
+        configuracion = ConfiguracionSistema.objects.first()
+        
+        if configuracion:
+            if not self.tipo_moneda:
+                self.tipo_moneda = configuracion.moneda_predeterminada
+            if not self.tasa_iva:
+                self.tasa_iva = configuracion.tasa_iva_default
+            if not self.id_personalizado:
+                self.id_personalizado = self.generate_new_id_personalizado(configuracion.formato_numero_cotizacion)
+        
+        if not self.fecha_solicitud:
+            self.fecha_solicitud = timezone.now()
+        if not self.fecha_caducidad:
+            self.fecha_caducidad = self.fecha_solicitud + timezone.timedelta(days=1)
+
+        super(Cotizacion, self).save(*args, **kwargs)
+        
+        # Calcular y guardar los valores derivados
+        self.subtotal = self.calculate_subtotal()
+        self.iva = self.calculate_iva()
+        self.total = self.calculate_total()
+        
+        super(Cotizacion, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.id_personalizado
+    
     
 #----------------------------------------------------
 # MODELO PARA CONCEPTOS
@@ -329,15 +354,61 @@ class FormatoOrden (models.Model):
 # MODELO PARA ORGANIZACION
 class Organizacion(models.Model):
     nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
+    slogan = models.CharField(max_length=255, blank=True, null=True)  # Slogan opcional
     direccion = models.CharField(max_length=255, default='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106')
     telefono = models.CharField(max_length=20, default='(664) 104 51 44')
     pagina_web = models.URLField()
+    logo = models.ImageField(upload_to='logos/', blank=True, null=True)  # Campo para el logo
     f_cotizacion = models.ForeignKey(FormatoCotizacion, related_name='formatos', on_delete=models.CASCADE, null=True)
     f_orden = models.ForeignKey(FormatoOrden, related_name='formatos', on_delete=models.CASCADE, null=True)
     
     
     def __str__(self):
         return self.nombre
+
+#----------------------------------------------------
+# MODELO PARA CONFIGURACIÓN GENERAL DEL SISTEMA
+#----------------------------------------------------
+
+class ConfiguracionSistema(models.Model):
+    moneda_predeterminada = models.CharField(
+        max_length=10,
+        choices=[
+            ('MXN', 'MXN - Moneda Nacional Mexicana'),
+            ('USD', 'USD - Dolar Estadunidense')
+        ],
+        default='MXN',
+        verbose_name=_("Moneda Predeterminada")
+    )
+    opciones_iva = [
+        ('0.08', '8%'),
+        ('0.16', '16%')
+    ]
+    tasa_iva_default = models.CharField(
+        max_length=4, 
+        choices=opciones_iva, 
+        default='0.08',
+        verbose_name=_("Tasa de IVA Predeterminada")
+    )
+    formatos_cotizacion = [
+        ('COT-{year}-{seq}', 'COT-{year}-{seq}'),
+        ('{year}-COT-{seq}', '{year}-COT-{seq}'),
+        ('COT-{seq}', 'COT-{seq}'),
+        ('{seq}', '{seq}')
+    ]
+    formato_numero_cotizacion = models.CharField(
+        max_length=50, 
+        choices=formatos_cotizacion,
+        default='{seq}',
+        verbose_name=_("Formato de Número de Cotización")
+    )
+    
+    def __str__(self):
+        return "Configuración General del Sistema"
+
+    class Meta:
+        verbose_name = "Configuración del Sistema"
+        verbose_name_plural = "Configuraciones del Sistema"
 
 #----------------------------------------------------
 # MODELO PARA QUEJAS

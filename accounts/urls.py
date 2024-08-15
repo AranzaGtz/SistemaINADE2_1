@@ -1,6 +1,8 @@
 from django.urls import path
+from SistemaINADE2 import settings
+from django.conf.urls.static import static
 from accounts import views
-from accounts.views import notificaciones, marcar_notificacion_leida, borrar_notificacion
+from accounts.views import editar_configuracion_sistema, notificaciones, marcar_notificacion_leida
 from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_guia, views_orden_trabajo, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
 from accounts.vistas.views_autenticacion import CustomPasswordResetView
@@ -125,5 +127,10 @@ urlpatterns = [
     path('guia_operaciones/', views_guia.guia_operaciones, name='guia_operaciones'),
     path('guia_operaciones/usuarios', views_guia.guia_add_u, name='guia_add_u'),
 
+    #   ---     CONFIGURACIÓN DEL SISTEMA   ---
+    path('configuracion/editar/', editar_configuracion_sistema, name='editar_configuracion_sistema'),
     # Define otras rutas según las vistas que hayas definido
 ]
+# Solo sirve archivos en desarrollo
+if settings.DEBUG:  # Solo sirve archivos en desarrollo
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
