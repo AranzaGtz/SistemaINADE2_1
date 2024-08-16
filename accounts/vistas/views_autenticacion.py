@@ -7,14 +7,15 @@ from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, Organizacion
 
 def login_view(request):
     
+    organizacion = Organizacion.objects.first()  # Asume que solo hay una organización
     context = {}
     
     if request.user.is_authenticated:
-        return redirect("dashboard") # AQUI QUIERO ACTUALIZA PAGUINA
+        return redirect("dashboard", organizacion) # AQUI QUIERO ACTUALIZA PAGUINA
 
     if request.method == "POST":
 
@@ -31,7 +32,7 @@ def login_view(request):
 
                 login(request, user)
                 messages.success(request, 'Inicio de sesion exitosa.!')
-                return redirect("dashboard")
+                return redirect("dashboard", organizacion)
             else:
                 
                 context['error'] = "No tienes permisos para acceder"
