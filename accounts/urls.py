@@ -121,6 +121,7 @@ urlpatterns = [
     path('organizacion/terminos/', views_organizacion.editar_organizacion, name='editar_organizacion'),
     path('formatos/', views_organizacion.formatos, name='formatos'),
     path('queja/', views_organizacion.enviar_queja, name='enviar_queja'),
+    path('cotizacion-prueba/', views_organizacion.cotizacion_prueba, name='cotizacion_prueba'),
 
     
     #   ---     GUIA DE OPERACIONES       ---
