@@ -269,24 +269,29 @@ class OrdenTrabajoForm(forms.ModelForm):
 class FormatoCotizacionForm(forms.ModelForm):
     class Meta:
         model = FormatoCotizacion
-        fields = ['nombre_formato','version','emision','terminos','avisos']
+        fields = ['nombre_formato','version','emision', 'titulo_documento','mensaje_propuesta','terminos','avisos','imagen_marca_agua']
         widgets = {
             'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
             'version': forms.TextInput(attrs={'class': 'form-control'}),
             'emision': forms.DateInput(attrs={'class': 'form-control'}),
+            'titulo_documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'mensaje_propuesta': forms.Textarea(attrs={'class': 'form-control'}),
             'terminos': forms.Textarea(attrs={'class': 'form-control'}),
             'avisos': forms.Textarea(attrs={'class': 'form-control'}),
+            'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
 
 #   FORMULARIO PARA FORMATOS DE ORDEN DE TRABAJO
 class FormatoOrdenForm(forms.ModelForm):
     class Meta:
         model = FormatoOrden
-        fields = ['nombre_formato', 'version', 'emision']
+        fields = ['nombre_formato', 'version', 'emision', 'titulo_documento', 'imagen_marca_agua']
         widgets = {
             'nombre_formato': forms.TextInput(attrs={'class': 'form-control'}),
             'version': forms.TextInput(attrs={'class': 'form-control'}),
             'emision': forms.DateInput(attrs={'class': 'form-control'}),
+            'titulo_documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
 
 #   FORMULARIO PARA QUEJAS

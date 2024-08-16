@@ -24,19 +24,56 @@
      <div class="tab-content">
           <div class="tab-pane fade show active" id="cotizaciones">
                <h2 class="mt-3">Cotizaciones</h2>
-               <form method="post">
+               <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ formato_cotizacion_form.as_p }}
-                    <button type="submit" name="guardar_cotizacion" class="btn btn-success">Guardar Cotización</button>
+                    <div class="row">
+                         <div class="col-md-4">
+                              {% if formato_cotizacion.imagen_marca_agua %}
+                                   <h4>Marca de agua:</h4>
+                                   <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 15px;">
+                                        <img src="{{ formato_cotizacion.imagen_marca_agua.url }}" alt="Marca de agua"
+                                             style="max-width: 100%; height: auto;">
+                                   </div>
+                              {% else %}
+                                   <code>No se ha subido ninguna imagen de marca de agua.</code>
+                              {% endif %}
+                         </div>
+                         <div class="col">
+                              {{ formato_cotizacion_form.as_p }}
+                         </div>
+                    </div>
+                    <div class="text-end m-5">
+                         <button type="submit" name="guardar_cotizacion" class="btn btn-success">Guardar Cotización</button>
+                         <!-- Ejemplo de botón -->
+                         <a href="{% url 'cotizacion_prueba' %}" class="btn btn-primary">Generar Cotización de Prueba Formato Acutal</a>
+                    </div>
                </form>
           </div>
 
           <div class="tab-pane fade" id="ordenes">
                <h2 class="mt-3">Órdenes de Trabajo</h2>
-               <form method="post">
+               <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ formato_orden_form.as_p }}
-                    <button type="submit" name="guardar_orden" class="btn btn-success">Guardar Orden</button>
+                    <div class="row">
+                         <div class="col-md-4">
+                              {% if formato_orden.imagen_marca_agua %}
+                                   <h4>Marca de agua:</h4>
+                                   <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 15px;">
+                                        <img src="{{ formato_orden.imagen_marca_agua.url }}" alt="Marca de agua"
+                                             style="max-width: 100%; height: auto;">
+                                   </div>
+                              {% else %}
+                                   <code>No se ha subido ninguna imagen de marca de agua.</code>
+                              {% endif %}
+                         </div>
+                         <div class="col">
+                              {{ formato_orden_form.as_p }}
+                         </div>
+                    </div>
+                    <div class="text-end m-5">
+                         <button type="submit" name="guardar_orden" class="btn btn-success">Guardar Orden</button>
+                    </div>
+                    
                </form>
           </div>
      </div>
@@ -59,12 +96,12 @@
           cancelButtonColor: '#d33',
           confirmButtonText: "Si, seguro!",
           cancelButtonText: "No, cancelar!",
-          
+
      }).then((result) => {
           if (result.isConfirmed) {
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-              // Redirigir a la página de inicio cuando se cancela
-              window.location.href = "{% url 'home' %}"; // Cambia esta URL por la de tu página de inicio
+               // Redirigir a la página de inicio cuando se cancela
+               window.location.href = "{% url 'home' %}"; // Cambia esta URL por la de tu página de inicio
           }
      });
 </script>
