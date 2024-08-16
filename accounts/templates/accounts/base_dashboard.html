@@ -91,69 +91,71 @@
         </div>
         <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <!--#   LINK HOME   -->
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img
-                            src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
                 </li>
+                <!--#   LINK COTIZACIONES   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img src="{% static 'img/pencil.svg' %}"
-                            alt=""> Cotizaciones</a>
+                    <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img src="{% static 'img/pencil.svg' %}" alt=""> Cotizaciones</a>
                 </li>
+                <!--#   LINK COTIZACIONES ACEPTADAS/PROYECTOS   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}"><img
-                            src="{% static 'img/pencil.svg' %}" alt=""> Proyectos</a>
+                    <a class="nav-link" href="{% url 'cotizaciones_aceptadas_list' %}"><img src="{% static 'img/pencil.svg' %}" alt=""> Proyectos</a>
                 </li>
+                <!--#   LINK ORDENES DE TRABAJO     -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'ordenes_list' %}"><img src="{% static 'img/clipboard-data.svg' %}"
-                            alt=""> Ordenes de Trabajo</a>
+                    <a class="nav-link" href="{% url 'ordenes_list' %}"><img src="{% static 'img/clipboard-data.svg' %}" alt=""> Ordenes de Trabajo</a>
                 </li>
+                <!--#   LINK CLIENTES   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'servicios_list' %}"><img src="{% static 'img/droplet-half.svg' %}"
-                            alt=""> Servicios y Métodos</a>
+                    <a class="nav-link" href="{% url 'lista_clientes' %}"><img src="{% static 'img/people-fill.svg' %}"> Clientes</a>
                 </li>
+                <!--#   LINK PROSPECTOS     -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_clientes' %}"><img src="{% static 'img/people-fill.svg' %}">
-                        Clientes</a>
+                    <a class="nav-link" href="{% url 'prospecto_list' %}"><img src="{% static 'img/people.svg' %}"> Prospectos</a>
                 </li>
+                <!--#   LINK EMPRESAS   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'prospecto_list' %}"><img src="{% static 'img/people.svg' %}">
-                        Prospectos</a>
+                    <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img src="{% static 'img/building.svg' %}"> Empresas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img
-                            src="{% static 'img/building.svg' %}">
-                        Empresas</a>
-                </li>
+                
                 <hr style="border-color:darkgrey">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuario_list' %}"><img src="{% static 'img/person-hearts.svg' %}">
-                        Usuarios</a>
+                <h6>Configuraciones</h6>
+                <!--#   LINK USUARIOS   -->
+                <li class="nav-item"><a class="nav-link" href="{% url 'usuario_list' %}">
+                    <img src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
                 </li>
+                <!--#   LINK ORGANIZACIÓN   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'editar_organizacion' %}"><img
-                            src="{% static 'img/diagram-3-fill.svg' %}"> Organización</a>
+                    <a class="nav-link" href="{% url 'editar_organizacion' %}"><img src="{% static 'img/diagram-3-fill.svg' %}"> Organización</a>
                 </li>
+                <!--#   LINK FORMATOS   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'formatos' %}"><img src="{% static 'img/card-checklist.svg' %}">
-                        Formatos</a>
+                    <a class="nav-link" href="{% url 'formatos' %}"><img src="{% static 'img/card-checklist.svg' %}"> Formatos</a>
                 </li>
+                <!--#   LINK QUEJAS Y SEUGERENCIAS  -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'enviar_queja' %}"><img
-                            src="{% static 'img/person-raised-hand.svg' %}"> Quejas y sugerencias</a>
+                    <a class="nav-link" href="{% url 'enviar_queja' %}"><img src="{% static 'img/person-raised-hand.svg' %}"> Quejas y sugerencias</a>
                 </li>
+                <!--#   LINK SISTEMA    -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'guia_operaciones' %}"><img
-                            src="{% static 'img/question-circle.svg' %}">
-                        Guía de operaciones</a>
+                    <a class="nav-link" href="{% url 'editar_configuracion_sistema' %}"><img src="{% static 'img/gear.svg' %}"> Sistema</a>
                 </li>
+                <!--#   LINK SERVICIOS Y METODOS    -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'editar_configuracion_sistema' %}"><img
-                            src="{% static 'img/gear.svg' %}">
-                        Configuración del sistema</a>
+                    <a class="nav-link" href="{% url 'servicios_list' %}"><img src="{% static 'img/droplet-half.svg' %}" alt=""> Servicios y Métodos</a>
                 </li>
+
+                <hr style="border-color:darkgrey">
+
+                <!--#   LINK SALIR DE SESION    -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'img/power.svg' %}">
-                        Salir de sesión</a>
+                    <a class="nav-link" href="{% url 'logout' %}"><img src="{% static 'img/power.svg' %}"> Salir de sesión</a>
+                </li>
+                <!--#   LINK GUIA DE OPERACIONES    -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'guia_operaciones' %}"><img src="{% static 'img/question-circle.svg' %}"> Guía de operaciones</a>
                 </li>
             </ul>
         </div>
