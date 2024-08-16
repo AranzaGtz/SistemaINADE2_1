@@ -11,15 +11,23 @@ def usuario_list(request):
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
-    Lista_usuarios = CustomUser.objects.all()
+    # Obtener el filtro de rol de la solicitud GET, si existe
+    rol = request.GET.get('rol', 'todos')
+
+    if rol == 'todos':
+        Lista_usuarios = CustomUser.objects.all()
+    else:
+        Lista_usuarios = CustomUser.objects.filter(rol=rol)
+
     form = CustomUserCreationForm()
-    context={
-        'usuarios':Lista_usuarios,
-        'form':form,
+    context = {
+        'usuarios': Lista_usuarios,
+        'form': form,
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
+        'rol_seleccionado': rol,
     }
-    return render(request, "accounts/usuarios/usuarios.html",context)
+    return render(request, "accounts/usuarios/usuarios.html", context)
 
 # VISTA PARA REGISTRAR UN USUARIO
 def usuario_create(request):
