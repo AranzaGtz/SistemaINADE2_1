@@ -252,8 +252,7 @@ class Cotizacion(models.Model):
 
     def __str__(self):
         return self.id_personalizado
-    
-    
+       
 #----------------------------------------------------
 # MODELO PARA CONCEPTOS
 #----------------------------------------------------
@@ -342,14 +341,19 @@ class FormatoCotizacion (models.Model):
     nombre_formato = models.CharField(max_length=255)
     version = models.CharField(max_length=50)
     emision = models.DateField(default=timezone.now)
+    titulo_documento = models.CharField(max_length=255, blank=True, default="COTIZACIÓN / CONTRATO")  # Nuevo campo para el título del documento
+    mensaje_propuesta = models.TextField(blank=True, default="Gracias por la oportunidad de presentar nuestra propuesta. Por favor revise que se cumple con sus requerimientos; en caso contrario, comuníquese con nosotros.")  # Nuevo campo para el mensaje de propuesta
     terminos = models.TextField(blank=True)  # Campo para términos
     avisos = models.TextField(blank=True)    # Campo para avisos
+    imagen_marca_agua = models.ImageField(upload_to='marca_agua/', blank=True, null=True)  # Nuevo campo para la imagen de marca de agua
     
 # MODELO PARA FORMATO DE ORDEN DE TRABAJO
 class FormatoOrden (models.Model):
     nombre_formato = models.CharField(max_length=255)
     version = models.CharField(max_length=50)
     emision = models.DateField(default=timezone.now)
+    titulo_documento = models.CharField(max_length=255, blank=True, default="Orden de Trabajo")  # Nuevo campo para el título del documento
+    imagen_marca_agua = models.ImageField(upload_to='marca_agua/', blank=True, null=True)  # Nuevo campo para la imagen de marca de agua
 
 # MODELO PARA ORGANIZACION
 class Organizacion(models.Model):
