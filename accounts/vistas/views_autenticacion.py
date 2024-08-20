@@ -10,49 +10,38 @@ from django.views.generic import FormView
 from accounts.models import CustomUser, Organizacion
 
 def login_view(request):
-    
-    organizacion = Organizacion.objects.first()  # Asume que solo hay una organización
     context = {}
     
     if request.user.is_authenticated:
+<<<<<<< Updated upstream
         return redirect("dashboard") # AQUI QUIERO ACTUALIZA PAGUINA
+=======
+        return redirect("dashboard")  # Redirigir sin pasar organizacion
+>>>>>>> Stashed changes
 
     if request.method == "POST":
-
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-
-            if (
-                user.is_staff
-            ):  # Verificando si el usuaro es trabajador o tiene permiso staff
-
+            if user.is_staff:  # Verificando si el usuario es trabajador o tiene permiso staff
                 login(request, user)
+<<<<<<< Updated upstream
                 messages.success(request, 'Inicio de sesion exitosa.!')
                 return redirect("dashboard")
+=======
+                messages.success(request, 'Inicio de sesión exitoso!')
+                return redirect("dashboard")  # Redirigir sin pasar organizacion
+>>>>>>> Stashed changes
             else:
-                
                 context['error'] = "No tienes permisos para acceder"
-                
-                return render(
-                    request,
-                    "accounts/autenticacion/login.html",context,
-                )
+                return render(request, "accounts/autenticacion/login.html", context)
         else:
-            
-            context['error'] = "Credenciales invalidas"
-            
-            return render(
-                request, "accounts/autenticacion/login.html", context
-            )
-            # Redirige al usuario a alguna página después de iniciar sesión correctamente
-            # Renderizar la plantilla con el contexto
-    response = render(request, "accounts/autenticacion/login.html", context)
-    
-    
+            context['error'] = "Credenciales inválidas"
+            return render(request, "accounts/autenticacion/login.html", context)
+
     return render(request, "accounts/autenticacion/login.html", context)
 
 # VISTA PARA SALIR DE SESION

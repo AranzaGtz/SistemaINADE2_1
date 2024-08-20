@@ -12,6 +12,7 @@ from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from weasyprint import HTML  # type: ignore
 from django.template.loader import render_to_string
 from django.db import IntegrityError, transaction
+from django.db.models import Count, Sum, Avg, F, ExpressionWrapper, DurationField
 from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
 
@@ -199,6 +200,62 @@ def cotizacion_detalle(request, pk):
         'tasa_iva': tasa_iva,
         'ordenes_trabajo': ordenes_trabajo,
     })
+
+# VISTA DE ESTADISTICAS DE COTIZACIONES
+def cotizacion_estadisticas(request):
+    # Total number of quotations issued
+    total_cotizaciones = Cotizacion.objects.count()
+
+    # Total value of quotations issued
+    valor_total_cotizaciones = Cotizacion.objects.aggregate(Sum('total'))['total__sum']
+
+    # Average value per quotation
+    promedio_valor_cotizacion = Cotizacion.objects.aggregate(Avg('total'))['total__avg']
+
+    # Average response time to a quotation
+    promedio_tiempo_respuesta = Cotizacion.objects.aggregate(
+        promedio_respuesta=Avg(ExpressionWrapper(F('fecha_caducidad') - F('fecha_solicitud'), output_field=DurationField()))
+    )['promedio_respuesta']
+
+    # Acceptance rate
+    tasa_aceptacion = Cotizacion.objects.filter(estado=True).count() / total_cotizaciones * 100 if total_cotizaciones else 0
+
+    # Rejection rate
+    tasa_rechazo = 100 - tasa_aceptacion
+
+    # Average time to close a quotation (considering accepted quotations)
+    tiempo_promedio_cierre = Cotizacion.objects.filter(estado=True).aggregate(
+        promedio_cierre=Avg(ExpressionWrapper(F('fecha_caducidad') - F('fecha_solicitud'), output_field=DurationField()))
+    )['promedio_cierre']
+
+    # Statistics by client
+    estadisticas_cliente = Cotizacion.objects.values('persona__nombre').annotate(
+        valor_total=Sum('total'),
+        numero_cotizaciones=Count('id')
+    ).order_by('-valor_total')
+
+    # Temporal statistics
+    estadisticas_temporales = Cotizacion.objects.annotate(
+        month=F('fecha_solicitud__month'),
+        year=F('fecha_solicitud__year')
+    ).values('month', 'year').annotate(
+        numero_cotizaciones=Count('id')
+    ).order_by('year', 'month')
+
+    context = {
+        'total_cotizaciones': total_cotizaciones,
+        'valor_total_cotizaciones': valor_total_cotizaciones,
+        'promedio_valor_cotizacion': promedio_valor_cotizacion,
+        'promedio_tiempo_respuesta': promedio_tiempo_respuesta,
+        'tasa_aceptacion': tasa_aceptacion,
+        'tasa_rechazo': tasa_rechazo,
+        'tiempo_promedio_cierre': tiempo_promedio_cierre,
+        'estadisticas_cliente': estadisticas_cliente,
+        'estadisticas_temporales': estadisticas_temporales,
+    }
+
+    return render(request, 'accounts/cotizaciones/cotizacion_estadisticas.html', context)
+
 
 # INTERFAZ PARA ELIMINAR COTIZACION
 def cotizacion_delete(request, pk):

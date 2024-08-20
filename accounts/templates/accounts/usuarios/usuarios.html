@@ -1,3 +1,4 @@
+<!-- accounts/templates/accounts/organizacion/usuario_list.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
 {% block title %}Usuarios{% endblock %}
@@ -99,6 +100,9 @@
                 <div class="modal-body">
                     <!-- Formulario del cliente -->
                     {{ form.as_p }}
+
+                    <!-- Leyenda de descripción de roles -->
+                    <div id="roleDescription" class="alert alert-info mt-3" style="display: none;"></div>
                 </div>
                 <div class="modal-footer">
                     <!-- Botón para cancelar la creación del cliente -->
@@ -130,6 +134,27 @@
             }
         });
     }
+
+    // Mostrar descripción del rol seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('id_rol');
+        const roleDescription = document.getElementById('roleDescription');
+        const roleDescriptions = {{ rol_descriptions|safe }};
+
+        function updateRoleDescription() {
+            const selectedRole = roleSelect.value;
+            if (roleDescriptions[selectedRole]) {
+                roleDescription.style.display = 'block';
+                roleDescription.textContent = roleDescriptions[selectedRole];
+            } else {
+                roleDescription.style.display = 'none';
+                roleDescription.textContent = '';
+            }
+        }
+
+        roleSelect.addEventListener('change', updateRoleDescription);
+        updateRoleDescription();  // Initialize description on page load
+    });
 </script>
 {% endblock %}
 {% endblock %}
