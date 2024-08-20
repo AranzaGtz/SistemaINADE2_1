@@ -1,3 +1,4 @@
+<!-- accounts/templates/accounts/organizacion/usuario_list.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
 {% block title %}Usuarios{% endblock %}
@@ -18,6 +19,25 @@
                     onclick="filterTable('searchInput', 'usuariosTable')">Buscar</button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- FILTRO POR ROL -->
+<div class="row mb-3 justify-content-center">
+    <div class="col-md-6">
+        <form method="get" action="{% url 'usuario_list' %}" id="rolFilterForm">
+            <div class="input-group mb-3">
+                <select class="form-select" name="rol" id="rolSelect" onchange="document.getElementById('rolFilterForm').submit();">
+                    <option value="todos" {% if rol_seleccionado == 'todos' %}selected{% endif %}>Todos</option>
+                    <option value="admin" {% if rol_seleccionado == 'admin' %}selected{% endif %}>Administrador</option>
+                    <option value="coordinador" {% if rol_seleccionado == 'coordinador' %}selected{% endif %}>Coordinador</option>
+                    <option value="muestras" {% if rol_seleccionado == 'muestras' %}selected{% endif %}>Muestras</option>
+                    <option value="informes" {% if rol_seleccionado == 'informes' %}selected{% endif %}>Informes</option>
+                    <option value="laboratorio" {% if rol_seleccionado == 'laboratorio' %}selected{% endif %}>Laboratorio</option>
+                    <option value="calidad" {% if rol_seleccionado == 'calidad' %}selected{% endif %}>Calidad</option>
+                </select>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -55,8 +75,7 @@
                     <td>{{ c.celular }}</td>
                     <td>{{ c.rol }}</td>
                     <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <td><a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">Eliminar</a>
-                    </td>
+                    <td><a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">Eliminar</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -81,6 +100,9 @@
                 <div class="modal-body">
                     <!-- Formulario del cliente -->
                     {{ form.as_p }}
+
+                    <!-- Leyenda de descripción de roles -->
+                    <div id="roleDescription" class="alert alert-info mt-3" style="display: none;"></div>
                 </div>
                 <div class="modal-footer">
                     <!-- Botón para cancelar la creación del cliente -->
@@ -92,6 +114,7 @@
         </div>
     </div>
 </div>
+
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -111,6 +134,27 @@
             }
         });
     }
+
+    // Mostrar descripción del rol seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('id_rol');
+        const roleDescription = document.getElementById('roleDescription');
+        const roleDescriptions = {{ rol_descriptions|safe }};
+
+        function updateRoleDescription() {
+            const selectedRole = roleSelect.value;
+            if (roleDescriptions[selectedRole]) {
+                roleDescription.style.display = 'block';
+                roleDescription.textContent = roleDescriptions[selectedRole];
+            } else {
+                roleDescription.style.display = 'none';
+                roleDescription.textContent = '';
+            }
+        }
+
+        roleSelect.addEventListener('change', updateRoleDescription);
+        updateRoleDescription();  // Initialize description on page load
+    });
 </script>
 {% endblock %}
 {% endblock %}

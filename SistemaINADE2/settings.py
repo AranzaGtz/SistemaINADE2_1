@@ -14,7 +14,6 @@ import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,6 +35,7 @@ ALLOWED_HOSTS = ['192.168.x.x', 'localhost', '127.0.0.1', '*']
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -168,3 +168,4 @@ EMAIL_HOST_USER = 'proyectos.inade@icloud.com'
 # La contraseña de la aplicación generada
 EMAIL_HOST_PASSWORD = 'aiuz-aivh-thmd-vwal'
 DEFAULT_FROM_EMAIL = 'proyectos.inade@icloud.com'
+SUPPORT_EMAIL = 'proyectos.inade@icloud.com'
