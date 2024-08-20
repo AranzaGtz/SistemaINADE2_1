@@ -4,6 +4,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
 from accounts.models import CustomUser
 from django.contrib import messages
+import json
+
+ROL_DESCRIPCION = {
+    'admin': 'Acceso completo al sistema. Puede gestionar usuarios, cotizaciones y administrar todas las áreas.',
+    'coordinador': 'Coordina las actividades del equipo y supervisa los procesos en las distintas áreas.',
+    'muestras': 'Gestiona la recolección y análisis de muestras.',
+    'informes': 'Encargado de la generación y revisión de informes.',
+    'laboratorio': 'Realiza análisis y pruebas en el laboratorio.',
+    'calidad': 'Asegura la calidad y cumplimiento de los estándares en los procesos.'
+}
 
 # VISTA PARA DIRIGIR A INTERFAZ DE USUARIO
 def usuario_list(request):
@@ -19,6 +29,16 @@ def usuario_list(request):
     else:
         Lista_usuarios = CustomUser.objects.filter(rol=rol)
 
+    # Definir descripciones de roles
+    ROL_DESCRIPCION = {
+        'admin': 'Administrador: Tiene acceso completo a todas las funcionalidades del sistema.',
+        'coordinador': 'Coordinador: Puede gestionar proyectos y coordinar equipos.',
+        'muestras': 'Muestras: Se encarga de la recolección y manejo de muestras.',
+        'informes': 'Informes: Responsable de la generación y revisión de informes.',
+        'laboratorio': 'Laboratorio: Gestiona las operaciones del laboratorio y pruebas.',
+        'calidad': 'Calidad: Supervisa y asegura la calidad de todos los procesos.',
+    }
+
     form = CustomUserCreationForm()
     context = {
         'usuarios': Lista_usuarios,
@@ -26,6 +46,7 @@ def usuario_list(request):
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
         'rol_seleccionado': rol,
+        'rol_descriptions': json.dumps(ROL_DESCRIPCION),  # Enviar descripciones al template
     }
     return render(request, "accounts/usuarios/usuarios.html", context)
 

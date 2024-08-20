@@ -264,6 +264,10 @@ class OrdenTrabajoForm(forms.ModelForm):
         labels = {
             'receptor': 'Seleccione el receptor de la orden:',
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['receptor'].queryset = CustomUser.objects.filter(rol='muestras')
 
 #   FORMULARIO PARA FORMATOS DE COTIZACIÓN
 class FormatoCotizacionForm(forms.ModelForm):
@@ -298,12 +302,12 @@ class FormatoOrdenForm(forms.ModelForm):
 class QuejaForm(forms.ModelForm):
     class Meta:
         model = Queja
-        fields = ['nombre', 'email', 'asunto', 'mensaje']
+        fields = ['asunto', 'mensaje', 'prioridad', 'archivo_adjunto']
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'asunto': forms.TextInput(attrs={'class': 'form-control'}),
             'mensaje': forms.Textarea(attrs={'class':'form-control'}),
+            'prioridad': forms.Select(attrs={'class': 'form-control'}),
+            'archivo_adjunto': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
 
 # ---       SISTEMA     ---

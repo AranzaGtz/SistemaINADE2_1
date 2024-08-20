@@ -20,7 +20,7 @@
 <!-- SECCION DE TITULO ENCABEZANDO -->
 <div class="row">
      <div class="col">
-          <h1>Generar Órden de Trabajo para Cotización {{ cotizacion.id_personalizado }}</h1>
+          <h1>Generar Orden de Trabajo para Cotización {{ cotizacion.id_personalizado }}</h1>
           <hr>
      </div>
 </div>
@@ -157,30 +157,37 @@
 
 </form>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
-     $(document).ready(function () {
-          $('.form-check-input').on('change', function () {
-               var target = $(this).data('target');
-               if ($(this).is(':checked')) {
-                    $(target).show();
-               } else {
-                    $(target).hide();
-               }
-          });
-     });
+    $(document).ready(function () {
+        // Inicializar Select2 en el campo receptor
+        $('select[name="receptor"]').select2({
+            placeholder: "Selecciona un receptor",
+            allowClear: true
+        });
+
+        // Muestra y oculta elementos basándose en checkboxes
+        $('.form-check-input').on('change', function () {
+            var target = $(this).data('target');
+            if ($(this).is(':checked')) {
+                $(target).show();
+            } else {
+                $(target).hide();
+            }
+        });
+    });
+
+    function abrirVentanaReceptor() {
+        const url = "{% url 'agregar_receptor' %}";
+        const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
+        window.open(url, 'Agregar Receptor', options);
+    }
+
+    function actualizarSelectReceptor(nuevoReceptor) {
+        const select = document.querySelector('select[name="receptor"]');
+        const option = new Option(nuevoReceptor.nombre, nuevoReceptor.id);
+        select.add(option);
+        select.value = nuevoReceptor.id;  // Select the newly added receptor
+    }
 </script>
-<script>
-     function abrirVentanaReceptor() {
-         const url = "{% url 'agregar_receptor' %}";
-         const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
-         window.open(url, 'Agregar Receptor', options);
-     }
- 
-     function actualizarSelectReceptor(nuevoReceptor) {
-         const select = document.querySelector('select[name="receptor"]');
-         const option = new Option(nuevoReceptor.nombre, nuevoReceptor.id);
-         select.add(option);
-         select.value = nuevoReceptor.id;  // Select the newly added receptor
-     }
- </script>
 {% endblock %}

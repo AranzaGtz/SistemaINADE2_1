@@ -424,7 +424,9 @@ class Queja(models.Model):
     email = models.EmailField()
     asunto = models.CharField(max_length=200)
     mensaje = models.TextField()
+    prioridad = models.CharField(max_length=50, choices=[('Baja', 'Baja'), ('Media', 'Media'), ('Alta', 'Alta')])
+    archivo_adjunto = models.FileField(upload_to='soporte_adjuntos/', null=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.asunto
+        return f"{self.asunto} ({self.prioridad})"

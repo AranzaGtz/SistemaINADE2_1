@@ -9,6 +9,11 @@ from accounts.helpers import get_unica_organizacion
 from accounts.models import  Concepto, Cotizacion, Empresa, FormatoCotizacion, FormatoOrden, Organizacion, Persona, Servicio, Titulo
 from django.contrib import messages
 from django.template.loader import render_to_string
+from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
+from django.core.mail import send_mail
+from django.conf import settings
+
 from weasyprint import HTML  # type: ignore
 
 #   VISTA PARA ACTUALIZAR LA ORGANIZACIÓN
@@ -91,18 +96,28 @@ def enviar_queja(request):
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     if request.method == 'POST':
-        form = QuejaForm(request.POST)
+        form = QuejaForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Queja o sujerencia enviada con exito!')
+            queja = form.save(commit=False)
+            queja.nombre = request.user.first_name
+            queja.email = request.user.email
+            queja.save()
+            send_mail(
+                subject=f"Nuevo Queja: {queja.asunto}",
+                message=f"Nombre: {queja.nombre}\nEmail: {queja.email}\nAsunto: {queja.asunto}\nMensaje: {queja.mensaje}\nPrioridad: {queja.prioridad}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[settings.SUPPORT_EMAIL],
+            )
+            messages.success(request, 'Solicitud de queja enviada con éxito!')
             return redirect('home')
     else:
         form = QuejaForm()
-        context={
-            'notificaciones': notificaciones,
-            'notificaciones_no_leidas': notificaciones_no_leidas,
-            'form':form
-        }
+        
+    context = {
+        'notificaciones': notificaciones,
+        'notificaciones_no_leidas': notificaciones_no_leidas,
+        'form': form
+    }
     return render(request, 'accounts/organizacion/enviar_queja.html', context)
 
 def cotizacion_prueba(request):
