@@ -15,7 +15,7 @@ def login_view(request):
     context = {}
     
     if request.user.is_authenticated:
-        return redirect("dashboard", organizacion) # AQUI QUIERO ACTUALIZA PAGUINA
+        return redirect("dashboard") # AQUI QUIERO ACTUALIZA PAGUINA
 
     if request.method == "POST":
 
@@ -32,7 +32,7 @@ def login_view(request):
 
                 login(request, user)
                 messages.success(request, 'Inicio de sesion exitosa.!')
-                return redirect("dashboard", organizacion)
+                return redirect("dashboard")
             else:
                 
                 context['error'] = "No tienes permisos para acceder"
