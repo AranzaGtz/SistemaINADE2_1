@@ -1,12 +1,30 @@
+<!-- accounts/templates/accounts/organizacion/enviar_queja.html -->
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Servicios{% endblock %}
-{% block header %}Servicios{% endblock %}
+{% block title %}Queja{% endblock %}
+{% block header %}Queja{% endblock %}
 {% block content %}
-    <h1>Enviar Queja</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Enviar queja o sujerencia</button>
-    </form>
+    <div class="container mt-4">
+        <h1>Enviar Solicitud de Queja</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_asunto" class="form-label">Asunto</label>
+                {{ form.asunto }}
+            </div>
+            <div class="mb-3">
+                <label for="id_mensaje" class="form-label">Mensaje</label>
+                {{ form.mensaje }}
+            </div>
+            <div class="mb-3">
+                <label for="id_prioridad" class="form-label">Prioridad</label>
+                {{ form.prioridad }}
+            </div>
+            <div class="mb-3">
+                <label for="id_archivo_adjunto" class="form-label">Archivo Adjunto (opcional)</label>
+                {{ form.archivo_adjunto }}
+            </div>
+            <button type="submit" class="btn btn-success">Enviar Solicitud de Queja</button>
+        </form>
+    </div>
 {% endblock %}

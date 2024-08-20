@@ -92,6 +92,7 @@ urlpatterns = [
     path('cotizacion/<int:pk>/pdf/', views_cotizaciones.cotizacion_pdf, name='cotizacion_pdf'),
     path('cotizacion/pdf', views_cotizaciones.generar_pdf_cotizacion, name='generar_pdf_cotizacion'),
     path('cotizacion/<int:pk>/actualizar_estado/', views_cotizaciones.actualizar_estado, name='actualizar_estado'),
+    path('cotizacion_estadisticas/', views_cotizaciones.cotizacion_estadisticas, name='cotizacion_estadisticas'),
     
     #   ---     INTERFAZ COTIZACIONES ACEPTADAS      ---
         
