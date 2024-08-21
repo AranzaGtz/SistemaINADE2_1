@@ -4,6 +4,7 @@
 {% block title %}Usuarios{% endblock %}
 {% block header %}Usuarios{% endblock %}
 {% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- TITULO -->
 <h1 class="text-center">Usuarios del Sistema</h1>
 <hr class="featurette-divider">
@@ -99,7 +100,40 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <!-- Formulario del cliente -->
-                    {{ form.as_p }}
+                     <p>
+                        <label for="{{form.username.id_for_label}}">Username:</label><span id="username_feedback"> </span>
+                        {{ form.username }}
+                     </p>
+                     <p>
+                        <label for="{{from.first_name.id_form_label}}">Nombre: </label>
+                        {{ form.first_name }}
+                     </p>
+                     <p>
+                        <label for="{{from.last_name.id_form_label}}">Apellidos: </label>
+                        {{ form.last_name }}
+                     </p>
+                     <p>
+                        <label for="{{from.email.id_form_label}}">Correo electronico: </label> <span id="email_feedback"></span>
+                        {{ form.email }}
+                     </p>
+                     <p>
+                        <label for="{{from.celular.id_form_label}}">Celular: </label>
+                        {{ form.celular }}
+                     </p>
+                     <p>
+                        <label for="{{from.rol.id_form_label}}">Rol: </label>
+                        {{form.rol}}
+                     </p>
+                     <p><span id="password2_feedback" class="feedback"></span></p>
+                     <p>
+                        <label for="{{from.password1.id_form_label}}">Contraseña: </label><br>
+                        {{form.password1}}
+                     </p>
+
+                     <p>
+                        <label for="{{from.password2.id_form_label}}">Confirmación de contraseña: </label><br>
+                        {{form.password2}}
+                     </p>
 
                     <!-- Leyenda de descripción de roles -->
                     <div id="roleDescription" class="alert alert-info mt-3" style="display: none;"></div>
@@ -154,6 +188,67 @@
 
         roleSelect.addEventListener('change', updateRoleDescription);
         updateRoleDescription();  // Initialize description on page load
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('#id_username').on('input', function() {
+            var username = $(this).val();
+            $.ajax({
+                url: '{% url "verificar_usuario" %}',
+                data: {
+                    'username': username
+                },
+                success: function(response) {
+                    if (response.exists) {
+                        $('#username_feedback').text(' Nombre de usuario ya existe. ❌').css('color', 'red');
+                    } else {
+                        $('#username_feedback').text(' Nombre de usuario disponible. ✔️').css('color', 'green');
+                    }
+                }
+            });
+        });
+    });
+    $(document).ready(function() {
+        $('#id_email').on('input', function() {
+            var email = $(this).val();
+            var emailFeedback = $('#email_feedback');
+
+            // Validar el formato del correo electrónico usando una expresión regular
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (emailPattern.test(email)) {
+                emailFeedback.text('Correo electrónico válido. ✔️').css('color', 'green');
+            } else {
+                emailFeedback.text('No es un correo electrónico válido. ❌').css('color', 'red');
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+        const password1Feedback = document.getElementById('password1_feedback');
+        const password2Feedback = document.getElementById('password2_feedback');
+
+        function validatePasswords() {
+            if (password1.value && password2.value) {
+                if (password1.value === password2.value) {
+                    password2Feedback.textContent = 'Las contraseñas coinciden. ✔️';
+                    password2Feedback.className = 'feedback feedback-valid';
+                    password2Feedback.style = 'color:green'
+                } else {
+                    password2Feedback.textContent = 'Las contraseñas no coinciden. ❌';
+                    password2Feedback.className = 'feedback feedback-invalid';
+                    password2Feedback.style = 'color:red'
+                }
+            } else {
+                password1Feedback.textContent = '';
+                password2Feedback.textContent = '';
+            }
+        }
+
+        password1.addEventListener('input', validatePasswords);
+        password2.addEventListener('input', validatePasswords);
     });
 </script>
 {% endblock %}

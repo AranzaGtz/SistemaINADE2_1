@@ -35,7 +35,6 @@ ALLOWED_HOSTS = ['192.168.x.x', 'localhost', '127.0.0.1', '*']
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'accounts.context_processors.organization_logo',  # Añade aquí el context processor
             ],
         },
     },

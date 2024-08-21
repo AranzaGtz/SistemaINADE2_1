@@ -1,10 +1,17 @@
 # views_usuarios.py
 
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
 from accounts.models import CustomUser
 from django.contrib import messages
 import json
+
+# VISTA PARA ACLARACIÓN DE ERRORES EN FORMULARIO DE CREACION DE USUARIOS
+def verificar_usuario(request):
+    username = request.GET.get('username', '')
+    existe = CustomUser.objects.filter(username=username).exists()
+    return JsonResponse({'exists': existe})
 
 ROL_DESCRIPCION = {
     'admin': 'Acceso completo al sistema. Puede gestionar usuarios, cotizaciones y administrar todas las áreas.',

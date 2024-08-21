@@ -43,8 +43,25 @@
           </div>
           <div class="form-group mt-4">
                <label for="cuerpo_mensaje">Mensaje Personalizado:</label>
+               
                <textarea class="form-control" id="cuerpo_mensaje" name="cuerpo_mensaje" rows="6">{{ cuerpo_mensaje_personalizado }}</textarea>
           </div>
+          <p>Si no se agrega mensaje se colocara un mensaje predeterminado como este: </p>
+              
+          <div class="border p-3">
+               <code> 
+                    <p>Estimado/a cliente,</p>
+                    <p>Adjunto a este correo encontrará la cotización solicitada con el ID 002.</p>
+                    <p>Para descargar la cotización y subir su orden de trabajo, haga clic en el siguiente enlace: http://pagina_de_enlace
+                    Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nosotros a través de este correo.
+                    Agradecemos su atención y esperamos poder colaborar con usted.</p>
+                    <p>Atentamente,</p>
+                    <p>El equipo de INADE Servicios Ambientales</p>
+                    
+                    ---
+                    Este es un correo generado automáticamente, por favor no responda a este mensaje. </code>
+          </div>
+          
           <button type="submit" class="btn btn-primary mt-3">Enviar Cotización</button>
      </form>
 </div>
