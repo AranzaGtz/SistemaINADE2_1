@@ -11,14 +11,9 @@ from django.forms import inlineformset_factory
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name',
-                  'email', 'celular', 'rol')
+        fields = ('username', 'first_name', 'last_name','email', 'celular', 'rol')
         widgets = {
-            'username': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Nombre de usuario',
-                'required': 'True'
-            }),
+            'username': forms.TextInput(attrs={ 'class': 'form-control','placeholder': 'Nombre de usuario','required': 'True' }),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre', 'required': 'False'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos', 'required': 'False'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}),

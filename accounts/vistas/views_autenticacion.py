@@ -13,11 +13,7 @@ def login_view(request):
     context = {}
     
     if request.user.is_authenticated:
-<<<<<<< Updated upstream
-        return redirect("dashboard") # AQUI QUIERO ACTUALIZA PAGUINA
-=======
         return redirect("dashboard")  # Redirigir sin pasar organizacion
->>>>>>> Stashed changes
 
     if request.method == "POST":
         username = request.POST.get("username")
@@ -28,13 +24,8 @@ def login_view(request):
         if user is not None:
             if user.is_staff:  # Verificando si el usuario es trabajador o tiene permiso staff
                 login(request, user)
-<<<<<<< Updated upstream
-                messages.success(request, 'Inicio de sesion exitosa.!')
-                return redirect("dashboard")
-=======
                 messages.success(request, 'Inicio de sesión exitoso!')
                 return redirect("dashboard")  # Redirigir sin pasar organizacion
->>>>>>> Stashed changes
             else:
                 context['error'] = "No tienes permisos para acceder"
                 return render(request, "accounts/autenticacion/login.html", context)

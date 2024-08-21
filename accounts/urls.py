@@ -39,6 +39,7 @@ urlpatterns = [
     path('usuarios/nuevo/', views_usuarios.usuario_create, name='usuario_create'),
     path('usuarios/eliminar/<id>/',views_usuarios.usuario_delete, name='usuario_delete'),
     path('usuarios/editar/<username>/',views_usuarios.usuario_update, name='usuario_edit'),
+    path('verificar-usuario/', views_usuarios.verificar_usuario, name='verificar_usuario'),
 
     #   ---     INTERFAZ CLIENTES       ---
     path('agregar-titulo/', views_clientes.agregar_titulo, name='agregar_titulo'),
