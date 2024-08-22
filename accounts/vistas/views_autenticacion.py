@@ -7,9 +7,62 @@ from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from accounts.forms import CustomUserCreationForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm
 from accounts.models import CustomUser, Organizacion
 
+def initial_setup(request):
+    if Organizacion.objects.exists():
+        return redirect('login')  # Redirige al dashboard si la organización ya está configurada
+
+    if request.method == 'POST':
+        user_form = CustomUserCreationForm(request.POST)
+        org_form = OrganizacionForm(request.POST, request.FILES)
+        cotizacion_form = FormatoCotizacionForm(request.POST, request.FILES)
+        orden_form = FormatoOrdenForm(request.POST, request.FILES)
+
+        if user_form.is_valid() and org_form.is_valid() and cotizacion_form.is_valid() and orden_form.is_valid():
+            user = user_form.save(commit=False)
+
+            user.is_staff = True  # Ajusta los atributos is_staff y is_superuser según el rol del usuario
+
+            if ( user.rol == "admin"):  # Si el rol es admin, se establece is_superuser a True.
+                user.is_superuser = True
+
+            user.save()  # Guarda el usuario en la base de datos.
+            print("Aqui filtro 1")
+
+            formato_cotizacion = cotizacion_form.save()
+            formato_orden = orden_form.save()
+            print("Aqui filtro 2")
+            organizacion = org_form.save(commit=False)
+            organizacion.f_cotizacion = formato_cotizacion
+            organizacion.f_orden = formato_orden
+            organizacion.save()
+            print("Aqui filtro 3")
+            return redirect('login')  # Redirige al dashboard después de la configuración inicial
+        else:
+            context = {
+                'form': user_form,
+                'org_form': org_form,
+                'cotizacion_form': cotizacion_form,
+                'orden_form': orden_form,
+            }
+    else:
+        context = {
+            'form': CustomUserCreationForm(),
+            'org_form': OrganizacionForm(),
+            'cotizacion_form': FormatoCotizacionForm(),
+            'orden_form': FormatoOrdenForm(),
+        }
+
+    return render(request, 'accounts/autenticacion/initial_setup.html', context)
+
 def login_view(request):
+    
+    # Verifica si hay usuarios registrados
+    if not CustomUser.objects.exists():
+        return redirect("initial_setup")  # Redirige a la configuración inicial si no hay usuarios
+    
     context = {}
     
     if request.user.is_authenticated:

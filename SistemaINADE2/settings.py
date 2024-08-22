@@ -169,3 +169,6 @@ EMAIL_HOST_USER = 'proyectos.inade@icloud.com'
 EMAIL_HOST_PASSWORD = 'aiuz-aivh-thmd-vwal'
 DEFAULT_FROM_EMAIL = 'proyectos.inade@icloud.com'
 SUPPORT_EMAIL = 'proyectos.inade@icloud.com'
+
+# settings.py
+LOGIN_URL = 'login/'  # Cambia esto a la URL correcta de tu página de inicio de sesión

@@ -66,7 +66,7 @@ class CustomUser(AbstractUser):
         ('laboratorio', 'Laboratorio'),
         ('calidad', 'Calidad')
     ]
-    rol = models.CharField(max_length=20, choices=AREA_CHOICES, blank=True, null=True)
+    rol = models.CharField(max_length=20, choices=AREA_CHOICES, blank=True, null=True, default='admin')
 
     objects = CustomUserManager()
 

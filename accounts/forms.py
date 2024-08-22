@@ -274,9 +274,9 @@ class FormatoCotizacionForm(forms.ModelForm):
             'version': forms.TextInput(attrs={'class': 'form-control'}),
             'emision': forms.DateInput(attrs={'class': 'form-control'}),
             'titulo_documento': forms.TextInput(attrs={'class': 'form-control'}),
-            'mensaje_propuesta': forms.Textarea(attrs={'class': 'form-control'}),
-            'terminos': forms.Textarea(attrs={'class': 'form-control'}),
-            'avisos': forms.Textarea(attrs={'class': 'form-control'}),
+            'mensaje_propuesta': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'terminos': forms.Textarea(attrs={'class': 'form-control' , 'rows': 2}),
+            'avisos': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
 

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <title>Configuración Inicial</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+     <style>
+          .container {
+               position: relative;
+               height: 100vh;
+               /* Altura completa de la ventana del navegador */
+               overflow: hidden;
+               /* Evita el desbordamiento */
+          }
+
+          #firstDiv,
+          #secondDiv {
+               position: absolute;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background: white;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               transition: opacity 0.5s ease, transform 0.5s ease;
+          }
+
+          #firstDiv {
+               z-index: 2;
+               /* Asegúrate de que el primer div esté encima del segundo inicialmente */
+               opacity: 1;
+               /* Asegúrate de que el primer div sea visible */
+          }
+
+          #secondDiv {
+               transform: translateX(100%);
+               /* Empuja el segundo div fuera de la vista */
+               opacity: 0;
+               /* Inicialmente oculto */
+               z-index: 1;
+               /* Asegúrate de que el segundo div esté detrás del primer div */
+          }
+
+          #firstDiv.hide {
+               opacity: 0;
+               /* Desvanece el primer div */
+          }
+
+          #secondDiv.show {
+               transform: translateX(0);
+               /* Trae el segundo div a la vista */
+               opacity: 1;
+               /* Hazlo visible */
+               z-index: 2;
+               /* Asegúrate de que el segundo div esté encima del primer div cuando sea visible */
+          }
+          /* Nuevo estilo para hacer el contenido desplazable */
+          .card {
+               width: 90%;
+               max-width: 800px;
+               height: 90vh; /* Altura ajustada */
+               display: flex;
+               flex-direction: column;
+          }
+          
+          .card-body {
+               flex: 1;
+               overflow-y: auto; /* Habilita el scroll vertical */
+               padding: 20px;
+               background-color: #f8f9fa; /* Color de fondo ligero para diferenciar */
+          }
+          @media (max-width: 768px) {
+               .card {
+                   width: 100%;
+                   height: 100vh;
+                   border-radius: 0;
+               }
+           
+               .card-body {
+                   padding: 15px;
+               }
+          }
+     </style>
+</head>
+
+<body>
+     <div class="container">
+          <div id="firstDiv">
+               <div>
+                    <h1>Bienvenido!</h1>
+                    <p>Te damos la bienvenida al sistema para laboratorios ambientales.</p>
+                    <p>Da clic en el siguiente botón para empezar a configurar tu organización.</p>
+                    <button id="startButton" type="button" class="btn btn-primary">¡Empecemos!</button>
+               </div>
+          </div>
+
+          <div id="secondDiv">
+               <div class="card">
+                    <div class="card-header text-center">
+                         <h1>Registro y Configuración Inicial</h1>
+                    </div>
+                    <div class="card-body">
+                         <form method="post" enctype="multipart/form-data" action="{% url 'initial_setup' %}">
+                              {% csrf_token %}
+                              <!-- Configuración de usuario -->
+                              <h3 class="mt-3">Configuración de usuario</h3>
+                              <div class="mb-3">
+                                   <label for="username" class="form-label">Username:</label>
+                                   <input type="text" id="username" class="form-control" name="username">
+                                   <div id="username_feedback" class="form-text"></div>
+                              </div>
+                              <div class="row">
+                                   <div class="col mb-3">
+                                        <label for="first_name" class="form-label">Nombre:</label>
+                                        <input type="text" id="first_name" class="form-control" name="first_name">
+                                   </div>
+                                   <div class="col mb-3">
+                                        <label for="last_name" class="form-label">Apellidos:</label>
+                                        <input type="text" id="last_name" class="form-control" name="last_name">
+                                   </div>
+                              </div>
+                              <div class="mb-3">
+                                   <label for="email" class="form-label">Correo Electrónico:</label>
+                                   <input type="email" id="email" class="form-control" name="email">
+                                   <div id="email_feedback" class="form-text"></div>
+                              </div>
+                              <div class="mb-3">
+                                   <label for="celular" class="form-label">Celular:</label>
+                                   <input type="tel" name="celular" class="form-control" placeholder="Celular"
+                                        maxlength="15" id="celular">
+                              </div>
+                              <div class="row">
+                                   <div class="col">
+                                        <label for="password1" class="form-label">Contraseña:</label>
+                                        <input type="password" id="password1" class="form-control" name="password1">
+                                   </div>
+                                   <div class="col">
+                                        <label for="password2" class="form-label">Confirmación de Contraseña:</label>
+                                        <input type="password" id="password2" class="form-control" name="password2">
+                                   </div>
+                              </div>
+                              <div id="password2_feedback" class="form-text mb-3"></div>
+                              <hr class="mt-3 mb-2">
+                              <!-- Configuración de organización -->
+                              <h3 class="mt-3">Configuración de organización</h3>
+                              <div id="url_feedback" class="feedback"></div>
+
+                              <!-- Aquí puedes añadir el formulario de organización -->
+                              {{ org_form.as_p }}
+                              <hr class="mt-3 mb-2">
+                              <!-- Configuración de formato de cotización -->
+                              <h3 class="mt-3">Configuración de formato de cotización</h3>
+                              <!-- Aquí puedes añadir el formulario de cotización -->
+                              {{ cotizacion_form.as_p }}
+                              <hr class="mt-3 mb-2">
+                              <!-- Configuración de formato de orden de trabajo -->
+                              <h3 class="mt-3">Configuración de formato de orden de trabajo</h3>
+                              <!-- Aquí puedes añadir el formulario de orden de trabajo -->
+                              {{ orden_form.as_p }}
+                              <hr class="mt-3 mb-2">
+                              <div class="mt-3 text-end">
+                                   <button type="submit" class="btn btn-success">Empezemos!</button>
+                              </div>
+                         </form>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     <script>
+          document.addEventListener('DOMContentLoaded', function () {
+               const startButton = document.getElementById('startButton');
+               const firstDiv = document.getElementById('firstDiv');
+               const secondDiv = document.getElementById('secondDiv');
+
+               startButton.addEventListener('click', function () {
+                    firstDiv.classList.add('hide');
+                    secondDiv.classList.add('show');
+               });
+          });
+          document.addEventListener('DOMContentLoaded', function () {
+               // Validación de username
+               const usernameInput = document.getElementById('username');
+               const usernameFeedback = document.getElementById('username_feedback');
+
+               usernameInput.addEventListener('input', function () {
+                    const username = this.value;
+                    fetch('{% url "verificar_usuario" %}?username=' + username)
+                         .then(response => response.json())
+                         .then(data => {
+                              if (data.exists) {
+                                   usernameFeedback.textContent = 'Nombre de usuario ya existe. ❌';
+                                   usernameFeedback.style.color = 'red';
+                              } else {
+                                   usernameFeedback.textContent = 'Nombre de usuario disponible. ✔️';
+                                   usernameFeedback.style.color = 'green';
+                              }
+                         });
+               });
+
+               // Validación de email
+               const emailInput = document.getElementById('email');
+               const emailFeedback = document.getElementById('email_feedback');
+               const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+               emailInput.addEventListener('input', function () {
+                    const email = this.value;
+                    if (emailPattern.test(email)) {
+                         emailFeedback.textContent = 'Correo electrónico válido. ✔️';
+                         emailFeedback.style.color = 'green';
+                    } else {
+                         emailFeedback.textContent = 'No es un correo electrónico válido. ❌';
+                         emailFeedback.style.color = 'red';
+                    }
+               });
+
+               // Validación de contraseñas
+               const password1 = document.getElementById('password1');
+               const password2 = document.getElementById('password2');
+               const password2Feedback = document.getElementById('password2_feedback');
+
+               function validatePasswords() {
+                    if (password1.value && password2.value) {
+                         if (password1.value === password2.value) {
+                              password2Feedback.textContent = 'Las contraseñas coinciden. ✔️';
+                              password2Feedback.style.color = 'green';
+                         } else {
+                              password2Feedback.textContent = 'Las contraseñas no coinciden. ❌';
+                              password2Feedback.style.color = 'red';
+                         }
+                    } else {
+                         password2Feedback.textContent = '';
+                    }
+               }
+
+               password1.addEventListener('input', validatePasswords);
+               password2.addEventListener('input', validatePasswords);
+          });
+          document.addEventListener('DOMContentLoaded', function() {
+               const urlInput = document.getElementById('id_pagina_web');
+               const urlFeedback = document.getElementById('url_feedback');
+   
+               // Validación de URL en tiempo real
+               urlInput.addEventListener('input', function() {
+                   const urlValue = this.value;
+                   try {
+                       // Intentar crear un objeto URL
+                       const url = new URL(urlValue);
+                       urlFeedback.textContent = 'URL válida ✔️';
+                       urlFeedback.style.color = 'green';
+                   } catch (_) {
+                       urlFeedback.textContent = 'URL no válida ❌';
+                       urlFeedback.style.color = 'red';
+                   }
+               });
+           });
+     </script>
+</body>
+
+</html>

@@ -5,7 +5,7 @@ from accounts import views
 from accounts.views import editar_configuracion_sistema, notificaciones, marcar_notificacion_leida
 from accounts.vistas import views_clientes, views_cotizaciones_aceptadas, views_empresas, views_guia, views_orden_trabajo, views_usuarios, views_prospectos, views_autenticacion, views_home, views_cotizaciones, views_servicios, views_correos, views_organizacion
 from django.contrib.auth import views as auth_views
-from accounts.vistas.views_autenticacion import CustomPasswordResetView
+from accounts.vistas.views_autenticacion import CustomPasswordResetView, initial_setup
 
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     path('', views_autenticacion.dashboard, name='dashboard'),
     path('login/', views_autenticacion.login_view, name='login'),
     path('logout/', views_autenticacion.logout_view, name='logout'),
+    path('initial-setup/', initial_setup, name='initial_setup'),
 
     #   ---     RECUPERACIÓN DE CONTRASEÑA       ---
 
