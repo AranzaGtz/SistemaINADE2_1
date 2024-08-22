@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from accounts.forms import CustomUserCreationForm, CustomUserChangeForm
 from accounts.models import CustomUser
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
 import json
 
 # VISTA PARA ACLARACIÓN DE ERRORES EN FORMULARIO DE CREACION DE USUARIOS
@@ -23,6 +25,7 @@ ROL_DESCRIPCION = {
 }
 
 # VISTA PARA DIRIGIR A INTERFAZ DE USUARIO
+@login_required
 def usuario_list(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
