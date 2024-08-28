@@ -1,0 +1,63 @@
+<!-- templates/cargar_csd.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+     <title>Cargar CSD</title>
+     <script>
+          function validateForm() {
+               const rfcInput = document.getElementById('id_rfc');
+               const cerFileInput = document.getElementById('formCerFile');
+               const keyFileInput = document.getElementById('formKeyFile');
+               const rfc = rfcInput.value.trim().toUpperCase();
+               const cerFile = cerFileInput.value;
+               const keyFile = keyFileInput.value;
+
+               // Validar RFC (Formato estándar: 4 letras + 6 dígitos + 3 caracteres)
+               const rfcRegex = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
+               if (!rfcRegex.test(rfc)) {
+                    alert('Por favor, ingresa un RFC válido.');
+                    return false; // Evita el envío del formulario
+               }
+
+               // Validar archivo .cer
+               if (!cerFile.endsWith('.cer')) {
+                    alert('Por favor, selecciona un archivo .cer válido.');
+                    return false; // Evita el envío del formulario
+               }
+
+               // Validar archivo .key
+               if (!keyFile.endsWith('.key')) {
+                    alert('Por favor, selecciona un archivo .key válido.');
+                    return false; // Evita el envío del formulario
+               }
+
+               return true; // Permite el envío del formulario
+          }
+     </script>
+
+</head>
+
+<body>
+     <div class="container mt-5">
+          <h1>Cargar Certificado de Sello Digital (CSD)</h1>
+          {% if messages %}
+          <ul class="messages">
+               {% for message in messages %}
+               <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                    {% endfor %}
+          </ul>
+          {% endif %}
+          <form method="post" enctype="multipart/form-data">
+               {% csrf_token %}
+               {{ form.as_p }}
+               <button type="submit" class="btn btn-primary">Cargar CSD</button>
+          </form>
+     </div>
+</body>
+
+</html>
