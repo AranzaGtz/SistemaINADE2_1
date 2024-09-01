@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { connect, ConnectedProps } from "react-redux";
 import { login } from "@/store/actions/authActions";
 import axios from "axios";
@@ -31,6 +31,8 @@ const Login: React.FC<Props> = ({ login, isAuthenticated }) => {
 
   const { email, password } = formData;
 
+  const navigate = useNavigate();
+
   const onChange = (e: ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -38,6 +40,10 @@ const Login: React.FC<Props> = ({ login, isAuthenticated }) => {
     e.preventDefault();
     login(email, password);
   };
+
+  const goSignup = () => navigate("/signup");
+
+  const goForgotPassword = () => navigate("/forgot-password");
 
   const continueWithGoogle = async () => {
     try {
@@ -51,7 +57,7 @@ const Login: React.FC<Props> = ({ login, isAuthenticated }) => {
   };
 
   if (isAuthenticated) {
-    return <Navigate to="/" />;
+    navigate("/");
   }
 
   return (
@@ -91,11 +97,11 @@ const Login: React.FC<Props> = ({ login, isAuthenticated }) => {
           Continue With Google
         </Button>
         <br />
-        <p className="mt-3">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
+        <p className="mt-3" onClick={goSignup}>
+          Don't have an account? Sign Up
         </p>
-        <p className="mt-3">
-          Forgot your Password? <Link to="/reset-password">Reset Password</Link>
+        <p className="mt-3" onClick={goForgotPassword}>
+          Forgot your Password? Reset Password
         </p>
       </Card>
     </div>

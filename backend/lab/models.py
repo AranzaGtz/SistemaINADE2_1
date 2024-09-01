@@ -13,8 +13,14 @@ class Laboratory(models.Model):
     phone = models.CharField(max_length=16, null=True, blank=True)
     email = models.EmailField(blank=True, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='laboratories')
-    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Laboratory'
+        verbose_name_plural = 'Laboratories'
+        ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
         if not self.address:
@@ -32,8 +38,14 @@ class Equipment(models.Model):
     name = models.CharField(max_length=64, null=False, blank=False)
     description = models.CharField(max_length=128, null=True, blank=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE, related_name='equipments')
-    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Equipment'
+        verbose_name_plural = 'Equipments'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
@@ -44,8 +56,14 @@ class SubEquipment(models.Model):
     name = models.CharField(max_length=64, null=False, blank=False)
     description = models.CharField(max_length=128, null=True, blank=True)
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE, related_name='sub_equipments')
-    created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'SubEquipment'
+        verbose_name_plural = 'SubEquipments'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
@@ -57,7 +75,14 @@ class InternalCustody(models.Model):
     final_disposition = models.CharField(choices=FinalDisposition.choices, default=FinalDisposition.RETURN_TO_CLIENT, max_length=20)
     observations = models.CharField(max_length=128, null=True, blank=True)
     work_order = models.ForeignKey(WorkOrder, on_delete=models.CASCADE, related_name='internal_custody')
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'InternalCustody'
+        verbose_name_plural = 'InternalCustodies'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.id
@@ -66,7 +91,14 @@ class FilterMethod(models.Model):
     id = models.CharField(primary_key=True, default=generate_short_uuid, max_length=8, editable=False, unique=True)
     name = models.CharField(max_length=64, null=False, blank=False)
     description = models.CharField(max_length=128, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'FilterMethod'
+        verbose_name_plural = 'FilterMethods'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.name
@@ -80,7 +112,14 @@ class Sample(models.Model):
     num_containers = models.IntegerField(null=True, blank=True)
     internal_custody = models.ForeignKey(InternalCustody, on_delete=models.CASCADE, related_name='samples')
     filter_method = models.OneToOneField(FilterMethod, on_delete=models.CASCADE, related_name='sample', null=True, blank=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Sample'
+        verbose_name_plural = 'Samples'
+        ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
         if not self.sampling_datetime:

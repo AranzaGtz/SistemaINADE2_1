@@ -22,7 +22,7 @@ from .views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('accounts.urls')),
+    path('api/accounts/', include('accounts.urls')),
     path('api/company/', include('company.urls')),
     path('api/lab/', include('lab.urls')),
     re_path(r'^(?!api|admin|media)(?P<path>.*)$', index),

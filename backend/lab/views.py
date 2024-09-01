@@ -2,12 +2,16 @@ from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .models import ( 
-    Laboratory, Equipment, SubEquipment
+    Laboratory, Equipment, SubEquipment,
+    InternalCustody, FilterMethod, Sample
 )
 from .serializers import ( 
     LaboratoryListSerializer, LaboratoryDetailSerializer,
     EquipmentListSerializer, EquipmentDetailSerializer,
-    SubEquipmentListSerializer, SubEquipmentDetailSerializer
+    SubEquipmentListSerializer, SubEquipmentDetailSerializer,
+    InternalCustodyListSerializer, InternalCustodyDetailSerializer,
+    FilterMethodListSerializer, FilterMethodDetailSerializer,
+    SampleListSerializer, SampleDetailSerializer
 )
 
 # Create your views here.

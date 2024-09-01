@@ -1,10 +1,32 @@
 import axios from "axios";
 import { AppDispatch } from "../store";
-import * as TYPE from "../types/authTypes";
+import {
+  loginSuccess,
+  loginFail,
+  authenticatedSuccess,
+  authenticatedFail,
+  userLoadedSuccess,
+  userLoadedFail,
+  refreshSuccess,
+  refreshFail,
+  signupSuccess,
+  signupFail,
+  activateAccountSuccess,
+  activateAccountFail,
+  resetSuccess,
+  resetFail,
+  setSuccess,
+  setFail,
+  logout,
+  changePasswordSuccess,
+  changePasswordFail,
+} from "../slices/authSlice";
 import { API_BASE_URL } from "@/constants/urls";
+import { ACCOUNTS } from "@/constants/appTypes";
+
 axios.defaults.withCredentials = true;
 
-export const loadUser = () => async (dispatch: AppDispatch) => {
+export const getUser = () => async (dispatch: AppDispatch) => {
   if (localStorage.getItem('access')) {
     const config = {
       headers: {
@@ -14,20 +36,13 @@ export const loadUser = () => async (dispatch: AppDispatch) => {
     };
 
     try {
-      const res = await axios.get(`${API_BASE_URL}/auth/users/me/`, config);
-      dispatch({
-        type: TYPE.USER_LOADED_SUCCESS,
-        payload: res.data,
-      });
+      const res = await axios.get(`${API_BASE_URL}${ACCOUNTS}/auth/users/me/`, config);
+      dispatch(userLoadedSuccess(res.data));
     } catch (err) {
-      dispatch({
-        type: TYPE.USER_LOADED_FAIL,
-      });
+      dispatch(userLoadedFail());
     }
   } else {
-    dispatch({
-      type: TYPE.USER_LOADED_FAIL,
-    });
+    dispatch(userLoadedFail());
   }
 };
 
@@ -39,26 +54,22 @@ export const googleAuthenticate = (state: string, code: string) => async (dispat
       }
     };
 
-    const details = {
+    const details: { [key: string]: string } = {
       'state': state,
       'code': code
     };
 
-    const formBody = Object.keys(details).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(details[key])).join('&');
+    const formBody = Object.keys(details)
+      .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(details[key]))
+      .join('&');
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/auth/o/google-oauth2/?${formBody}`, config);
+      const res = await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/o/google-oauth2/?${formBody}`, config);
 
-      dispatch({
-        type: TYPE.GOOGLE_AUTH_SUCCESS,
-        payload: res.data
-      });
-
-      dispatch(loadUser());
+      dispatch(loginSuccess(res.data));
+      dispatch(getUser());
     } catch (err) {
-      dispatch({
-        type: TYPE.GOOGLE_AUTH_FAIL
-      });
+      dispatch(loginFail(err));
     }
   }
 };
@@ -68,33 +79,24 @@ export const checkAuthenticated = () => async (dispatch: AppDispatch) => {
     const config = {
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json",
       },
     };
     const body = JSON.stringify({ token: localStorage.getItem('access') });
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/auth/jwt/verify/`, body, config);
+      const res = await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/jwt/verify/`, body, config);
 
       if (res.data.code !== 'token_not_valid') {
-        dispatch({
-          type: TYPE.AUTHENTICATED_SUCCESS,
-        });
+        dispatch(authenticatedSuccess());
       } else {
-        dispatch({
-          type: TYPE.AUTHENTICATED_FAIL,
-        });
+        dispatch(authenticatedFail());
         dispatch(refreshToken());
       }
     } catch (err) {
-      dispatch({
-        type: TYPE.AUTHENTICATED_FAIL,
-      });
+      dispatch(authenticatedFail());
     }
   } else {
-    dispatch({
-      type: TYPE.AUTHENTICATED_FAIL,
-    });
+    dispatch(authenticatedFail());
   }
 };
 
@@ -107,15 +109,11 @@ export const login = (email: string, password: string) => async (dispatch: AppDi
   const body = JSON.stringify({ email, password });
 
   try {
-    const res = await axios.post(`${API_BASE_URL}/auth/jwt/create/`, body, config);
-    dispatch({
-      type: TYPE.LOGIN_SUCCESS,
-      payload: res.data,
-    });
+    const res = await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/jwt/create/`, body, config);
+    dispatch(loginSuccess(res.data));
+    console.log(res.data);
   } catch (err) {
-    dispatch({
-      type: TYPE.LOGIN_FAIL,
-    });
+    dispatch(loginFail(err));
   }
 };
 
@@ -128,14 +126,10 @@ export const signup = (email: string, first_name: string, last_name: string, pas
   const body = JSON.stringify({ email, first_name, last_name, password, re_password });
   
   try {
-    await axios.post(`${API_BASE_URL}/auth/users/`, body, config);
-    dispatch({
-      type: TYPE.SIGNUP_SUCCESS,
-    });
+    await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/users/`, body, config);
+    dispatch(signupSuccess());
   } catch (err) {
-    dispatch({
-      type: TYPE.SIGNUP_FAIL,
-    });
+    dispatch(signupFail());
   }
 };
 
@@ -148,14 +142,10 @@ export const verify = (uid: string, token: string) => async (dispatch: AppDispat
   const body = JSON.stringify({ uid, token });
 
   try {
-    await axios.post(`${API_BASE_URL}/auth/users/activation/`, body, config);
-    dispatch({
-      type: TYPE.ACTIVATE_ACCOUNT_SUCCESS,
-    });
+    await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/users/activation/`, body, config);
+    dispatch(activateAccountSuccess());
   } catch (err) {
-    dispatch({
-      type: TYPE.ACTIVATE_ACCOUNT_FAIL,
-    });
+    dispatch(activateAccountFail());
   }
 };
 
@@ -168,14 +158,10 @@ export const resetPassword = (email: string) => async (dispatch: AppDispatch) =>
   const body = JSON.stringify({ email });
 
   try {
-    await axios.post(`${API_BASE_URL}/auth/users/reset_password/`, body, config);
-    dispatch({
-      type: TYPE.PASSWORD_RESET_SUCCESS,
-    });
+    await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/users/reset_password/`, body, config);
+    dispatch(resetSuccess());
   } catch (err) {
-    dispatch({
-      type: TYPE.PASSWORD_RESET_FAIL,
-    });
+    dispatch(resetFail());
   }
 };
 
@@ -188,14 +174,10 @@ export const resetPasswordConfirm = (uid: string, token: string, new_password: s
   const body = JSON.stringify({ uid, token, new_password, re_new_password });
 
   try {
-    await axios.post(`${API_BASE_URL}/auth/users/reset_password_confirm/`, body, config);
-    dispatch({
-      type: TYPE.PASSWORD_RESET_CONFIRM_SUCCESS,
-    });
+    await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/users/reset_password_confirm/`, body, config);
+    dispatch(setSuccess());
   } catch (err) {
-    dispatch({
-      type: TYPE.PASSWORD_RESET_CONFIRM_FAIL,
-    });
+    dispatch(setFail());
   }
 };
 
@@ -209,31 +191,21 @@ export const refreshToken = () => async (dispatch: AppDispatch) => {
     const body = JSON.stringify({ refresh: localStorage.getItem('refresh') });
 
     try {
-      const res = await axios.post(`${API_BASE_URL}/auth/jwt/refresh/`, body, config);
-      dispatch({
-        type: TYPE.REFRESH_SUCCESS,
-        payload: res.data,
-      });
+      const res = await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/jwt/refresh/`, body, config);
+      dispatch(refreshSuccess(res.data));
     } catch (err) {
-      dispatch({
-        type: TYPE.REFRESH_FAIL,
-      });
+      dispatch(refreshFail());
     }
   } else {
-    dispatch({
-      type: TYPE.REFRESH_FAIL,
-    });
+    dispatch(refreshFail());
   }
 };
 
-export const logout = () => (dispatch: AppDispatch) => {
+export const logoutUser = () => (dispatch: AppDispatch) => {
   localStorage.removeItem('access');
   localStorage.removeItem('refresh');
-  dispatch({
-    type: TYPE.LOGOUT,
-  });
+  dispatch(logout());
 };
-
 
 export const changePassword = (current_password: string, new_password: string) => async (dispatch: AppDispatch) => {
   await dispatch(checkAuthenticated());
@@ -247,13 +219,9 @@ export const changePassword = (current_password: string, new_password: string) =
   const body = JSON.stringify({ current_password, new_password });
   
   try {
-    await axios.post(`${API_BASE_URL}/auth/users/set_password/`, body, config);
-    dispatch({
-      type: TYPE.CHANGE_PASSWORD_SUCCESS,
-    });
+    await axios.post(`${API_BASE_URL}${ACCOUNTS}/auth/users/set_password/`, body, config);
+    dispatch(changePasswordSuccess());
   } catch (err) {
-    dispatch({
-      type: TYPE.CHANGE_PASSWORD_FAIL,
-    });
+    dispatch(changePasswordFail());
   }
 };

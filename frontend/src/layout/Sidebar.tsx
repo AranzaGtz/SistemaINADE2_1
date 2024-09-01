@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export const AdminNavbar: React.FC = () => {
+export const AdminSidebar: React.FC = () => {
   const navigate = useNavigate();
   return (
     <nav>
@@ -14,7 +14,7 @@ export const AdminNavbar: React.FC = () => {
   );
 };
 
-export const CustomerNavbar: React.FC = () => {
+export const CustomerSidebar: React.FC = () => {
   const navigate = useNavigate();
   return (
     <nav>
@@ -27,7 +27,7 @@ export const CustomerNavbar: React.FC = () => {
   );
 };
 
-export const GuestNavbar: React.FC = () => {
+export const GuestSidebar: React.FC = () => {
   const navigate = useNavigate();
   return (
     <nav>

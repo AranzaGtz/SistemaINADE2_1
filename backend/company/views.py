@@ -10,6 +10,7 @@ from .serializers import (
 )
 
 # Create your views here.
+
 class OrganizationListView(generics.ListCreateAPIView):
     serializer_class = OrganizationListSerializer
     
