@@ -265,16 +265,20 @@ class Metodo(models.Model):
 
 # MODELO PARA SERVICIO
 class Servicio(models.Model):
+    codigo = models.CharField(max_length=15)
     metodo = models.ForeignKey(Metodo,on_delete=models.SET_NULL, null=True)
     nombre_servicio = models.CharField(max_length=100)# REPRESENTA EL NOMBRE DEL SERVICIO
-    precio_sugerido = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()#MUESTRA UNA DESCRIPCION DEL SERVICIO
+    unidad = models.CharField(max_length=50)
+    unidad_cfdi = models.CharField(max_length=20, choices=[('ACT', 'ACT - Actividad'), ('E48', 'E48 - Unidad de Servicio'), ('H87', 'H87 - Pieza'), ('EA', 'EA - Elemento'), ('E51', 'E51 - Trabajo')], default='E48')
+    clave_cfdi = models.CharField(max_length=20, choices=[('77101700', '77101700 - Servicios de asesoría ambiental'),('77101701', '77101701 - Servicios de asesoramiento sobre ciencias ambientales')], default='77101700')
     subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
     acreditado = models.BooleanField(default=True) # False para "No acreditado", Ture para "Acreditado"
 
     def save(self, *args, **kwargs):
-        if self.precio_sugerido <= 0:
-            self.precio_sugerido = 1
+        if self.precio_unitario <= 0:
+            self.precio_unitario = 1
         super(Servicio, self).save(*args, **kwargs)
     
     def __str__(self):
@@ -285,15 +289,19 @@ class Concepto(models.Model):
     cotizacion = models.ForeignKey(Cotizacion, related_name='conceptos', on_delete=models.CASCADE)
     cantidad_servicios = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    importe = models.DecimalField(max_digits=10,decimal_places=2, default=0.00, blank=True, null=True)
     notas = models.TextField(null=True, blank=True)
     servicio = models.ForeignKey(Servicio, on_delete=models.PROTECT)
     subcontrato = models.BooleanField(default=False) # False para "No sub contrato", True para "sub contrato"
     
     def save(self, *args, **kwargs):
         if self.precio <= 0:
-            self.precio = self.servicio.precio_sugerido
+            self.precio = self.servicio.precio_unitario
         if self.cantidad_servicios <= 0:
             self.cantidad_servicios = 1
+        
+        # Calcular el importe
+        self.importe = self.precio * self.cantidad_servicios
         super(Concepto, self).save(*args, **kwargs)
         
     def __str__(self):
@@ -369,6 +377,25 @@ class Organizacion(models.Model):
     
     def __str__(self):
         return self.nombre
+
+# MODELO PARA MATRIZ
+class Sucursal(models.Model):
+    nombre = models.CharField(max_length=255, default='Matriz')
+    direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE, null=True, blank=True, related_name='sucursal_direccion')
+    organizacion = models.ForeignKey(Organizacion, null=False, blank=False, related_name='organizacion_sucursal', on_delete=models.PROTECT)  # Protege la organización de ser eliminada si existen sucursales.)
+    
+    def __str__(self):
+        return self.nombre
+    
+# MODELO PARA ALMACÉN
+class Almacen(models.Model):
+    nombre = models.CharField(max_length=255, default='Matriz')
+    direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE, null=True, blank=True, related_name='almacen_direccion')
+    organizacion = models.ForeignKey(Organizacion, null=False, blank=False, related_name='almacen_sucursal', on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.nombre
+    # Protege la organización de ser eliminada si existen sucursales.)
 
 #----------------------------------------------------
 # MODELO PARA CONFIGURACIÓN GENERAL DEL SISTEMA

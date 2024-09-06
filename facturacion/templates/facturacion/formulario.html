@@ -3,6 +3,309 @@
 {% block title %}Detalles de la Orden de trabajo{% endblock %}
 {% block header %}Detalles de la Orden de trabajo{% endblock %}
 {% block content %}
-<h1>Aqui debe ir formulario para registrar nueva factura</h1>
-<h2>Orden de Trabajo <code>{{orden.id_personalizado}}</code> a facturar</h2>
+<style>
+     .form-row div.form-group {
+          margin: 0 auto;
+          width: 100%;
+          max-width: 200px;
+     }
+</style>
+
+<!-- FORMULARIO -->
+<form method="post" enctype="multipart/form-data">
+     {% csrf_token %}
+     {{ form.non_field_errors }}
+     <!-- CARD -->
+     <div class="card border-light mb-3">
+          <!-- ENCABEZADO DE CARD -->
+          <div class="card-header text-center">
+               <div class="p-2">
+                    <h3>Facturar {{orden.id_personalizado}}</h3>
+                    <div class="row">
+                         <div class="col col-1">
+                              <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;"
+                                   class="mr-2">
+                         </div>
+                         <div class="col text-start card-text ">
+                              <h5>Emisor</h5>
+                              <p>
+                                   <strong>{{ organization_name }}</strong><br>
+                                   <strong>RFC:</strong>
+                                   <strong>Telefono: </strong>{{organization.telefono}} <br>
+                                   <strong>Direccion: </strong>{{ organization.direccion }}
+                              </p>
+                         </div>
+                         <div class="col text-start">
+                              <h5 class="card-title">Receptor</h5>
+                              <strong>Nombre Receptor</strong><br>
+                              <strong>RFC:</strong>
+                         </div>
+                    </div>
+               </div>
+          </div>
+          <!-- CUERPO DE CARD -->
+          <div class="card-body ">
+               <div class="form-row mb-3">
+                    <div class="form-group input-group">
+                         <!-- Renderizar la etiqueta (label) del campo -->
+                         <div style="width: 200px;">{{ encabezado_form.sucursal.label_tag }}</div>
+                         <!-- Renderizar el campo con los atributos personalizados -->
+                         {{ encabezado_form.sucursal }}
+                         <a class="btn btn-outline-secondary" type="button" onclick="abrirVentanaSucursal()">
+                              &plus;
+                         </a>
+                         <!-- Mostrar errores específicos de este campo -->
+                         {% if encabezado_form.sucursal.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.sucursal.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+
+                    <div class="form-group input-group">
+                         <div style="width: 200px;">{{ encabezado_form.almacen.label_tag }}</div>
+                         {{ encabezado_form.almacen }}
+                         <a class="btn btn-outline-secondary" type="button" onclick="abrirVentanaAlmacen()">
+                              &plus;
+                         </a>
+                         {% if encabezado_form.almacen.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.almacen.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                         {{ encabezado_form.tipo_moneda.label_tag }}
+                         {{ encabezado_form.tipo_moneda }}
+                         {% if encabezado_form.tipo_moneda.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.tipo_moneda.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                         {{ encabezado_form.orden_compra.label_tag }}
+                         {{ encabezado_form.orden_compra }}
+                         {% if encabezado_form.orden_compra.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.orden_compra.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                         {{ encabezado_form.uso_cfdi.label_tag }}
+                         {{ encabezado_form.uso_cfdi }}
+                         {% if encabezado_form.uso_cfdi.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.uso_cfdi.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                         {{ encabezado_form.forma_pago.label_tag }}
+                         {{ encabezado_form.forma_pago }}
+                         {% if encabezado_form.forma_pago.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.forma_pago.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+               </div>
+          </div>
+     </div>
+
+     {{formset.as_p}}
+
+
+     <!-- DETALLES DE CONCEPTOS -->
+     <div class="table-responsive">
+          <table class="table table-hover">
+               <thead class="thead-light">
+                    <tr>
+                         <th class="col-1">Código</th>
+                         <th>Nombre del servicio</th>
+                         <th>Método</th>
+                         <th class="col-1">Cantidad</th>
+                         <th class="col-1">Precio</th>
+                         <th class="col-1">Importe</th>
+                    </tr>
+               </thead>
+               <tbody id="conceptos-table-body">
+                    <!-- Aquí se agregarán los formularios -->
+                    {% for concepto in conceptos %}
+                    <tr class="concepto-row">
+                         <td class="col-1">
+                              <select name="codigo_servicio_{{ forloop.counter }}"
+                                   id="codigo_servicio_{{ forloop.counter }}" class="form-control" onchange="getServiceData(this)">
+                                   <option value="">Seleccionar código</option>
+                                   {% for servicio in servicios %}
+                                        <option value="{{ servicio.codigo }}">{{ servicio.codigo }}</option>
+                                   {% endfor %}
+                              </select>
+                         </td>
+                         <td>
+                              <input type="text" name="nombre_servicio_{{ forloop.counter }}"
+                                   value="{{ concepto.concepto.servicio.nombre_servicio }}" class="form-control">
+                         </td>
+                         <td>
+                              <input type="text" name="metodo_{{ forloop.counter }}"
+                                   value="{{ concepto.concepto.servicio.metodo }}" class="form-control">
+                         </td>
+                         <td class="col-1">
+                              <input type="number" name="cantidad_servicios_{{ forloop.counter }}"
+                                   value="{{ concepto.concepto.cantidad_servicios }}" class="form-control">
+                         </td>
+                         <td class="col-1">
+                              <input type="number" step="0.01" name="precio_{{ forloop.counter }}"
+                                   value="{{ concepto.concepto.precio }}" class="form-control">
+                         </td>
+                         <td class="col-1">
+                              <input type="text" name="importe_{{ forloop.counter }}"
+                                   value="{{ concepto.concepto.importe }}" class="form-control">
+                         </td>
+                    </tr>
+                    {% endfor %}
+               </tbody>
+          </table>
+
+          <div class="row">
+               <a id="add-concepto" class="btn btn-light" href="#">Agrega servicio</a>
+          </div>
+     </div>
+
+     <div class="row">
+          <div class="col">
+               {{ pie_form.as_p }}
+          </div>
+          <div class="col col-3">
+               <div class="form-group">
+                    <!-- Renderizar la etiqueta (label) del campo subtotal -->
+                    {{ totales_form.subtotal.label_tag }}
+                    <!-- Renderizar el campo subtotal con los atributos personalizados -->
+                    {{ totales_form.subtotal }}
+                    <!-- Mostrar errores específicos de este campo -->
+                    {% if totales_form.subtotal.errors %}
+                    <div class="text-danger">
+                         {{ totales_form.subtotal.errors }}
+                    </div>
+                    {% endif %}
+               </div>
+
+               <div class="form-group">
+                    <!-- Renderizar la etiqueta (label) del campo iva -->
+                    {{ totales_form.iva.label_tag }}
+                    <!-- Renderizar el campo iva con los atributos personalizados -->
+                    {{ totales_form.iva }}
+                    <!-- Mostrar errores específicos de este campo -->
+                    {% if totales_form.iva.errors %}
+                    <div class="text-danger">
+                         {{ totales_form.iva.errors }}
+                    </div>
+                    {% endif %}
+               </div>
+               <div class="form-group">
+                    {{ totales_form.tasa_iva.label_tag }}
+                    <select name="tasa_iva" id="tasa_iva" class="form-select">
+                         <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%
+                         </option>
+                         <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%
+                         </option>
+                    </select>
+                    {% if totales_form.tasa_iva.errors %}
+                    <div class="text-danger">
+                         {{ totales_form.tasa_iva.errors }}
+                    </div>
+                    {% endif %}
+               </div>
+
+               <div class="form-group">
+                    <!-- Renderizar la etiqueta (label) del campo total -->
+                    {{ totales_form.total.label_tag }}
+                    <!-- Renderizar el campo total -->
+                    {{ totales_form.total }}
+                    <!-- Mostrar errores específicos de este campo -->
+                    {% if totales_form.total.errors %}
+                    <div class="text-danger">
+                         {{ totales_form.total.errors }}
+                    </div>
+                    {% endif %}
+               </div>
+
+          </div>
+     </div>
+
+     <!-- BOTON DE FORMULARIO -->
+     <div class="text-end m-3">
+          <button type="submit" class="btn btn-primary  p-2">Pre facturar</button>
+     </div>
+
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+     function abrirVentanaSucursal() {
+          const url = "{% url 'agregar_sucursal' %}";
+          const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
+          window.open(url, 'Agregar Sucursal', options);
+     }
+     function actualizarSelectSucursal(nuevoSucursal) {
+          const select = document.querySelector('select[name="sucursal"]');
+          const option = new Option(nuevoSucursal.nombre, nuevoSucursal.id);
+          select.add(option);
+          select.value = nuevoSucursal.id;  // Select the newly added receptor
+     }
+     function abrirVentanaAlmacen() {
+          const url = "{% url 'agregar_almacen' %}";
+          const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
+          window.open(url, 'Agregar Almacen', options);
+     }
+     function actualizarSelectAlmacen(nuevoAlmacen) {
+          const select = document.querySelector('select[name="almacen"]');
+          const option = new Option(nuevoAlmacen.nombre, nuevoAlmacen.id);
+          select.add(option);
+          select.value = nuevoAlmacen.id;  // Select the newly added receptor
+     }
+</script>
+
+<script>
+     document.addEventListener('DOMContentLoaded', function () {
+          const addButton = document.getElementById('add-concepto');
+          const tableBody = document.getElementById('conceptos-table-body');
+          let counter = {{ conceptos| length | add: 1
+     }}; // Inicializa el contador en función de la cantidad de conceptos
+
+     addButton.addEventListener('click', function (event) {
+          event.preventDefault(); // Evita el comportamiento predeterminado del enlace
+
+          // Obtiene la última fila del tbody
+          const lastRow = tableBody.querySelector('.concepto-row:last-child');
+
+          if (lastRow) {
+               // Clona la última fila
+               const newRow = lastRow.cloneNode(true);
+
+               // Limpia los valores de los inputs en la nueva fila y actualiza los nombres
+               newRow.querySelectorAll('input').forEach(input => {
+                    input.value = ''; // Limpia el valor
+                    const nameParts = input.name.split('_');
+                    if (nameParts.length > 1 && !isNaN(nameParts.pop())) {
+                         input.name = nameParts.join('_') + '_' + counter;
+                    }
+               });
+
+               // Incrementa el contador
+               counter++;
+
+               // Agrega la nueva fila al final del tbody
+               tableBody.appendChild(newRow);
+          }
+     });
+      });
+</script>
+
 {% endblock content %}

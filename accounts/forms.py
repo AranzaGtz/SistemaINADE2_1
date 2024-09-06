@@ -2,7 +2,7 @@ from django import forms
 
 # accounts/forms.py
 from .utils import obtener_configuracion
-from .models import Concepto, ConfiguracionSistema, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Titulo
+from .models import Almacen, Concepto, ConfiguracionSistema, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Sucursal, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -153,12 +153,15 @@ class MetodoForm(forms.ModelForm):
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['nombre_servicio', 'descripcion','precio_sugerido','subcontrato','acreditado']
+        fields = ['codigo', 'nombre_servicio','unidad','unidad_cfdi','clave_cfdi', 'descripcion','precio_unitario','subcontrato','acreditado']
         widgets = {
-
+            'codigo':forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingresa codigo'}),
+            'unidad':forms.TextInput(attrs={'class':'form-control','placeholder':'Ingresa unidad'}),
+            'unidad_cfdi':forms.Select(attrs={'class':'form-control'}),
+            'clave_cfdi':forms.Select(attrs={'class':'form-control'}),
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto', 'rows': 2}),
-            'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
             'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'})
         }
@@ -167,11 +170,15 @@ class ServicioForm(forms.ModelForm):
 class ServicioForm2(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['metodo', 'nombre_servicio', 'precio_sugerido', 'descripcion','subcontrato','acreditado']
+        fields = ['codigo', 'metodo', 'nombre_servicio','unidad','unidad_cfdi','clave_cfdi', 'precio_unitario', 'descripcion','subcontrato','acreditado']
         widgets = {
+            'codigo':forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingresa codigo'}),
+            'unidad':forms.TextInput(attrs={'class':'form-control','placeholder':'Ingresa unidad'}),
+            'unidad_cfdi':forms.Select(attrs={'class':'form-control'}),
+            'clave_cfdi':forms.Select(attrs={'class':'form-control'}),
             'metodo': forms.Select(attrs={'class': 'form-control'}),
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio'}),
-            'precio_sugerido': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio'}),
             'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
             'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'})
@@ -183,6 +190,7 @@ class ConceptoForm(forms.ModelForm):
         model = Concepto
         fields = ['servicio', 'cantidad_servicios', 'precio',  'notas']
         widgets = {
+            
             'servicio': forms.Select(attrs={'class': 'form-control', 'list': 'servicios-list', 'autocomplete': 'off'}),
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad', 'min': 1}),
             'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido', 'min': 1, 'step': 1.00}), # subir peso a peso
@@ -315,3 +323,31 @@ class ConfiguracionSistemaForm(forms.ModelForm):
             'tasa_iva_default': forms.Select(attrs={'class': 'form-control'}),
             'formato_numero_cotizacion': forms.Select(attrs={'class': 'form-control'}),
         }
+        
+#   FORMULARIO PARA SUCURSAL
+class SucursalForm(forms.ModelForm):
+    # Campos de Direccion
+    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
+    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
+    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
+    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
+    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
+    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
+    class Meta:
+        model = Sucursal
+        fields = ['nombre','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
+        widgets = {'nombre':forms.TextInput(attrs={'class':'form-control'})}
+
+#   FORMULARIO PARA ALMACEN
+class AlmacenForm(forms.ModelForm):
+    # Campos de Direccion
+    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
+    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
+    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
+    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
+    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
+    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
+    class Meta:
+        model = Almacen
+        fields = ['nombre','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
+        widgets = {'nombre':forms.TextInput(attrs={'class':'form-control'})}
