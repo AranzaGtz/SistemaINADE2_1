@@ -4,6 +4,14 @@
 {% block title %}Clientes{% endblock %}
 {% block header %}Clientes{% endblock %}
 {% block content %}
+
+{% if personas == 0 %}
+<div class="alert alert-warning" role="alert">
+    <strong>¡Atención!</strong> No tienes ningún cliente agregado, por favor agrega uno.
+</div>
+  
+{% endif %}
+
 <div class="row">
     <div class="col">
         <h1 class="text-center">Clientes</h1>
@@ -63,6 +71,7 @@
 </div>
 
 <p>Número de clientes: {{ personas }}</p>
+
 <div class="pagination">
     {% if personas_page.has_previous %}
     <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>

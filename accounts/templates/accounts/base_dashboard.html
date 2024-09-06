@@ -58,7 +58,8 @@
                         <!-- Por ejemplo, en cualquier archivo HTML como base.html o menu.html -->
 
                         {% if organization_logo %}
-                        <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;" class="mr-2">
+                        <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;"
+                            class="mr-2">
                         {{ organization_name }}
                         {% else %}
                         <p>No logo available</p>
@@ -157,6 +158,15 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'editar_configuracion_sistema' %}"><img
                             src="{% static 'img/gear.svg' %}"> Sistema</a>
+                </li>
+                <!--#   LINK SISTEMA    -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'sucursal' %}"><img
+                            src="{% static 'img/gear.svg' %}"> Sucursal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'almacen' %}"><img
+                            src="{% static 'img/gear.svg' %}"> Almacen</a>
                 </li>
                 <!--#   LINK SERVICIOS Y METODOS    -->
                 <li class="nav-item">

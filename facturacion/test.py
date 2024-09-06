@@ -13,7 +13,7 @@ certificate_base64 = base64.b64encode(certificate_content).decode()
 with open(private_key_path, 'rb') as key_file:
     private_key_content = key_file.read()
 private_key_base64 = base64.b64encode(private_key_content).decode()
-
+ 
 # Imprimir los valores codificados
 print("Certificado en Base64:")
 print(certificate_base64)

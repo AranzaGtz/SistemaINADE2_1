@@ -39,11 +39,11 @@
                 <!-- ENCABEZADO DE TABLA -->
                 <thead class="thead-light">
                     <tr>
-                        <th><a class="link-secondary" href="?order_by=id">#</a></th>
+                        <th><a class="link-secondary" href="?order_by=codigo">Codigo</a></th>
                         <th><a class="link-secondary" href="?order_by=nombre_servicio">Nombre</a></th>
                         <th><a class="link-secondary" href="?order_by=metodo__metodo">Método</a></th>
                         <th><a class="link-secondary" href="?order_by=descripcion">Descripción</a></th>
-                        <th><a class="link-secondary" href="?order_by=precio_sugerido">Precio sugerido</a></th>
+                        <th><a class="link-secondary" href="?order_by=precio_unitario">Precio sugerido</a></th>
                         <th><a class="link-secondary" href="?order_by=acreditado">Acreditado</a></th>
                         <th colspan="2" class="col-md-1"></th>
                     </tr>
@@ -52,11 +52,11 @@
                 <tbody>
                     {% for s in servicios_page %}
                     <tr>
-                        <td>{{ s.id }}</td>
+                        <td>{{ s.codigo }}</td>
                         <td>{{ s.nombre_servicio }}</td>
                         <td>{{ s.metodo.metodo }}</td>
                         <td>{{ s.descripcion }}</td>
-                        <td>{{ s.precio_sugerido }}</td>
+                        <td>{{ s.precio_unitario }}</td>
                         <td>{% if s.acreditado %}Acreditado{% else %}No Acreditado{% endif %}</td>
                         <td>
                             <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>

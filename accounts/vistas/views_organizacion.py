@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 import os
 import random
 from django.http import HttpResponse
-from django.shortcuts import  redirect, render
-from accounts.forms import FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm
+from django.shortcuts import  get_object_or_404, redirect, render
+from accounts.forms import AlmacenForm, DireccionForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm, SucursalForm
 from accounts.helpers import get_unica_organizacion
 from accounts.models import  Concepto, Cotizacion, Empresa, FormatoCotizacion, FormatoOrden, Organizacion, Persona, Servicio, Titulo
 from django.contrib import messages
@@ -89,7 +89,7 @@ def formatos(request):
 
     return render(request, 'accounts/organizacion/formatos.html', context)
 
-# VISTA PARA QUEJAS
+#   VISTA PARA QUEJAS
 def enviar_queja(request):
     # Notificación
     notificaciones = request.user.notificacion_set.all()
@@ -120,6 +120,7 @@ def enviar_queja(request):
     }
     return render(request, 'accounts/organizacion/enviar_queja.html', context)
 
+#   VISTA PARA PROBAR COTIZACIÓN
 def cotizacion_prueba(request):
     # Obtener el número total de cotizaciones en la base de datos
     total_cotizaciones = Cotizacion.objects.count()
@@ -165,5 +166,57 @@ def cotizacion_prueba(request):
     else:
         return HttpResponse("No hay cotizaciones disponibles.")
         
-    
+#   VISTA PARA CREAR SUCURSAL
+def sucursal(request):
+    if request.method == 'POST':
+        form = SucursalForm(request.POST)
+        direccion_form = DireccionForm(request.POST)
+
+        organizacion = get_object_or_404(Organizacion, pk=1)
+
+        if form.is_valid() and direccion_form.is_valid():
+            direccion = direccion_form.save()  # Guarda la dirección
+
+            sucursal = form.save(commit=False)
+            sucursal.organizacion = organizacion
+            sucursal.direccion = direccion  # Asigna la dirección a la sucursal
+            sucursal.save()
+            messages.success(request, 'Se agrego correctamente la sucursal.')
+            return redirect('sucursal')
+    else:
+        form = SucursalForm()
+        direccion_form = DireccionForm()
+
+    context = {
+        'form': form,
+        'direccion_form': direccion_form,
+    }
+    return render(request, 'accounts/organizacion/sucursal.html', context)
+
+#   VISTA PARA CREAR SUCURSAL
+def almacen(request):
+    if request.method == 'POST':
+        almacenForm = AlmacenForm(request.POST)
+        direccion_form = DireccionForm(request.POST)
+
+        organizacion = get_object_or_404(Organizacion, pk=1)
+
+        if almacenForm.is_valid() and direccion_form.is_valid():
+            direccion = direccion_form.save()  # Guarda la dirección
+
+            almacen = almacenForm.save(commit=False)
+            almacen.organizacion = organizacion
+            almacen.direccion = direccion  # Asigna la dirección al almacén
+            almacen.save()
+            messages.success(request,'Se agrego correctamente el almacen.')
+            return redirect('almacen')
+    else:
+        almacenForm = AlmacenForm()
+        direccion_form = DireccionForm()
+
+    context = {
+        'almacenForm': almacenForm,
+        'direccion_form': direccion_form,
+    }
+    return render(request, 'accounts/organizacion/alamacen.html', context)
     

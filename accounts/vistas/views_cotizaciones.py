@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.forms import modelformset_factory, inlineformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import  get_unica_organizacion
-from accounts.models import Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
+from accounts.models import ConfiguracionSistema, Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, MetodoForm, PersonaForm, ProspectoForm, ServicioForm, ServicioForm2
 from django.contrib import messages
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
@@ -96,7 +96,7 @@ def obtener_datos_servicio(request, servicio_id):
         data = {
             'nombre': servicio.nombre_servicio,
             'descripcion': servicio.descripcion,
-            'precio': servicio.precio_sugerido,
+            'precio': servicio.precio_unitario,
             # Asegúrate de manejar relaciones nulas
             'metodo': servicio.metodo.metodo if servicio.metodo else 'No disponible',
             # Agrega otros campos que necesites
@@ -256,7 +256,6 @@ def cotizacion_estadisticas(request):
 
     return render(request, 'accounts/cotizaciones/cotizacion_estadisticas.html', context)
 
-
 # INTERFAZ PARA ELIMINAR COTIZACION
 def cotizacion_delete(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
@@ -325,36 +324,44 @@ def cotizacion_edit(request, pk):
 def cotizacion_duplicar(request, pk):
     cotizacion_original = get_object_or_404(Cotizacion, id=pk)
     
-    # Crear una nueva instancia de Cotizacion con los mismos datos que la original
-    cotizacion_nueva = Cotizacion.objects.create(
-        persona=cotizacion_original.persona,
-        fecha_solicitud=cotizacion_original.fecha_solicitud,
-        fecha_caducidad=cotizacion_original.fecha_caducidad,
-        metodo_pago=cotizacion_original.metodo_pago,
-        tasa_iva=cotizacion_original.tasa_iva,
-        notas=cotizacion_original.notas,
-        correos_adicionales=cotizacion_original.correos_adicionales,
-        subtotal=cotizacion_original.subtotal,
-        iva=cotizacion_original.iva,
-        total=cotizacion_original.total,
-        estado=False  # Estado inicial como "No Aceptado"
-    )
-    cotizacion_nueva.id_personalizado = cotizacion_nueva.generate_new_id_personalizado()
-    cotizacion_nueva.save()
+    try:
+        with transaction.atomic():
+            # Crear una nueva instancia de Cotizacion con los mismos datos que la original
+            cotizacion_nueva = Cotizacion(
+                persona=cotizacion_original.persona,
+                fecha_solicitud=cotizacion_original.fecha_solicitud,
+                fecha_caducidad=cotizacion_original.fecha_caducidad,
+                metodo_pago=cotizacion_original.metodo_pago,
+                tasa_iva=cotizacion_original.tasa_iva,
+                notas=cotizacion_original.notas,
+                correos_adicionales=cotizacion_original.correos_adicionales,
+                subtotal=cotizacion_original.subtotal,
+                iva=cotizacion_original.iva,
+                total=cotizacion_original.total,
+                estado=False  # Estado inicial como "No Aceptado"
+            )
+            
+            # Generar el nuevo id_personalizado secuencialmente
+            configuracion = ConfiguracionSistema.objects.first()
+            if configuracion:
+                cotizacion_nueva.id_personalizado = cotizacion_nueva.generate_new_id_personalizado(configuracion.formato_numero_cotizacion)
+            else:
+                cotizacion_nueva.id_personalizado = cotizacion_nueva.generate_new_id_personalizado("{year}-{seq}")
 
-    # Duplicar los conceptos asociados
-    conceptos_originales = Concepto.objects.filter(cotizacion=cotizacion_original)
-    for concepto in conceptos_originales:
-        Concepto.objects.create(
-            cotizacion=cotizacion_nueva,
-            servicio=concepto.servicio,
-            cantidad_servicios=concepto.cantidad_servicios,
-            precio=concepto.precio,
-            notas=concepto.notas
-        )
+            cotizacion_nueva.save()
 
-    messages.success(request, 'Cotización duplicada con éxito.')
-    return redirect('cotizacion_detalle', pk=cotizacion_nueva.id)
+            # Duplicar los conceptos asociados
+            for concepto in cotizacion_original.conceptos.all():
+                concepto.pk = None  # Esto asegurará que se cree una nueva instancia
+                concepto.cotizacion = cotizacion_nueva
+                concepto.save()
+
+        messages.success(request, f'Cotización {cotizacion_original.id_personalizado} duplicada con éxito. Se creo la cotrización {cotizacion_nueva.id_personalizado}.')
+        return redirect('cotizacion_detalle', pk=cotizacion_nueva.id)
+
+    except Exception as e:
+        messages.error(request, f'Error al duplicar la cotización: {str(e)}')
+        return redirect('cotizacion_detalle', pk=cotizacion_original.id)
 
 # VISTA PARA VER ARCHIVO PDF COTIZACION
 def cotizacion_pdf(request, pk):
