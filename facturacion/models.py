@@ -1,6 +1,6 @@
 # Create your models here.
 from django.db import models
-from accounts.models import Almacen, Cotizacion, Servicio, Sucursal
+from accounts.models import Almacen, Cotizacion, Organizacion, Servicio, Sucursal
 
 
 class Emisor(models.Model):
@@ -42,13 +42,13 @@ class CFDI(models.Model):
 
 
 class CSD(models.Model):
-    rfc = models.CharField(max_length=13, unique=True)
+    organizacion = models.ForeignKey(Organizacion, on_delete=models.PROTECT)
     cer_file = models.FileField(upload_to='csds/cer/')
     key_file = models.FileField(upload_to='csds/key/')
     password = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.rfc
+        return self.organizacion.rfc
 
 
 class Factura(models.Model):
