@@ -106,6 +106,7 @@ class Direccion(models.Model):
 # MODELO PARA EMPRESA
 class Empresa(models.Model):
     id = models.AutoField(primary_key=True)
+    rfc = models.CharField(max_length=13, unique=True)
     nombre_empresa = models.CharField(max_length=100, null=False, blank=False)
     rfc = models.CharField(max_length=50, null=True, blank=True)
     direccion = models.OneToOneField(Direccion, on_delete=models.CASCADE, null=True, blank=True)
@@ -365,6 +366,7 @@ class FormatoOrden (models.Model):
 
 # MODELO PARA ORGANIZACION
 class Organizacion(models.Model):
+    rfc = models.CharField(max_length=13, unique=True)
     nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
     slogan = models.CharField(max_length=255, blank=True, null=True)  # Slogan opcional
     direccion = models.CharField(max_length=255, default='Calle Puebla, No. 4990, col. Guillen, Tijuana BC, México, C.P. 22106')
