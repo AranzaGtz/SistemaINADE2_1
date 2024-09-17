@@ -3,6 +3,11 @@
 {% block title %}Servicios{% endblock %}
 {% block header %}Servicios{% endblock %}
 {% block content %}
+<style>
+    .modal-dialog.custom-size {
+        max-width: 80%; /* Ajusta el valor según sea necesario */
+    }
+</style>
 
 <!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
 
@@ -131,7 +136,7 @@
 
 <!-- Modal para crear un nuevo servicio -->
 <div class="modal fade" id="createServicioModal" tabindex="-1" aria-labelledby="createServicioLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog custom-size">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createServicioLabel">Crear Nuevo Servicio</h5>
@@ -206,7 +211,7 @@
 
 <!-- Modal para confirmar eliminación de servicio -->
 <div class="modal fade" id="deleteServicioModal" tabindex="-1" aria-labelledby="deleteServicioLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog custom-size">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteServicioLabel">Confirmar Eliminación</h5>

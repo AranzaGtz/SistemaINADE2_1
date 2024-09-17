@@ -4,7 +4,7 @@ from accounts.forms import ServicioForm
 from accounts.utils import obtener_configuracion
 from .models import CSD, Factura
 from django.forms import inlineformset_factory, formset_factory
-from .models import Factura, ConceptoFactura, Servicio
+from .models import Factura, Servicio
 
 class SeleccionForm(forms.Form):
     TIPO_OPCIONES = [
@@ -20,7 +20,7 @@ class CSDForm(forms.ModelForm):
     class Meta:
         model = CSD
         # Especifica los campos del formulario
-        fields = ['cer_file', 'key_file', 'password']
+        fields = ['rfc','cer_file', 'key_file', 'password']
         widgets = {
             'rfc': forms.TextInput(attrs={'class': 'form-control'}),
             'cer_file': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'formCerFile'}),
@@ -66,8 +66,7 @@ class FacturaForm(forms.ModelForm):
 class FacturaEncabezadoForm(forms.ModelForm):
     class Meta:
         model = Factura
-        fields = ['sucursal', 'almacen', 'tipo_moneda',
-                  'orden_compra', 'uso_cfdi', 'forma_pago']
+        fields = ['sucursal', 'almacen', 'tipo_moneda','orden_compra', 'uso_cfdi', 'forma_pago','metodo_pago']
         widgets = {
             'sucursal': forms.Select(attrs={'class': 'form-control form-select', 'placeholder': 'Seleccione sucursal', 'id': 'inputGroupSelect03'}),
             'almacen': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione almacen'}),
@@ -75,6 +74,7 @@ class FacturaEncabezadoForm(forms.ModelForm):
             'orden_compra': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ID de orden de compra'}),
             'uso_cfdi': forms.Select(attrs={'class': 'form-control'}),
             'forma_pago': forms.Select(attrs={'class': 'form-control'}),
+            'metodo_pago': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -137,26 +137,6 @@ class FacturaTotalesForm(forms.ModelForm):
         if configuracion:
             self.fields['tasa_iva'].initial = configuracion.tasa_iva_default
 
-#   FORMULARIOS CONCEPTOS FACTURAS
-class ConceptoFacturaForm(forms.ModelForm):
-    class Meta:
-        model = ConceptoFactura
-        fields = ['servicio', 'cantidad_servicios', 'precio', 'importe']
-        widgets = {
-            'servicio': forms.Select(attrs={'class': 'form-control form-select'}),
-            'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control'}),
-            'precio': forms.NumberInput(attrs={'class': 'form-control'}),  # Aquí cambias DecimalField por NumberInput
-            'importe': forms.NumberInput(attrs={'class': 'form-control'})  # Lo mismo para importe
-        }
-
-#   FORMULARTIO SET PARA CREAR CONCEPTO
-ConceptoFacturaFormSet = inlineformset_factory(
-    Factura, 
-    ConceptoFactura,
-    form=ConceptoFacturaForm,
-    extra=1,
-    can_delete=True
-)
 
 #   FORMULARIO SET PARA SERVIVIO
 ServicioFormset = formset_factory(
