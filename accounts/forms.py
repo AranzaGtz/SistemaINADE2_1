@@ -64,11 +64,12 @@ class EmpresaForm(forms.ModelForm):
 
     class Meta:
         model = Empresa
-        fields = ['nombre_empresa', 'rfc', 'moneda', 'condiciones_pago',
+        fields = ['nombre_empresa', 'rfc','regimen_fiscal', 'moneda', 'condiciones_pago',
                   'calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
             'nombre_empresa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa el Nombre de la Empresa ', 'required': 'True'}),
             'rfc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa RFC ', 'required': 'False', 'pattern': r"[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}"}),
+            'regimen_fiscal': forms.Select(attrs={'class':'form-control'}),
             'moneda': forms.Select(attrs={'class': 'form-control'}),
             'condiciones_pago': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Días de pago '}),
         }
@@ -153,7 +154,7 @@ class MetodoForm(forms.ModelForm):
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['codigo', 'nombre_servicio','unidad','unidad_cfdi','clave_cfdi', 'descripcion','precio_unitario','subcontrato','acreditado']
+        fields = ['codigo', 'nombre_servicio','unidad','unidad_cfdi','clave_cfdi', 'descripcion','precio_unitario', 'objeto_impuesto','descuento','subcontrato','acreditado']
         widgets = {
             'codigo':forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ingresa codigo'}),
             'unidad':forms.TextInput(attrs={'class':'form-control','placeholder':'Ingresa unidad'}),
@@ -163,7 +164,9 @@ class ServicioForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto', 'rows': 2}),
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
-            'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'})
+            'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
+            'objeto_impuesto': forms.Select(attrs={'class':'form-control'}),
+            'descuento': forms.NumberInput(attrs={'class':'form-control'}),
         }
 
 #   FORMULARIO PARA SERVICIO
@@ -181,7 +184,7 @@ class ServicioForm2(forms.ModelForm):
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio'}),
             'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
-            'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'})
+            'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
         }
 
 #   FORMULARIO PARA CONCEPTO
@@ -238,13 +241,19 @@ class CotizacionChangeForm(forms.ModelForm):
 
 #   FORMULARIO PARA LA ORGANIZACION
 class OrganizacionForm(forms.ModelForm):
+    # Campos de Direccion
+    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
+    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
+    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
+    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
+    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
+    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
     class Meta:
         model = Organizacion
-        fields = ['nombre','slogan', 'direccion', 'telefono', 'pagina_web', 'logo']
+        fields = ['nombre','slogan', 'telefono', 'pagina_web', 'logo','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'slogan': forms.TextInput(attrs={'class': 'form-control'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'pagina_web': forms.URLInput(attrs={'class': 'form-control'}),
             'logo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),  # Widget para manejar la subida de imágenes

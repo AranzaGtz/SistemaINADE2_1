@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView
 
 from accounts.forms import CustomUserCreationForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm
-from accounts.models import CustomUser, Organizacion
+from accounts.models import CustomUser, Direccion, Organizacion
 
 def initial_setup(request):
     if Organizacion.objects.exists():
@@ -21,24 +21,32 @@ def initial_setup(request):
         orden_form = FormatoOrdenForm(request.POST, request.FILES)
 
         if user_form.is_valid() and org_form.is_valid() and cotizacion_form.is_valid() and orden_form.is_valid():
+            
+            # Crear o actualizar la dirección
+            direccion, created = Direccion.objects.update_or_create(
+                calle=org_form.cleaned_data['calle'],
+                numero=org_form.cleaned_data['numero'],
+                colonia=org_form.cleaned_data['colonia'],
+                ciudad=org_form.cleaned_data['ciudad'],
+                codigo=org_form.cleaned_data['codigo'],
+                estado=org_form.cleaned_data['estado'],
+            )
+            
             user = user_form.save(commit=False)
-
             user.is_staff = True  # Ajusta los atributos is_staff y is_superuser según el rol del usuario
 
             if ( user.rol == "admin"):  # Si el rol es admin, se establece is_superuser a True.
                 user.is_superuser = True
 
             user.save()  # Guarda el usuario en la base de datos.
-            print("Aqui filtro 1")
 
             formato_cotizacion = cotizacion_form.save()
             formato_orden = orden_form.save()
-            print("Aqui filtro 2")
             organizacion = org_form.save(commit=False)
+            organizacion.direaccion = direccion
             organizacion.f_cotizacion = formato_cotizacion
             organizacion.f_orden = formato_orden
             organizacion.save()
-            print("Aqui filtro 3")
             return redirect('login')  # Redirige al dashboard después de la configuración inicial
         else:
             context = {

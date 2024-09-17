@@ -135,6 +135,7 @@ def cotizacion_form(request,persona_id, cotizacion_id=None):
                         conceptos = concepto_formset.save(commit=False)
                         for concepto in conceptos:
                             concepto.cotizacion = cotizacion
+                            concepto.iva = cotizacion.tasa_iva
                             concepto.save()
 
                         cotizacion.subtotal = sum(

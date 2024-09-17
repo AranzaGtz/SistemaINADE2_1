@@ -37,8 +37,13 @@
                          </div>
                          <div class="col text-start">
                               <h5 class="card-title">Receptor</h5>
-                              <strong>Nombre Receptor</strong><br>
-                              <strong>RFC:</strong>
+                              <strong>Nombre Receptor</strong> {{cliente.empresa.nombre_empresa}} <br>
+                              <strong>RFC:</strong> {{cliente.empresa.rfc }} <br>
+                              <strong>Regimen Fiscal: </strong> {{cliente.empresa.regimen_fiscal}}
+                              <input type="hidden" name="id_cliente_rfc" id="id_cliente_rfc" value="{{ cliente.empresa.rfc }}">
+                              <input type="hidden" name="id_cliente_reg" id="id_cliente_reg" value="{{ cliente.empresa.regimen_fiscal }}">
+                              <input type="hidden" name="id_cliente_nombre" id="id_cliente_nombre" value="{{ cliente.empresa.nombre_empresa }}">
+                              <input type="hidden" name="id_cliente_cp" id="id_cliente_cp" value="{{ cliente.empresa.direccion.codigo }}">
                          </div>
                     </div>
                </div>
@@ -94,7 +99,10 @@
                          </div>
                          {% endif %}
                     </div>
+                    
+               </div>
 
+               <div class="form-row mb-3">
                     <div class="form-group">
                          {{ encabezado_form.uso_cfdi.label_tag }}
                          {{ encabezado_form.uso_cfdi }}
@@ -111,6 +119,16 @@
                          {% if encabezado_form.forma_pago.errors %}
                          <div class="text-danger">
                               {{ encabezado_form.forma_pago.errors }}
+                         </div>
+                         {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                         {{ encabezado_form.metodo_pago.label_tag }}
+                         {{ encabezado_form.metodo_pago }}
+                         {% if encabezado_form.metodo_pago.errors %}
+                         <div class="text-danger">
+                              {{ encabezado_form.metodo_pago.errors }}
                          </div>
                          {% endif %}
                     </div>
@@ -138,43 +156,38 @@
                     <!-- Aquí se agregarán los formularios -->
                     {% for concepto in conceptos %}
                     <tr class="concepto-row">
+                         <input type="hidden" name="id_concepto" id="id_concepto" value="{{ concepto.concepto.id }}">
                          <td class="col-1">
-                              <select name="codigo_servicio_{{ forloop.counter }}"
-                                   id="codigo_servicio_{{ forloop.counter }}" class="form-control" onchange="getServiceData(this)">
-                                   <option value="">Seleccionar código</option>
-                                   {% for servicio in servicios %}
-                                        <option value="{{ servicio.codigo }}">{{ servicio.codigo }}</option>
-                                   {% endfor %}
-                              </select>
+                              <input type="text" name="concepto.concepto.servicio.codigo_{{ forloop.counter }}"
+                              value="{{concepto.concepto.servicio.codigo}}" class="form-control" readonly>
                          </td>
-                         <td>
+                         <td class="col-3">
                               <input type="text" name="nombre_servicio_{{ forloop.counter }}"
-                                   value="{{ concepto.concepto.servicio.nombre_servicio }}" class="form-control">
+                                   value="{{ concepto.concepto.servicio.nombre_servicio }}" class="form-control" readonly>
                          </td>
-                         <td>
+                         <td class="col-2">
                               <input type="text" name="metodo_{{ forloop.counter }}"
-                                   value="{{ concepto.concepto.servicio.metodo }}" class="form-control">
+                                   value="{{ concepto.concepto.servicio.metodo }}" class="form-control" readonly>
                          </td>
                          <td class="col-1">
                               <input type="number" name="cantidad_servicios_{{ forloop.counter }}"
-                                   value="{{ concepto.concepto.cantidad_servicios }}" class="form-control">
+                                   value="{{ concepto.concepto.cantidad_servicios }}" class="form-control" readonly>
                          </td>
                          <td class="col-1">
                               <input type="number" step="0.01" name="precio_{{ forloop.counter }}"
-                                   value="{{ concepto.concepto.precio }}" class="form-control">
+                                   value="{{ concepto.concepto.precio }}" class="form-control" readonly>
                          </td>
                          <td class="col-1">
-                              <input type="text" name="importe_{{ forloop.counter }}"
-                                   value="{{ concepto.concepto.importe }}" class="form-control">
+                              <input type="text" name="importe_{{ forloop.counter }}" step="0.01" value="{{ concepto.concepto.total }}"  class="form-control concepto-importe" readonly>
                          </td>
                     </tr>
                     {% endfor %}
                </tbody>
           </table>
 
-          <div class="row">
+          <!-- <div class="row">
                <a id="add-concepto" class="btn btn-light" href="#">Agrega servicio</a>
-          </div>
+          </div> -->
      </div>
 
      <div class="row">
@@ -186,7 +199,7 @@
                     <!-- Renderizar la etiqueta (label) del campo subtotal -->
                     {{ totales_form.subtotal.label_tag }}
                     <!-- Renderizar el campo subtotal con los atributos personalizados -->
-                    {{ totales_form.subtotal }}
+                    <input type="number" name="subtotal" step="0.01" class="form-control" placeholder="Ingrese un número decimal" inputmode="decimal" required="" id="id_subtotal" readonly>
                     <!-- Mostrar errores específicos de este campo -->
                     {% if totales_form.subtotal.errors %}
                     <div class="text-danger">
@@ -196,20 +209,8 @@
                </div>
 
                <div class="form-group">
-                    <!-- Renderizar la etiqueta (label) del campo iva -->
-                    {{ totales_form.iva.label_tag }}
-                    <!-- Renderizar el campo iva con los atributos personalizados -->
-                    {{ totales_form.iva }}
-                    <!-- Mostrar errores específicos de este campo -->
-                    {% if totales_form.iva.errors %}
-                    <div class="text-danger">
-                         {{ totales_form.iva.errors }}
-                    </div>
-                    {% endif %}
-               </div>
-               <div class="form-group">
                     {{ totales_form.tasa_iva.label_tag }}
-                    <select name="tasa_iva" id="tasa_iva" class="form-select">
+                    <select name="tasa_iva" name="tasa_iva" id="tasa_iva" class="form-select">
                          <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%
                          </option>
                          <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%
@@ -223,10 +224,24 @@
                </div>
 
                <div class="form-group">
+                    <!-- Renderizar la etiqueta (label) del campo iva -->
+                    {{ totales_form.iva.label_tag }}
+                    <!-- Renderizar el campo iva con los atributos personalizados -->
+                    <input type="number" name="iva" step="0.01" class="form-control" placeholder="Ingrese un número decimal" inputmode="decimal" required="" id="id_iva" readonly>
+                    <!-- Mostrar errores específicos de este campo -->
+                    {% if totales_form.iva.errors %}
+                    <div class="text-danger">
+                         {{ totales_form.iva.errors }}
+                    </div>
+                    {% endif %}
+               </div>
+
+               <div class="form-group">
                     <!-- Renderizar la etiqueta (label) del campo total -->
                     {{ totales_form.total.label_tag }}
                     <!-- Renderizar el campo total -->
-                    {{ totales_form.total }}
+                    
+                    <input type="number" name="total" step="0.01" class="form-control" placeholder="Ingrese un número decimal" inputmode="decimal" required="" id="id_total" readonly>
                     <!-- Mostrar errores específicos de este campo -->
                     {% if totales_form.total.errors %}
                     <div class="text-danger">
@@ -238,74 +253,87 @@
           </div>
      </div>
 
-     <!-- BOTON DE FORMULARIO -->
-     <div class="text-end m-3">
+     <div class="d-flex justify-content-end gap-3">
           <button type="submit" class="btn btn-primary  p-2">Pre facturar</button>
+          <button type="submit" class="btn btn-success  p-2">Facturar</button>
+          <button type="submit" class="btn btn-danger  p-2">Cancelar</button>
      </div>
-
 </form>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<script>
-     function abrirVentanaSucursal() {
-          const url = "{% url 'agregar_sucursal' %}";
-          const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
-          window.open(url, 'Agregar Sucursal', options);
-     }
-     function actualizarSelectSucursal(nuevoSucursal) {
-          const select = document.querySelector('select[name="sucursal"]');
-          const option = new Option(nuevoSucursal.nombre, nuevoSucursal.id);
-          select.add(option);
-          select.value = nuevoSucursal.id;  // Select the newly added receptor
-     }
-     function abrirVentanaAlmacen() {
-          const url = "{% url 'agregar_almacen' %}";
-          const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
-          window.open(url, 'Agregar Almacen', options);
-     }
-     function actualizarSelectAlmacen(nuevoAlmacen) {
-          const select = document.querySelector('select[name="almacen"]');
-          const option = new Option(nuevoAlmacen.nombre, nuevoAlmacen.id);
-          select.add(option);
-          select.value = nuevoAlmacen.id;  // Select the newly added receptor
-     }
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const tasaIvaSelect = document.getElementById('tasa_iva');
+        const subtotalInput = document.getElementById('id_subtotal');
+        const ivaInput = document.getElementById('{{ totales_form.iva.id_for_label }}');  // Campo de IVA
+        const totalInput = document.getElementById('{{ totales_form.total.id_for_label }}');  // Campo de Total
+  
+        // Función para calcular el IVA y el Total
+        function calcularTotales() {
+            const subtotal = parseFloat(subtotalInput.value) || 0;  // Valor del subtotal
+            const tasaIva = parseFloat(tasaIvaSelect.value) || 0;   // Tasa de IVA seleccionada
+  
+            const iva = subtotal * tasaIva; // Cálculo del IVA
+            const total = subtotal + iva;   // Total (subtotal + IVA)
+  
+            ivaInput.value = iva.toFixed(2);  // Mostrar el IVA calculado
+            totalInput.value = total.toFixed(2);  // Mostrar el Total calculado
+        }
+  
+        // Escuchar cambios en la tasa de IVA
+        tasaIvaSelect.addEventListener('change', calcularTotales);
+
+        // Función para calcular el subtotal totalizando los campos .concepto-importe
+        function calcularSubtotal() {
+            let total = 0;
+            document.querySelectorAll('.concepto-importe').forEach(function(input) {
+                let valor = parseFloat(input.value) || 0;  // Asegurarse que el valor sea un número
+                total += valor;
+            });
+            subtotalInput.value = total.toFixed(2);  // Mostrar con 2 decimales
+            calcularTotales();  // Recalcular IVA y Total cuando cambie el subtotal
+        }
+
+        // Añadir evento 'input' a todos los campos de importe
+        document.querySelectorAll('.concepto-importe').forEach(function(input) {
+            input.addEventListener('input', calcularSubtotal);
+        });
+      
+        // Calcular el total inicial cuando se cargue la página
+        calcularSubtotal();
+    });
+
+    // Función para abrir ventana emergente de sucursal
+    function abrirVentanaSucursal() {
+        const url = "{% url 'agregar_sucursal' %}";
+        const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
+        window.open(url, 'Agregar Sucursal', options);
+    }
+
+    // Actualizar el select de sucursal después de agregar una nueva
+    function actualizarSelectSucursal(nuevoSucursal) {
+        const select = document.querySelector('select[name="sucursal"]');
+        const option = new Option(nuevoSucursal.nombre, nuevoSucursal.id);
+        select.add(option);
+        select.value = nuevoSucursal.id;  // Seleccionar la nueva sucursal
+    }
+
+    // Función para abrir ventana emergente de almacén
+    function abrirVentanaAlmacen() {
+        const url = "{% url 'agregar_almacen' %}";
+        const options = "width=600,height=400,left=100,top=100,resizable=yes,scrollbars=yes,status=no,menubar=no";
+        window.open(url, 'Agregar Almacén', options);
+    }
+
+    // Actualizar el select de almacén después de agregar uno nuevo
+    function actualizarSelectAlmacen(nuevoAlmacen) {
+        const select = document.querySelector('select[name="almacen"]');
+        const option = new Option(nuevoAlmacen.nombre, nuevoAlmacen.id);
+        select.add(option);
+        select.value = nuevoAlmacen.id;  // Seleccionar el nuevo almacén
+    }
 </script>
 
-<script>
-     document.addEventListener('DOMContentLoaded', function () {
-          const addButton = document.getElementById('add-concepto');
-          const tableBody = document.getElementById('conceptos-table-body');
-          let counter = {{ conceptos| length | add: 1
-     }}; // Inicializa el contador en función de la cantidad de conceptos
-
-     addButton.addEventListener('click', function (event) {
-          event.preventDefault(); // Evita el comportamiento predeterminado del enlace
-
-          // Obtiene la última fila del tbody
-          const lastRow = tableBody.querySelector('.concepto-row:last-child');
-
-          if (lastRow) {
-               // Clona la última fila
-               const newRow = lastRow.cloneNode(true);
-
-               // Limpia los valores de los inputs en la nueva fila y actualiza los nombres
-               newRow.querySelectorAll('input').forEach(input => {
-                    input.value = ''; // Limpia el valor
-                    const nameParts = input.name.split('_');
-                    if (nameParts.length > 1 && !isNaN(nameParts.pop())) {
-                         input.name = nameParts.join('_') + '_' + counter;
-                    }
-               });
-
-               // Incrementa el contador
-               counter++;
-
-               // Agrega la nueva fila al final del tbody
-               tableBody.appendChild(newRow);
-          }
-     });
-      });
-</script>
 
 {% endblock content %}
