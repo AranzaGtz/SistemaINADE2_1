@@ -130,6 +130,7 @@ def cotizacion_form(request,persona_id, cotizacion_id=None):
                         cotizacion.persona = persona
                             
                         cotizacion.id_personalizado = generate_new_id_personalizado()
+                        cotizacion.usuario = request.user
                         cotizacion.save()
 
                         conceptos = concepto_formset.save(commit=False)
