@@ -287,6 +287,10 @@ def crear_factura(request, id_personalizado):
                 response_data = response.json()
                 # Imprime la respuesta
                 print(json.dumps(response_data, indent=4))
+                resp = json.dumps(response_data, indent=4)
+                # Extrae el "Id"
+                cfdi_id = response_data.get("Id")
+                print(f"El ID del CFDI es: {cfdi_id}")
                 messages.success(request, 'CFDI timbrado correctamente.')
                 print(request , messages)
                 # Redirigir a una página de éxito
