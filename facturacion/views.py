@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from pyexpat.errors import messages
 from django.forms import inlineformset_factory
@@ -12,7 +12,6 @@ from facturacion.models import CSD, Factura
 from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
-
 
 def agregar_sucursal(request):
     org = Organizacion.objects.first()  # Obtén la primera organización
@@ -160,22 +159,25 @@ def crear_factura(request, id_personalizado):
             iva = datos_t['iva']
             tasa_iva = datos_t['tasa_iva']
             total = datos_t['total']
+            
+            # Obtener la hora UTC actual
+            now_utc = datetime.utcnow()
+
+            # Ajustar la hora a UTC-8 para Tijuana (horario estándar)
+            offset = timedelta(hours=-8)  # Usa -7 si estás en horario de verano
+            now_tijuana = now_utc + offset
 
             # Iteramos sobre los conceptos
             conceptos_data = []
             # Suponiendo que el contador empieza en 1 y termina en el último concepto
             for i in range(1, len(request.POST) + 1):
                 # Obtenemos los datos de cada concepto desde el formulario
-                codigo_servicio = request.POST.get(
-                    f'concepto.concepto.servicio.codigo_{i}')
+                codigo_servicio = request.POST.get(f'concepto.concepto.servicio.codigo_{i}')
                 nombre_servicio = request.POST.get(f'nombre_servicio_{i}')
                 metodo = request.POST.get(f'metodo_{i}')
-                cantidad_servicios = request.POST.get(
-                    f'cantidad_servicios_{i}')
+                cantidad_servicios = request.POST.get(f'cantidad_servicios_{i}')
                 precio = request.POST.get(f'precio_{i}')
                 importe = request.POST.get(f'importe_{i}')
-
-                servicio = get_object_or_404(Servicio, codigo=codigo_servicio)
 
                 # Buscamos el servicio en la base de datos a partir del código
                 if codigo_servicio:
@@ -191,27 +193,31 @@ def crear_factura(request, id_personalizado):
 
                             # Agregamos los datos del servicio a conceptos_data
                             conceptos_data.append({
+                                'id': servicio.codigo,
                                 'codigo': servicio.clave_cfdi,  # Código CFDI que es el que necesita el SAT
                                 'nombre': servicio.nombre_servicio,  # Nombre del servicio
+                                'unit': servicio.unidad,
+                                'unit_cfdi': servicio.unidad_cfdi,
+                                'precio': precio,  # Precio unitario del servicio
                                 'metodo': servicio.metodo,  # Método asociado al servicio
                                 'cantidad': cantidad_servicios,  # Cantidad de servicios
-                                'precio': precio_unitario,  # Precio unitario del servicio
+                                'objeto_imp': servicio.objeto_impuesto,
                                 'importe': importe  # Importe total para ese servicio
                             })
                     except Servicio.DoesNotExist:
                         # Si el servicio no existe, podrías lanzar una excepción o manejar el error de otra forma
                         raise ValueError(f"El servicio con el código {codigo_servicio} no existe.")
 
-            # Verificamos si existen valores para el índice actual
-            if codigo_servicio and nombre_servicio:
-                conceptos_data.append({
-                    'codigo': codigo_servicio,
-                    'nombre': nombre_servicio,
-                    'metodo': metodo,
-                    'cantidad': cantidad_servicios,
-                    'precio': precio,
-                    'importe': importe
-                })
+            # # Verificamos si existen valores para el índice actual
+            # if codigo_servicio and nombre_servicio:
+            #     conceptos_data.append({
+            #         'codigo': codigo_servicio,
+            #         'nombre': nombre_servicio,
+            #         'metodo': metodo,
+            #         'cantidad': cantidad_servicios,
+            #         'precio': precio,
+            #         'importe': importe
+            #     })
 
             cfdi_data = {
                 # "CfdiType":"I"
@@ -221,7 +227,7 @@ def crear_factura(request, id_personalizado):
                 "Currency": "MXN",
                 # ( string ) Folio: Atributo para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de 1 a 40 caracteres.
                 "Folio": "1",
-                "Date": datetime.now().isoformat(),  # Fecha actual en formato ISO 8601
+                "Date": now_tijuana.isoformat(),  # Fecha actual en formato ISO 8601
                 # ( string ) Atributo requerido para expresar el efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado Required Data type: TextMatching regular expression pattern: I|E|T|N|P
                 "CfdiType": "I",
                 # ( string ) Url del logo, ej. https://dominio.com/mi-logo.png
@@ -262,13 +268,15 @@ def crear_factura(request, id_personalizado):
                 },
                 "Items": [
                     {
+                        "IdProduct": concepto['id'],
                         "ProductCode": concepto['codigo'],
                         "Description": concepto['nombre'],
-                        "Unit": "E48",
-                        "UnitCode": "E48",
+                        "Unit": concepto['unit'],
+                        "UnitCode": concepto['unit_cfdi'],
                         "UnitPrice": float(concepto['precio']),
                         "Quantity": float(concepto['cantidad']),
                         "Subtotal": float(concepto['importe']),
+                        "TaxObject": concepto['objeto_imp'],
                         "Taxes": [
                             {
                                 "Total": float(concepto['importe']) * 0.16,
@@ -278,32 +286,32 @@ def crear_factura(request, id_personalizado):
                                 "IsRetention": False
                             }
                         ],
-                        "Total": float(concepto['importe']) * 1.16
+                        "Total": round(float(concepto['importe']) * 1.16, 2)
                     }
                     for concepto in conceptos_data
                 ]
             }
 
-            # # URL de la API de Facturama
-            # url = "https://apisandbox.facturama.mx/api-lite/3/cfdis"
-            # username = "AranzaInade"  # nombre de usuario
-            # password = "Puebla4990"
-            # response = requests.post(
-            #     url, json=cfdi_data, auth=(username, password))
+            # URL de la API de Facturama
+            url = "https://apisandbox.facturama.mx/api-lite/3/cfdis"
+            username = "AranzaInade"  # nombre de usuario
+            password = "Puebla4990"
+            response = requests.post(
+                url, json=cfdi_data, auth=(username, password))
 
-            # # Manejar la respuesta de la API
-            # if response.status_code == 201:
-            #     # Si se carga correctamente
-            #     messages.success(request, 'CFDI timbrado correctamente.')
-            #     print(messages, error_message)
-            #     # Redirigir a una página de éxito
-            #     return redirect('home')
-            # else:
-            #     # Si ocurre un error, mostrar el mensaje
-            #     error_message = f"Error al cargar CSD: {response.text}"
-            #     messages.error(request, error_message)
-            #     print(error_message)
-        print(cfdi_data)
+            # Manejar la respuesta de la API
+            if response.status_code == 201:
+                # Si se carga correctamente
+                messages.success(request, 'CFDI timbrado correctamente.')
+                print(messages)
+                # Redirigir a una página de éxito
+                return redirect('home')
+            else:
+                # Si ocurre un error, mostrar el mensaje
+                error_message = f"Error al cargar CSD: {response.text}"
+                messages.error(request, error_message)
+                print(error_message)
+            print(cfdi_data)
         # Aquí envías `cfdi_data` a la API de Facturama utilizando tu cliente HTTP (requests u otro)
 
         return redirect('home')
