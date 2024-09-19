@@ -12,6 +12,7 @@ from facturacion.models import CSD, Factura
 from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
+import json
 
 def agregar_sucursal(request):
     org = Organizacion.objects.first()  # Obtén la primera organización
@@ -98,24 +99,19 @@ def crear_factura(request, id_personalizado):
     emisor = orden.cotizacion.usuario
 
     # Buscar conceptos de la orden de trabajo
-    conceptos = OrdenTrabajoConcepto.objects.filter(
-        orden_de_trabajo=id_personalizado)
+    conceptos = OrdenTrabajoConcepto.objects.filter(orden_de_trabajo=id_personalizado)
 
     # En este caso inicializamos los formularios vacios
-    encabezado_form = FacturaEncabezadoForm(
-        initial={'orden': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
-    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,
-                              'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
+    encabezado_form = FacturaEncabezadoForm(initial={'orden': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
+    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
     totales_form = FacturaTotalesForm()
     servicio_formset = ServicioFormset()
 
     if request.method == 'POST':
         print("Facturando...")
         # Inicializamos los formularios con POST
-        encabezado_form = FacturaEncabezadoForm(
-            request.POST, initial={'orden': orden.id_personalizado})
-        pie_form = FacturaPieForm(request.POST, initial={
-                                  'direccion': orden.direccion})
+        encabezado_form = FacturaEncabezadoForm(request.POST, initial={'orden': orden.id_personalizado})
+        pie_form = FacturaPieForm(request.POST, initial={'direccion': orden.direccion})
         totales_form = FacturaTotalesForm(request.POST)
         print("Validando formularios...")
 
@@ -144,8 +140,6 @@ def crear_factura(request, id_personalizado):
             emisor_regimen = emisor.organizacion.regimen_fiscal
             emisor_cp = emisor.organizacion.direccion.codigo
 
-            sucursal = datos_e['sucursal']
-            almacen = datos_e['almacen']
             tipo_moneda = datos_e['tipo_moneda']
             orden_compra = datos_e['orden_compra']
             uso_cfdi = datos_e['uso_cfdi']
@@ -207,17 +201,6 @@ def crear_factura(request, id_personalizado):
                     except Servicio.DoesNotExist:
                         # Si el servicio no existe, podrías lanzar una excepción o manejar el error de otra forma
                         raise ValueError(f"El servicio con el código {codigo_servicio} no existe.")
-
-            # # Verificamos si existen valores para el índice actual
-            # if codigo_servicio and nombre_servicio:
-            #     conceptos_data.append({
-            #         'codigo': codigo_servicio,
-            #         'nombre': nombre_servicio,
-            #         'metodo': metodo,
-            #         'cantidad': cantidad_servicios,
-            #         'precio': precio,
-            #         'importe': importe
-            #     })
 
             cfdi_data = {
                 # "CfdiType":"I"
@@ -291,27 +274,29 @@ def crear_factura(request, id_personalizado):
                     for concepto in conceptos_data
                 ]
             }
-
+            print(cfdi_data)
             # URL de la API de Facturama
             url = "https://apisandbox.facturama.mx/api-lite/3/cfdis"
             username = "AranzaInade"  # nombre de usuario
             password = "Puebla4990"
-            response = requests.post(
-                url, json=cfdi_data, auth=(username, password))
+            response = requests.post(url, json=cfdi_data, auth=(username, password))
 
             # Manejar la respuesta de la API
             if response.status_code == 201:
                 # Si se carga correctamente
+                response_data = response.json()
+                # Imprime la respuesta
+                print(json.dumps(response_data, indent=4))
                 messages.success(request, 'CFDI timbrado correctamente.')
-                print(messages)
+                print(request , messages)
                 # Redirigir a una página de éxito
                 return redirect('home')
             else:
                 # Si ocurre un error, mostrar el mensaje
                 error_message = f"Error al cargar CSD: {response.text}"
                 messages.error(request, error_message)
-                print(error_message)
-            print(cfdi_data)
+                print(request,error_message)
+            
         # Aquí envías `cfdi_data` a la API de Facturama utilizando tu cliente HTTP (requests u otro)
 
         return redirect('home')
