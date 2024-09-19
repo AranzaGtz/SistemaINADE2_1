@@ -14,15 +14,33 @@
 <div class="container mt-5">
      <ul class="nav nav-tabs">
           <li class="nav-item">
-               <a class="nav-link active" href="#cotizaciones" data-bs-toggle="tab">Cotizaciones</a>
+               <a class="nav-link active" href="#organizacion" data-bs-toggle="tab">Organización</a>
+          </li>
+          <li class="nav-item">
+               <a class="nav-link " href="#cotizaciones" data-bs-toggle="tab">Cotizaciones</a>
           </li>
           <li class="nav-item">
                <a class="nav-link" href="#ordenes" data-bs-toggle="tab">Órdenes de Trabajo</a>
           </li>
+          <li class="nav-item">
+               <a class="nav-link" href="#sistema" data-bs-toggle="tab">Configuracion del sistema</a>
+          </li>
      </ul>
 
      <div class="tab-content">
-          <div class="tab-pane fade show active" id="cotizaciones">
+
+          <div class="tab-pane fade show active" id="organizacion">
+               <h2 class="mt-3">Organizacion</h2>
+               <form method="post" enctype="multipart/form-data">  <!-- Añade enctype si usas archivos -->
+                    {% csrf_token %}
+                    {{ form.as_p }}  <!-- Imprime el formulario de organización una vez -->
+                    <div class="text-end m-5">
+                        <button type="submit" name="guardar_organizacion" class="btn btn-success">Guardar organización</button>
+                    </div>
+                </form>
+          </div>
+
+          <div class="tab-pane fade show" id="cotizaciones">
                <h2 class="mt-3">Cotizaciones</h2>
                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
@@ -76,6 +94,29 @@
                     
                </form>
           </div>
+
+          <div class="tab-pane fade" id="sistema">
+               <h2 class="mt-3">Configuración del Sistema</h2>
+               <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                         <label for="moneda_predeterminada" class="form-label">Moneda Predeterminada</label>
+                         {{ forms.moneda_predeterminada }}
+                    </div>
+                    <div class="mb-3">
+                         <label for="tasa_iva_default" class="form-label">Tasa de IVA Predeterminada</label>
+                         {{ forms.tasa_iva_default }}
+                    </div>
+                    <div class="mb-3">
+                         <label for="formato_numero_cotizacion" class="form-label">Formato de Número de Cotización</label>
+                         {{ forms.formato_numero_cotizacion }}
+                    </div>
+                    <div class="text-end m-5">
+                         <button type="submit" name="guardar_sistema" class="btn btn-success">Guardar configuracion de sistema</button>
+                    </div>
+               </form>
+          </div>
+
      </div>
 </div>
 {% block extra_js %}

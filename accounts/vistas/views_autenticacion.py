@@ -7,8 +7,8 @@ from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
-from accounts.forms import CustomUserCreationForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm
-from accounts.models import CustomUser, Direccion, Organizacion
+from accounts.forms import CustomUserCreationForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionInitialForm
+from accounts.models import CustomUser, Direccion, FormatoCotizacion, FormatoOrden, Organizacion
 
 def initial_setup(request):
     if Organizacion.objects.exists():
@@ -16,51 +16,44 @@ def initial_setup(request):
 
     if request.method == 'POST':
         user_form = CustomUserCreationForm(request.POST)
-        org_form = OrganizacionForm(request.POST, request.FILES)
-        cotizacion_form = FormatoCotizacionForm(request.POST, request.FILES)
-        orden_form = FormatoOrdenForm(request.POST, request.FILES)
+        org_form = OrganizacionInitialForm(request.POST, request.FILES)
 
-        if user_form.is_valid() and org_form.is_valid() and cotizacion_form.is_valid() and orden_form.is_valid():
+        if user_form.is_valid() and org_form.is_valid() :
             
-            # Crear o actualizar la dirección
-            direccion, created = Direccion.objects.update_or_create(
-                calle=org_form.cleaned_data['calle'],
-                numero=org_form.cleaned_data['numero'],
-                colonia=org_form.cleaned_data['colonia'],
-                ciudad=org_form.cleaned_data['ciudad'],
-                codigo=org_form.cleaned_data['codigo'],
-                estado=org_form.cleaned_data['estado'],
+            # Crear instancias vacías de FormatoCotizacion y FormatoOrden
+            formato_cotizacion = FormatoCotizacion.objects.create(
+                nombre_formato="Formato Cotización",  # Valores por defecto
+                version="1.0"
             )
+            formato_orden = FormatoOrden.objects.create(
+                nombre_formato="Formato Orden de Trabajo",  # Valores por defecto
+                version="1.0"
+            )
+
+            organizacion = org_form.save(commit=False)
+            organizacion.f_cotizacion = formato_cotizacion
+            organizacion.f_orden = formato_orden
+            organizacion.save()
             
             user = user_form.save(commit=False)
             user.is_staff = True  # Ajusta los atributos is_staff y is_superuser según el rol del usuario
 
             if ( user.rol == "admin"):  # Si el rol es admin, se establece is_superuser a True.
                 user.is_superuser = True
+            user.organizacion = organizacion
 
             user.save()  # Guarda el usuario en la base de datos.
-
-            formato_cotizacion = cotizacion_form.save()
-            formato_orden = orden_form.save()
-            organizacion = org_form.save(commit=False)
-            organizacion.direaccion = direccion
-            organizacion.f_cotizacion = formato_cotizacion
-            organizacion.f_orden = formato_orden
-            organizacion.save()
+            
             return redirect('login')  # Redirige al dashboard después de la configuración inicial
         else:
             context = {
                 'form': user_form,
                 'org_form': org_form,
-                'cotizacion_form': cotizacion_form,
-                'orden_form': orden_form,
             }
     else:
         context = {
             'form': CustomUserCreationForm(),
-            'org_form': OrganizacionForm(),
-            'cotizacion_form': FormatoCotizacionForm(),
-            'orden_form': FormatoOrdenForm(),
+            'org_form': OrganizacionInitialForm(),
         }
 
     return render(request, 'accounts/autenticacion/initial_setup.html', context)
