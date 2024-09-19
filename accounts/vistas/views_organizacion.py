@@ -4,9 +4,9 @@ import os
 import random
 from django.http import HttpResponse
 from django.shortcuts import  get_object_or_404, redirect, render
-from accounts.forms import AlmacenForm, DireccionForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm, SucursalForm
+from accounts.forms import AlmacenForm, ConfiguracionSistemaForm, DireccionForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm, SucursalForm
 from accounts.helpers import get_unica_organizacion
-from accounts.models import  Concepto, Cotizacion, Empresa, FormatoCotizacion, FormatoOrden, Organizacion, Persona, Servicio, Titulo
+from accounts.models import  Concepto, ConfiguracionSistema, Cotizacion, CustomUser, Direccion, Empresa, FormatoCotizacion, FormatoOrden, Organizacion, Persona, Servicio, Titulo
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.core.files.base import ContentFile
@@ -16,78 +16,103 @@ from django.conf import settings
 
 from weasyprint import HTML  # type: ignore
 
-#   VISTA PARA ACTUALIZAR LA ORGANIZACIÓN
-def editar_organizacion(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
-    organizacion = Organizacion.objects.first() # Asume que solo hay una organización
-    
-    if not organizacion:
-        # Si no existe ninguna organización, crea una nueva instancia
-        organizacion = Organizacion()
-        organizacion.save()
-
-    if request.method == 'POST':
-        form = OrganizacionForm(request.POST,request.FILES, instance=organizacion)
-        # Verifica si el logo ha cambiado
-        if 'logo' in form.changed_data:
-            if organizacion.logo:
-                # Borra el logo antiguo si existe
-                if os.path.isfile(organizacion.logo.path):
-                    os.remove(organizacion.logo.path)
-        form.save()
-        messages.success(request, 'Organización actualizada correctamente!.')
-        return redirect('editar_organizacion')  # Redirige a la página actual
-
-    else:
-        form = OrganizacionForm(instance=organizacion)
-    context={
-        'form':form,
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
-        'organizacion':organizacion
-    }
-    return render(request, 'accounts/organizacion/editar_organizacion.html',context)
-
 #   VISTA PARA LA INTERFAZ DE FORMATOS
 def formatos(request):
     # Notificaciones del usuario
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
-    # Obtener el primer registro o none
-    formato_cotizacion = FormatoCotizacion.objects.first()
-    formato_orden = FormatoOrden.objects.first()
-
-    # Inicializar formularios con la instancia existente o nueva si no hay registro
+    organizacion = request.user.organizacion
+    org_direccion = organizacion.direccion
+    
+    formato_cotizacion = organizacion.f_cotizacion
+    formato_orden = organizacion.f_orden
+    
+    # Verificar si la organización tiene una dirección
+    if not org_direccion:
+        # Crear una dirección vacía y asignarla a la organización
+        org_direccion = Direccion(
+            calle='',
+            numero='',
+            colonia='',
+            ciudad='',
+            codigo='',
+            estado=''
+        )
+        org_direccion.save()
+        organizacion.direccion = org_direccion
+        organizacion.save()
+    
+    # Inicializar formularios con las instancias existentes
     formato_cotizacion_form = FormatoCotizacionForm(instance=formato_cotizacion)
     formato_orden_form = FormatoOrdenForm(instance=formato_orden)
     
+    # Inicializar el formulario de organización con la instancia
+    organizacion_form = OrganizacionForm(instance=organizacion)
+    
+    if org_direccion:
+        organizacion_form.fields['calle'].initial = org_direccion.calle
+        organizacion_form.fields['numero'].initial = org_direccion.numero
+        organizacion_form.fields['colonia'].initial = org_direccion.colonia
+        organizacion_form.fields['ciudad'].initial = org_direccion.ciudad
+        organizacion_form.fields['codigo'].initial = org_direccion.codigo
+        organizacion_form.fields['estado'].initial = org_direccion.estado
+    
+    # Obtén la primera instancia de ConfiguracionSistema o crea una si no existe
+    configuracion, created = ConfiguracionSistema.objects.get_or_create(id=1)
+    
+    # Inicializar la variable forms
+    forms = ConfiguracionSistemaForm(instance=configuracion)
+    
+    # Si el formulario es POST, manejar la actualización
     if request.method == 'POST':
         if 'guardar_cotizacion' in request.POST:
-            formato_cotizacion_form = FormatoCotizacionForm(request.POST,request.FILES, instance=formato_cotizacion)
+            formato_cotizacion_form = FormatoCotizacionForm(request.POST, request.FILES, instance=formato_cotizacion)
             if formato_cotizacion_form.is_valid():
                 formato_cotizacion_form.save()
                 messages.success(request, 'Formato de cotización actualizado correctamente!.')
-                return redirect('home')  # Asumiendo que 'home' es la URL de redirección
+                return redirect('home')
         elif 'guardar_orden' in request.POST:
-            formato_orden_form = FormatoOrdenForm(request.POST,request.FILES, instance=formato_orden)
+            formato_orden_form = FormatoOrdenForm(request.POST, request.FILES, instance=formato_orden)
             if formato_orden_form.is_valid():
                 formato_orden_form.save()
                 messages.success(request, 'Formato de orden de trabajo actualizado correctamente!.')
                 return redirect('home')
-
+        elif 'guardar_organizacion' in request.POST:
+            organizacion_form = OrganizacionForm(request.POST, request.FILES, instance=organizacion)
+            if organizacion_form.is_valid():
+                organizacion_form.save()
+                # Actualizar la dirección existente
+                org_direccion.calle = request.POST.get('calle')
+                org_direccion.numero = request.POST.get('numero')
+                org_direccion.colonia = request.POST.get('colonia')
+                org_direccion.ciudad = request.POST.get('ciudad')
+                org_direccion.codigo = request.POST.get('codigo')
+                org_direccion.estado = request.POST.get('estado')
+                org_direccion.save()
+                messages.success(request, 'Organización y dirección actualizadas correctamente!.')
+                return redirect('home')
+        elif 'guardar_sistema' in request.POST:
+            forms = ConfiguracionSistemaForm(request.POST, instance=configuracion)
+            if forms.is_valid():
+                forms.save()
+                messages.success(request, 'La configuración del sistema se ha actualizado correctamente.')
+                return redirect('home')
+    
     context = {
         'formato_cotizacion_form': formato_cotizacion_form,
         'formato_orden_form': formato_orden_form,
+        'form': organizacion_form,
+        'forms': forms,
         'notificaciones': notificaciones,
         'notificaciones_no_leidas': notificaciones_no_leidas,
         'formato_cotizacion': formato_cotizacion,
         'formato_orden': formato_orden,
+        'organizacion': organizacion,
     }
 
     return render(request, 'accounts/organizacion/formatos.html', context)
+
 
 #   VISTA PARA QUEJAS
 def enviar_queja(request):

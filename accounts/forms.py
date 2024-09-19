@@ -52,6 +52,7 @@ class DireccionForm(forms.ModelForm):
             'estado':   forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa Estado', 'required': 'True'}),
         }
 
+
 #   FORMULARIO PARA EMPRESA
 class EmpresaForm(forms.ModelForm):
     # Campos de Direccion
@@ -240,14 +241,25 @@ class CotizacionChangeForm(forms.ModelForm):
 # ---      ORGANIZACIÓN     ---
 
 #   FORMULARIO PARA LA ORGANIZACION
+class OrganizacionInitialForm(forms.ModelForm):
+    class Meta:
+        model = Organizacion
+        fields = ['nombre','slogan', 'logo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'slogan': forms.TextInput(attrs={'class': 'form-control'}),
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),  # Widget para manejar la subida de imágenes
+        }
+
+#   FORMULARIO PARA LA ORGANIZACION
 class OrganizacionForm(forms.ModelForm):
     # Campos de Direccion
-    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
-    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
-    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
-    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
-    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
-    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
+    calle =     forms.CharField(max_length=50,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
+    numero =    forms.CharField(max_length=50,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
+    colonia =   forms.CharField(max_length=100,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
+    ciudad =    forms.CharField(max_length=100,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
+    codigo =    forms.CharField(max_length=6,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
+    estado =    forms.CharField(max_length=100,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
     class Meta:
         model = Organizacion
         fields = ['nombre','slogan', 'telefono', 'pagina_web', 'logo','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
@@ -258,6 +270,9 @@ class OrganizacionForm(forms.ModelForm):
             'pagina_web': forms.URLInput(attrs={'class': 'form-control'}),
             'logo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),  # Widget para manejar la subida de imágenes
         }
+    optional = ['nombre','slogan', 'telefono', 'pagina_web', 'logo']
+    
+    
 
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
 class OrdenPedidoForm(forms.Form):

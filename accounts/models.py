@@ -56,14 +56,13 @@ class Organizacion(models.Model):
         ('610', 'Régimen de Personas Morales con Fines no Lucrativos'),
         ('611', 'Régimen de Consolidación Fiscal'),] , default='612')
     slogan = models.CharField(max_length=255, blank=True, null=True)  # Slogan opcional
-    direccion = models.ForeignKey(Direccion, related_name='direccion_org',on_delete=models.CASCADE)
+    direccion = models.ForeignKey(Direccion, related_name='direccion_org',on_delete=models.CASCADE,blank=True, null=True )
     telefono = models.CharField(max_length=20, default='(664) 104 51 44')
-    pagina_web = models.URLField()
+    pagina_web = models.URLField(max_length=200, blank=True, null=True)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)  # Campo para el logo
     f_cotizacion = models.ForeignKey(FormatoCotizacion, related_name='formatos', on_delete=models.CASCADE, null=True)
     f_orden = models.ForeignKey(FormatoOrden, related_name='formatos', on_delete=models.CASCADE, null=True)
-    
-    
+
     def __str__(self):
         return self.nombre
 
@@ -165,6 +164,7 @@ class Empresa(models.Model):
     ]
     moneda = models.CharField(max_length=10, choices=tipo_moneda, blank=True, null=True)
     condiciones_pago = models.CharField(max_length=200, null=False, blank=True, default='15')
+    first_configuration = models.BooleanField(default=False)
     
     def __str__(self):
         return self.nombre_empresa

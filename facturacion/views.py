@@ -293,6 +293,8 @@ def crear_factura(request, id_personalizado):
                 print(f"El ID del CFDI es: {cfdi_id}")
                 messages.success(request, 'CFDI timbrado correctamente.')
                 print(request , messages)
+                print("Guardando en la BD")
+                
                 # Redirigir a una página de éxito
                 return redirect('home')
             else:
