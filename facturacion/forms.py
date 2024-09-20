@@ -3,8 +3,8 @@ from django import forms
 from accounts.forms import ServicioForm
 from accounts.utils import obtener_configuracion
 from .models import CSD, Factura
-from django.forms import inlineformset_factory, formset_factory
-from .models import Factura, Servicio
+from django.forms import  formset_factory
+from .models import Factura
 
 class SeleccionForm(forms.Form):
     TIPO_OPCIONES = [
@@ -66,10 +66,8 @@ class FacturaForm(forms.ModelForm):
 class FacturaEncabezadoForm(forms.ModelForm):
     class Meta:
         model = Factura
-        fields = ['sucursal', 'almacen', 'tipo_moneda','orden_compra', 'uso_cfdi', 'forma_pago','metodo_pago']
+        fields = ['tipo_moneda','orden_compra', 'uso_cfdi', 'forma_pago','metodo_pago']
         widgets = {
-            'sucursal': forms.Select(attrs={'class': 'form-control form-select', 'placeholder': 'Seleccione sucursal', 'id': 'inputGroupSelect03'}),
-            'almacen': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione almacen'}),
             'tipo_moneda': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione tipo moneda'}),
             'orden_compra': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ID de orden de compra'}),
             'uso_cfdi': forms.Select(attrs={'class': 'form-control'}),

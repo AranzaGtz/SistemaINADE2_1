@@ -17,9 +17,8 @@
 
 </style>
 
-<div class="container mt-4">
+<div class="container">
     <h1 class="mb-5">Bienvenidos a SistemaINADE2</h1>
-
     <div class="d-flex flex-wrap justify-content-center">
         <!-- BOTON PARA CREAR CLIENTES -->
         <a href="{% url 'lista_clientes' %}" class="text-decoration-none">
@@ -105,7 +104,7 @@
         </a>
 
         <!-- BOTON PARA FORMATO -->
-        <a href="{% url 'formatos' %}" class="text-decoration-none">
+        <a href="{% url 'config_org' %}" class="text-decoration-none">
             <div class="card m-2 card-custom">
                 <div class="card-img-top p-1 text-center">
                     <i class="bi bi-gear-wide-connected card-icon"></i>
@@ -145,7 +144,6 @@
         </div>
     </div>
 </div>
-
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {

@@ -1,6 +1,5 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Iterable
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
@@ -47,14 +46,14 @@ class FormatoOrden (models.Model):
 class Organizacion(models.Model):
     nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
     regimen_fiscal = models.CharField(max_length=5,choices=[
-        ('612', 'Régimen de Incorporación Fiscal'), 
-        ('601', 'Régimen General de Ley Personas Morales'),
-        ('603', 'Régimen de Sueldos y Salarios'),
-        ('605', 'Régimen de Arrendamiento'),
-        ('606', 'Régimen de Actividades Empresariales y Profesionales'),
-        ('607', 'Régimen de Enajenación de Bienes'),
-        ('610', 'Régimen de Personas Morales con Fines no Lucrativos'),
-        ('611', 'Régimen de Consolidación Fiscal'),] , default='612')
+        ('612', '612 - Régimen de Incorporación Fiscal'), 
+        ('601', '601 - Régimen General de Ley Personas Morales'),
+        ('603', '603 - Régimen de Sueldos y Salarios'),
+        ('605', '605 - Régimen de Arrendamiento'),
+        ('606', '606 - Régimen de Actividades Empresariales y Profesionales'),
+        ('607', '607 - Régimen de Enajenación de Bienes'),
+        ('610', '610 - Régimen de Personas Morales con Fines no Lucrativos'),
+        ('611', '611 - Régimen de Consolidación Fiscal'),] , default='612')
     slogan = models.CharField(max_length=255, blank=True, null=True)  # Slogan opcional
     direccion = models.ForeignKey(Direccion, related_name='direccion_org',on_delete=models.CASCADE,blank=True, null=True )
     telefono = models.CharField(max_length=20, default='(664) 104 51 44')
@@ -383,26 +382,6 @@ class OrdenTrabajoConcepto(models.Model):
 
     orden_de_trabajo = models.ForeignKey(OrdenTrabajo, related_name='conceptos', on_delete=models.CASCADE)
     concepto = models.ForeignKey(Concepto, on_delete=models.CASCADE)
-
-
-# MODELO PARA MATRIZ
-class Sucursal(models.Model):
-    nombre = models.CharField(max_length=255, default='Matriz')
-    direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE, null=True, blank=True, related_name='sucursal_direccion')
-    organizacion = models.ForeignKey(Organizacion, null=False, blank=False, related_name='organizacion_sucursal', on_delete=models.PROTECT)  # Protege la organización de ser eliminada si existen sucursales.)
-    
-    def __str__(self):
-        return self.nombre
-    
-# MODELO PARA ALMACÉN
-class Almacen(models.Model):
-    nombre = models.CharField(max_length=255, default='Matriz')
-    direccion = models.ForeignKey(Direccion, on_delete=models.CASCADE, null=True, blank=True, related_name='almacen_direccion')
-    organizacion = models.ForeignKey(Organizacion, null=False, blank=False, related_name='almacen_sucursal', on_delete=models.PROTECT)
-    
-    def __str__(self):
-        return self.nombre
-    # Protege la organización de ser eliminada si existen sucursales.)
 
 # MODELO PARA CONFIGURACIÓN GENERAL DEL SISTEMA
 class ConfiguracionSistema(models.Model):

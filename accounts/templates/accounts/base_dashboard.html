@@ -79,8 +79,7 @@
                     <button class="navbar-toggler ms-2" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar"
                         aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"
-                                alt=""></span>
+                        <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;" alt=""></span>
                     </button>
                 </div>
             </div>
@@ -90,8 +89,8 @@
     <!-- Contenido del offcanvas -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Hola!,
-                {{ user.username|default:'Guest' }}
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Hola! 🖐️
+                {{ user.first_name|default:'Guest' }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
@@ -133,15 +132,21 @@
                             src="{% static 'img/building.svg' %}"> Empresas</a>
                 </li>
 
+                <!--#   LINK SERVICIOS Y METODOS    -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'servicios_list' %}"><img src="{% static 'img/droplet-half.svg' %}"
+                            alt=""> Servicios y Métodos</a>
+                </li>
+
                 <hr style="border-color:darkgrey">
                 <h6>Configuraciones</h6>
                 <!--#   LINK USUARIOS   -->
                 <li class="nav-item"><a class="nav-link" href="{% url 'usuario_list' %}">
                         <img src="{% static 'img/person-hearts.svg' %}"> Usuarios</a>
                 </li>
-                <!--#   LINK FORMATOS   -->
+                <!--#   LINK CONFIGURACION   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'formatos' %}"><img src="{% static 'img/gear-wide-connected.svg' %}"> Organización y formatos</a>
+                    <a class="nav-link" href="{% url 'config_org' %}"><img src="{% static 'img/gear-wide-connected.svg' %}"> Configuracion</a>
                 </li>
                 <!--#   LINK QUEJAS Y SEUGERENCIAS  -->
                 <li class="nav-item">
@@ -149,26 +154,6 @@
                             src="{% static 'img/person-raised-hand.svg' %}"> Quejas y sugerencias</a>
                 </li>
 
-                <!--#   LINK CSD    -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cargar_csd' %}"><img
-                            src="{% static 'img/gear.svg' %}"> Carga CSD</a>
-                </li>
-
-                <!--#   LINK SISTEMA    -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'sucursal' %}"><img
-                            src="{% static 'img/gear.svg' %}"> Sucursal</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'almacen' %}"><img
-                            src="{% static 'img/gear.svg' %}"> Almacen</a>
-                </li>
-                <!--#   LINK SERVICIOS Y METODOS    -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'servicios_list' %}"><img src="{% static 'img/droplet-half.svg' %}"
-                            alt=""> Servicios y Métodos</a>
-                </li>
 
                 <hr style="border-color:darkgrey">
 
@@ -188,7 +173,7 @@
 
     <div class="content" style="margin-top: 10vh;">
         <!-- Contenido principal de la página -->
-        <main class="" style="min-height: 80vh; padding: 0 6vh;">
+        <main>
             {% block content %}
             {% endblock %}
         </main>

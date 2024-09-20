@@ -121,11 +121,9 @@ urlpatterns = [
     
     #   ---     ORGANIZACION       ---
 
-    path('formatos/', views_organizacion.formatos, name='formatos'),
+    path('configuracion/', views_organizacion.config_org, name='config_org'),
     path('queja/', views_organizacion.enviar_queja, name='enviar_queja'),
     path('cotizacion-prueba/', views_organizacion.cotizacion_prueba, name='cotizacion_prueba'),
-    path('sucursal/', views_organizacion.sucursal, name= 'sucursal'),
-    path('almacen/', views_organizacion.almacen, name= 'almacen'),
 
     
     #   ---     GUIA DE OPERACIONES       ---

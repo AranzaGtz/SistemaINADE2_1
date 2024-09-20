@@ -30,7 +30,16 @@
      <div class="tab-content">
 
           <div class="tab-pane fade show active" id="organizacion">
-               <h2 class="mt-3">Organizacion</h2>
+               <div class="row">
+                    <div class="col">
+                         <h2 class="mt-3">Organizacion</h2>
+                    </div>
+                    <div class="col mt-4 text-end">
+                         <a href="{% url 'cargar_csd' %}" class="btn btn-primary">Carga Certificado de Sellos Dijitales</a>
+                    </div>
+                    
+               </div>
+               
                <form method="post" enctype="multipart/form-data">  <!-- Añade enctype si usas archivos -->
                     {% csrf_token %}
                     {{ form.as_p }}  <!-- Imprime el formulario de organización una vez -->
@@ -116,7 +125,6 @@
                     </div>
                </form>
           </div>
-
      </div>
 </div>
 {% block extra_js %}

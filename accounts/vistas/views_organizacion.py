@@ -1,23 +1,22 @@
 # VISTA PARA MODIFICAR NUESTRA INFORMACION DE FORMATO
-from datetime import datetime, timedelta
-import os
+from datetime import datetime
 import random
 from django.http import HttpResponse
 from django.shortcuts import  get_object_or_404, redirect, render
-from accounts.forms import AlmacenForm, ConfiguracionSistemaForm, DireccionForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm, SucursalForm
+from accounts.forms import ConfiguracionSistemaForm, DireccionForm, FormatoCotizacionForm, FormatoOrdenForm, OrganizacionForm, QuejaForm
 from accounts.helpers import get_unica_organizacion
-from accounts.models import  Concepto, ConfiguracionSistema, Cotizacion, CustomUser, Direccion, Empresa, FormatoCotizacion, FormatoOrden, Organizacion, Persona, Servicio, Titulo
+from accounts.models import  ConfiguracionSistema, Cotizacion,  Direccion,  Organizacion
 from django.contrib import messages
 from django.template.loader import render_to_string
-from django.core.files.base import ContentFile
-from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 
 from weasyprint import HTML  # type: ignore
 
 #   VISTA PARA LA INTERFAZ DE FORMATOS
-def formatos(request):
+@login_required
+def config_org(request):
     # Notificaciones del usuario
     notificaciones = request.user.notificacion_set.all()
     notificaciones_no_leidas = notificaciones.filter(leido=False).count()
@@ -71,13 +70,13 @@ def formatos(request):
             if formato_cotizacion_form.is_valid():
                 formato_cotizacion_form.save()
                 messages.success(request, 'Formato de cotización actualizado correctamente!.')
-                return redirect('home')
+                return redirect('config_org')
         elif 'guardar_orden' in request.POST:
             formato_orden_form = FormatoOrdenForm(request.POST, request.FILES, instance=formato_orden)
             if formato_orden_form.is_valid():
                 formato_orden_form.save()
                 messages.success(request, 'Formato de orden de trabajo actualizado correctamente!.')
-                return redirect('home')
+                return redirect('config_org')
         elif 'guardar_organizacion' in request.POST:
             organizacion_form = OrganizacionForm(request.POST, request.FILES, instance=organizacion)
             if organizacion_form.is_valid():
@@ -91,13 +90,13 @@ def formatos(request):
                 org_direccion.estado = request.POST.get('estado')
                 org_direccion.save()
                 messages.success(request, 'Organización y dirección actualizadas correctamente!.')
-                return redirect('home')
+                return redirect('config_org')
         elif 'guardar_sistema' in request.POST:
             forms = ConfiguracionSistemaForm(request.POST, instance=configuracion)
             if forms.is_valid():
                 forms.save()
                 messages.success(request, 'La configuración del sistema se ha actualizado correctamente.')
-                return redirect('home')
+                return redirect('config_org')
     
     context = {
         'formato_cotizacion_form': formato_cotizacion_form,
@@ -112,7 +111,6 @@ def formatos(request):
     }
 
     return render(request, 'accounts/organizacion/formatos.html', context)
-
 
 #   VISTA PARA QUEJAS
 def enviar_queja(request):
@@ -190,58 +188,4 @@ def cotizacion_prueba(request):
         return response
     else:
         return HttpResponse("No hay cotizaciones disponibles.")
-        
-#   VISTA PARA CREAR SUCURSAL
-def sucursal(request):
-    if request.method == 'POST':
-        form = SucursalForm(request.POST)
-        direccion_form = DireccionForm(request.POST)
-
-        organizacion = get_object_or_404(Organizacion, pk=1)
-
-        if form.is_valid() and direccion_form.is_valid():
-            direccion = direccion_form.save()  # Guarda la dirección
-
-            sucursal = form.save(commit=False)
-            sucursal.organizacion = organizacion
-            sucursal.direccion = direccion  # Asigna la dirección a la sucursal
-            sucursal.save()
-            messages.success(request, 'Se agrego correctamente la sucursal.')
-            return redirect('sucursal')
-    else:
-        form = SucursalForm()
-        direccion_form = DireccionForm()
-
-    context = {
-        'form': form,
-        'direccion_form': direccion_form,
-    }
-    return render(request, 'accounts/organizacion/sucursal.html', context)
-
-#   VISTA PARA CREAR SUCURSAL
-def almacen(request):
-    if request.method == 'POST':
-        almacenForm = AlmacenForm(request.POST)
-        direccion_form = DireccionForm(request.POST)
-
-        organizacion = get_object_or_404(Organizacion, pk=1)
-
-        if almacenForm.is_valid() and direccion_form.is_valid():
-            direccion = direccion_form.save()  # Guarda la dirección
-
-            almacen = almacenForm.save(commit=False)
-            almacen.organizacion = organizacion
-            almacen.direccion = direccion  # Asigna la dirección al almacén
-            almacen.save()
-            messages.success(request,'Se agrego correctamente el almacen.')
-            return redirect('almacen')
-    else:
-        almacenForm = AlmacenForm()
-        direccion_form = DireccionForm()
-
-    context = {
-        'almacenForm': almacenForm,
-        'direccion_form': direccion_form,
-    }
-    return render(request, 'accounts/organizacion/alamacen.html', context)
     

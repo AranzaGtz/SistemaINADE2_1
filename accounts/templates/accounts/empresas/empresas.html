@@ -6,81 +6,83 @@
 {% block header %}Empresas{% endblock %}
 
 {% block content %}
+<div class="container">
 
-<!-- SECCION DE TITULO ENCABEZANDO DIV -->
-<div class="row">
-    <div class="col">
-        <h1 class="text-center">Empresas</h1>
-        <hr class="featurette-divider">
+    <!-- SECCION DE TITULO ENCABEZANDO DIV -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Empresas</h1>
+            <hr class="featurette-divider">
+        </div>
     </div>
-</div>
 
-<!-- BUSCADOR -->
-<div class="row mb-3 justify-content-center">
-    <div class="col-md-6">
-        <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar empresas..." onkeyup="filterTable('searchInput', 'empresasTable')">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'empresasTable')">Buscar</button>
+    <!-- BUSCADOR -->
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar empresas..." onkeyup="filterTable('searchInput', 'empresasTable')">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'empresasTable')">Buscar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmpresaModal"> Añadir Empresa </button>
+    <div class="row mb-3 justify-content-end">
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmpresaModal"> Añadir Empresa </button>
+        </div>
     </div>
-</div>
 
-<!-- TABLA -->
-<div class="row">
-    <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-        <table id="empresasTable" class="table table-hover" >
-            <!-- ENCABEZADO DE TABLA -->
-            <thead class="thead-light">
-                <tr>
-                    <th><a class="link-secondary" href="?order_by=id">#</a></th>
-                    <th><a class="link-secondary" href="?order_by=nombre_empresa">Empresa</a></th>
-                    <th><a class="link-secondary" href="?order_by=rfc">RFC</a></th>
-                    <th><a class="link-secondary" href="?order_by=direccion">Direccion</a></th>
-                    <th><a class="link-secondary" href="?order_by=moneda">Moneda</a></th>
-                    <th><a class="link-secondary" href="?order_by=condiciones_pago">Condiciones</a></th>
-                    <th colspan="2"></th>
-                </tr>
-            </thead>
+    <!-- TABLA -->
+    <div class="row">
+        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+            <table id="empresasTable" class="table table-hover" >
+                <!-- ENCABEZADO DE TABLA -->
+                <thead class="thead-light">
+                    <tr>
+                        <th><a class="link-secondary" href="?order_by=id">#</a></th>
+                        <th><a class="link-secondary" href="?order_by=nombre_empresa">Empresa</a></th>
+                        <th><a class="link-secondary" href="?order_by=rfc">RFC</a></th>
+                        <th><a class="link-secondary" href="?order_by=direccion">Direccion</a></th>
+                        <th><a class="link-secondary" href="?order_by=moneda">Moneda</a></th>
+                        <th><a class="link-secondary" href="?order_by=condiciones_pago">Condiciones</a></th>
+                        <th colspan="2"></th>
+                    </tr>
+                </thead>
 
-            <!-- CUERPO DE TABLA -->
-            <tbody>
-                {% for e in empresas_page %}
-                <tr>
-                    <td>{{ e.id }}</td>
-                    <td>{{ e.nombre_empresa }}</td>
-                    <td>{{ e.rfc }}</td>
-                    <td>{{ e.direccion }}</td>
-                    <td>{{ e.moneda }}</td>
-                    <td>{{ e.condiciones_pago }}</td>
-                    <td><a href="{% url 'empresa_edit' e.id %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <td><a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <!-- CUERPO DE TABLA -->
+                <tbody>
+                    {% for e in empresas_page %}
+                    <tr>
+                        <td>{{ e.id }}</td>
+                        <td>{{ e.nombre_empresa }}</td>
+                        <td>{{ e.rfc }}</td>
+                        <td>{{ e.direccion }}</td>
+                        <td>{{ e.moneda }}</td>
+                        <td>{{ e.condiciones_pago }}</td>
+                        <td><a href="{% url 'empresa_edit' e.id %}" class="btn btn-primary btn-sm">Editar</a></td>
+                        <td><a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p>Número de empresas: {{ empresas_page.paginator.count }}</p>
+        <!-- CONTROLES DE PAGINACIÓN -->
+        <div class="pagination">
+            {% if empresas_page.has_previous %}
+                <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                <a href="?page={{ empresas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+            {% endif %}
+            Página {{ empresas_page.number }} de {{ empresas_page.paginator.num_pages }}.
+            {% if empresas_page.has_next %}
+                <a href="?page={{ empresas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+                <a href="?page={{ empresas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+            {% endif %}
+        </div>
+        <hr class="featurette-divider">
     </div>
-    <p>Número de empresas: {{ empresas_page.paginator.count }}</p>
-     <!-- CONTROLES DE PAGINACIÓN -->
-     <div class="pagination">
-        {% if empresas_page.has_previous %}
-            <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-            <a href="?page={{ empresas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
-        {% endif %}
-        Página {{ empresas_page.number }} de {{ empresas_page.paginator.num_pages }}.
-        {% if empresas_page.has_next %}
-            <a href="?page={{ empresas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
-            <a href="?page={{ empresas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
-        {% endif %}
-    </div>
-    <hr class="featurette-divider">
 </div>
 
 <!-- Modal para crear una nueva empresa -->

@@ -62,28 +62,37 @@ def usuario_list(request):
 
 # VISTA PARA REGISTRAR UN USUARIO
 def usuario_create(request):
-
-    if request.method == "POST":  # Se envio informacion
-
-        form = CustomUserCreationForm(request.POST)  # se crea instancia del formulario
+    form = CustomUserCreationForm(initial={'rol':'muestras'} )
+    if request.method == "POST":  # Se envió información
+        form = CustomUserCreationForm(request.POST, initial={'rol':'muestras'})  # Se crea instancia del formulario
 
         if form.is_valid():  # Se verifica el formulario
-
             user = form.save(commit=False)
-
             user.is_staff = True  # Ajusta los atributos is_staff y is_superuser según el rol del usuario
 
-            if ( user.rol == "admin"):  # Si el rol es admin, se establece is_superuser a True.
-                user.is_superuser = True
+             # Establece el rol directamente a "muestreador"
+            user.rol = "muestras"
 
-            user.save()  # Guarda el usuario en la base de datos.
-            
-            messages.success(request, 'El usuario se ha registrado!.')
-            
-            return redirect("usuario_list")  # Redirige al usuario a login
+            # Intenta asignar la organización del usuario logueado
+            user.organizacion = getattr(request.user, 'organizacion', None)
+
+            # Si no hay una organización asignada, maneja el error
+            if not user.organizacion:
+                messages.error(request, 'No se ha podido asignar una organización. Verifica que el usuario actual tenga una organización asociada.')
+                return render(request, 'accounts/usuarios/usuarios.html', {'registro_form': form})
+
+            try:
+                user.save()  # Guarda el usuario en la base de datos
+                messages.success(request, 'El usuario se ha registrado correctamente.')
+                return redirect("usuario_list")  # Redirige al usuario a la lista de usuarios
+            except Exception as e:
+                messages.error(request, f'Error al guardar el usuario: {e}')
+                return render(request, 'accounts/usuarios/usuarios.html', {'registro_form': form})
+
     else:
-        form = (CustomUserCreationForm())  # Si la solicitud no es POST, crea un formulario vacío.
-    return render(request,'accounts/usuarios/usuarios.html',{'registro_form':form}) # Renderiza la plantilla con el formulario.
+        form = CustomUserCreationForm(initial={'rol':'muestras'})  # Si la solicitud no es POST, crea un formulario vacío.
+
+    return render(request, 'accounts/usuarios/usuarios.html', {'registro_form': form})  # Renderiza la plantilla con el formulario.
 
 # VISTA PARA IR EDITANDO USUARIO
 def usuario_update(request,username):
