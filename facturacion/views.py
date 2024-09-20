@@ -1,70 +1,16 @@
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from pyexpat.errors import messages
-from django.forms import inlineformset_factory
-from django.http import HttpResponse, JsonResponse
+from django.http import  JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import requests
-from accounts.forms import AlmacenForm, SucursalForm
 from accounts.helpers import get_unica_organizacion
-from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Organizacion, Servicio
+from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
 from facturacion.models import CSD, Factura
 from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
 import json
-
-def agregar_sucursal(request):
-    org = Organizacion.objects.first()  # Obtén la primera organización
-    if request.method == 'POST':
-        form = SucursalForm(request.POST)
-        if form.is_valid():
-            sucursal = form.save(commit=False)
-            sucursal.organizacion = org  # Asigna la organización
-            sucursal.save()  # Guarda la sucursal
-
-            # Retorna el script para actualizar el select en la ventana principal y cierra la ventana
-            return HttpResponse(f"""
-                <script>
-                    window.opener.actualizarSelectSucursal({{
-                        nombre: "{sucursal.nombre}",
-                        sucursal: "{sucursal.direccion}",
-                        organizacion: "{org.id}"
-                    }});
-                    window.close();
-                </script>
-            """)
-    else:
-        form = SucursalForm()
-
-    return render(request, 'facturacion/agregar_sucursal.html', {'form': form})
-
-
-def agregar_almacen(request):
-    org = Organizacion.objects.first()  # Obtén la primera organización
-    if request.method == 'POST':
-        form = AlmacenForm(request.POST)
-        if form.is_valid():
-            almacen = form.save(commit=False)
-            almacen.organizacion = org  # Asigna la organización
-            almacen.save()  # Guarda la almacen
-
-            # Retorna el script para actualizar el select en la ventana principal y cierra la ventana
-            return HttpResponse(f"""
-                <script>
-                    window.opener.actualizarSelectAlmacen({{
-                        nombre: "{almacen.nombre}",
-                        almacen: "{almacen.direccion}",
-                        organizacion: "{org.id}"
-                    }});
-                    window.close();
-                </script>
-            """)
-    else:
-        form = AlmacenForm()
-
-    return render(request, 'facturacion/agregar_almacen.html', {'form': form})
-
 
 def obtener_datos_cotizacion(request, cotizacion_id):
     try:
@@ -91,10 +37,10 @@ def obtener_datos_cotizacion(request, cotizacion_id):
     except Cotizacion.DoesNotExist:
         return JsonResponse({'error': 'Cotización no encontrada'}, status=404)
 
-
+@login_required
 def crear_factura(request, id_personalizado):
     # Buscar orden de trabajo
-    orden = get_object_or_404(OrdenTrabajo, id_personalizado=id_personalizado)
+    orden = OrdenTrabajo.objects.get(id_personalizado=id_personalizado)
     cliente = orden.cotizacion.persona
     emisor = orden.cotizacion.usuario
 
@@ -121,10 +67,27 @@ def crear_factura(request, id_personalizado):
             datos_e = encabezado_form.cleaned_data
             datos_p = pie_form.cleaned_data
             datos_t = totales_form.cleaned_data
-
-            # Puedes acceder a los datos así
-            organizacion = orden.cotizacion.usuario.organizacion
-            csd = get_object_or_404(CSD, organizacion=organizacion)
+            
+            # Intentar obtener el CSD de la organización
+            try:
+                # Puedes acceder a los datos así
+                organizacion = orden.cotizacion.usuario.organizacion
+                csd = CSD.objects.get(organizacion=organizacion)
+            except CSD.DoesNotExist:
+                # Mostrar mensaje de error si no se encuentra un CSD
+                messages.error(request, "No se encontró un CSD asociado a la organización. Por favor, cargue un CSD de manera correcta antes de continuar.")
+                # Redirigir al usuario a una página adecuada o devolver la misma página con el mensaje de error
+                
+                # Renderizar la misma vista con los formularios y el mensaje de error
+                context = {
+                    'orden': orden,
+                    'cliente': cliente,
+                    'encabezado_form': encabezado_form,
+                    'pie_form': pie_form,
+                    'totales_form': totales_form,
+                    'conceptos': conceptos,
+                }
+                return render(request, 'facturacion/formulario.html', context)
 
             cliente_rfc = request.POST.get('id_cliente_rfc')
             cliente_regimen = request.POST.get('id_cliente_reg')
@@ -295,13 +258,21 @@ def crear_factura(request, id_personalizado):
                 print(request , messages)
                 print("Guardando en la BD")
                 
+                # Guarda factrura en la BD
+                nueva_factura = Factura(
+                    # Aquí debes agregar los campos necesarios para la factura
+                )
+                # nueva_factura.save()  Asegúrate de guardar la factura
+    
                 # Redirigir a una página de éxito
                 return redirect('home')
             else:
-                # Si ocurre un error, mostrar el mensaje
-                error_message = f"Error al cargar CSD: {response.text}"
-                messages.error(request, error_message)
-                print(request,error_message)
+                # Si ocurre un error, mostrar un mensaje detallado
+                error_code = response.status_code
+                error_message = response.json().get("message", "Ocurrió un error inesperado.")
+                full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+                messages.error(request, full_error_message)
+                print(request, full_error_message)
             
         # Aquí envías `cfdi_data` a la API de Facturama utilizando tu cliente HTTP (requests u otro)
 
@@ -315,7 +286,6 @@ def crear_factura(request, id_personalizado):
         'conceptos': conceptos,
     }
     return render(request, 'facturacion/formulario.html', context)
-
 
 @login_required
 def cargar_csd(request):
@@ -350,15 +320,12 @@ def cargar_csd(request):
                 "PrivateKey": key_base64,
                 "PrivateKeyPassword": key_password,
             }
-
-            print(csd_data)
-
+            
             # URL de la API de Facturama
             url = "https://apisandbox.facturama.mx/api-lite/csds"
             username = "AranzaInade"  # nombre de usuario
             password = "Puebla4990"
-            response = requests.post(
-                url, json=csd_data, auth=(username, password))
+            response = requests.post(url, json=csd_data, auth=(username, password))
 
             # Manejar la respuesta de la API
             if response.status_code == 200:
@@ -369,9 +336,27 @@ def cargar_csd(request):
                 # Redirigir a una página de éxito
                 return redirect('cargar_csd')
             else:
-                # Si ocurre un error, mostrar el mensaje
-                error_message = f"Error al cargar CSD: {response.text}"
-                messages.error(request, error_message)
+                    # Si ocurre un error, intenta extraer un mensaje más claro
+                try:
+                    # Intenta cargar el contenido como JSON
+                    error_data = response.json()
+                    message = error_data.get("Message", "Error desconocido al cargar CSD.")
+                    model_state = error_data.get("ModelState", {})
+                    
+                    # Construir un mensaje de error más detallado si hay información en ModelState
+                    model_errors = []
+                    for field, errors in model_state.items():
+                        for error in errors:
+                            model_errors.append(f"{field}: {error}")
+
+                    # Combinar los mensajes
+                    detailed_error = message + (" Detalles: " + "; ".join(model_errors) if model_errors else "")
+                except (ValueError, KeyError):
+                    # Si no es un JSON válido o faltan claves, mostrar el texto completo
+                    detailed_error = response.text
+
+                # Mostrar el mensaje de error
+                messages.error(request, f"Error al cargar CSD: {detailed_error}")
     else:
         form = CSDForm()
     return render(request, 'facturacion/cargar_csd.html', {'form': form})

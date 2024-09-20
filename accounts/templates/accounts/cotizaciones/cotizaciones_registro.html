@@ -18,200 +18,200 @@
 <script type="text/javascript">
     var servicios = {{ servicios_json | safe }};
 </script>
+<div class="container">
+    <h1 class="text-center">Registro de cotización</h1>
+    <hr />
 
-<h1 class="text-center">Registro de cotización</h1>
-<hr />
+    <form action="" method="post" id="cotizacionForm">
+        {% csrf_token %}
 
-<form action="" method="post" id="cotizacionForm">
-    {% csrf_token %}
-
-    <div class="form-group mt-4">
-        <div class="alert alert-primary mb-4">
-            <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
-            Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
-        </div>
-
-        <div class="container mt-3">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card border-primary">
-                        <div class="card-header bg-primary text-white text-center">
-                            <h5>Cliente <strong>{{ cliente.empresa.nombre_empresa }}</strong></h5>
-                        </div>
-                        <div class="card-body bg-light">
-                            <p class="card-text">
-                                <strong>RFC:</strong> <span class="text-monospace">{{ cliente.empresa.rfc }}</span>
-                            </p>
-                            <p class="card-text">
-                                <strong>Representante:</strong> {{ cliente }}
-                            </p>
-                            <p class="card-text">
-                                <strong>Información de contacto:</strong> {{ cliente.informacion_contacto }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+        <div class="form-group mt-4">
+            <div class="alert alert-primary mb-4">
+                <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
+                Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-6 mt-2">
-                <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
-                {{ cotizacion_form.fecha_solicitud }}
-            </div>
-            <div class="col-md-6 mt-2">
-                <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
-                {{ cotizacion_form.fecha_caducidad }}
-            </div>
-        </div>
-
-        <div class="mt-2 text-end">
-            <span class="text-primary">Por favor, ingresa las fechas en el formato correcto (por ejemplo: 2024-07-28).</span>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mt-2">
-                <label for="metodo_pago">Denominación</label>
-                <select name="metodo_pago" id="metodo_pago" class="form-select">
-                    <option value="MXN" {% if cotizacion_form.metodo_pago.value == 'MXN' %}selected{% endif %}>MXN</option>
-                    <option value="USD" {% if cotizacion_form.metodo_pago.value == 'USD' %}selected{% endif %}>USD</option>
-                </select>
-            </div>
-            <div class="col-md-6 mt-2">
-                <label for="tasa_iva">Tasa del IVA actual</label>
-                <select name="tasa_iva" id="tasa_iva" class="form-select">
-                    <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%</option>
-                    <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%</option>
-                </select>
-            </div>            
-        </div>
-
-        <div class="row mt-2">
-            <div class="col-12">
-                <label for="{{ cotizacion_form.notas.id_for_label }}">Notas</label>
-                {{ cotizacion_form.notas }}
-            </div>
-        </div>
-
-        <div class="row mt-2">
-            <div class="col-12">
-                <label for="{{ cotizacion_form.correos_adicionales.id_for_label }}">Correos Adicionales</label>
-                {{ cotizacion_form.correos_adicionales }}
-            </div>
-        </div>
-
-        <br>
-
-        <h4>Agregar Conceptos</h4>
-        <div class="mt-2 text-end">
-            <span class="text-primary">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deseas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
-        </div>
-
-        {{ concepto_formset.management_form }}
-
-        <div id="concepto_formset">
-            {% for form in concepto_formset %}
-            <div class="concepto-form border-custom border-custom-left p-3 bg-light mt-5">
-                <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
-                <label for="{{ form.servicio.id_for_label }}">Servicio:</label>
-                <div class="row">
-                    <div class="col auto">
-                        <div class="auto">
-                            {{form.servicio}}
-                        </div>
-                    </div>
-                    <div class="col col-1">
-                        <div>
-                            <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" class="text-end">
-                                <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" class="text-end" style="filter: invert(1);" >
-                            </a>
+            <div class="container mt-3">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white text-center">
+                                <h5>Cliente <strong>{{ cliente.empresa.nombre_empresa }}</strong></h5>
+                            </div>
+                            <div class="card-body bg-light">
+                                <p class="card-text">
+                                    <strong>RFC:</strong> <span class="text-monospace">{{ cliente.empresa.rfc }}</span>
+                                </p>
+                                <p class="card-text">
+                                    <strong>Representante:</strong> {{ cliente }}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Información de contacto:</strong> {{ cliente.informacion_contacto }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="">
-                    <p id="servicio-datos-{{ forloop.counter0 }}" class="alert-primary mt-2">
-                    </p>
+            <div class="row">
+                <div class="col-md-6 mt-2">
+                    <label for="{{ cotizacion_form.fecha_solicitud.id_for_label }}">Fecha Solicitada</label>
+                    {{ cotizacion_form.fecha_solicitud }}
                 </div>
-                <div class="mt-2">
-                    <label for="{{ form.cantidad.id_for_label }}">Cantidad de servicios:</label>
-                    {{form.cantidad_servicios}}
-                </div>
-                <div class="mt-2">
-                    <label for="{{ form.precio.id_for_label }}">Precio de servicio:</label>
-                    {{form.precio}}
-                </div>
-                <div class="mt-2">
-                    <label for="{{ form.notas.id_for_label }}">Notas del servicio:</label>
-                    {{form.notas}}
-                </div>
-                <div class="mt-2">
-                    <label for="{{form.DELETE.id_for_label}}"> Eliminar: </label>
-                    {{form.DELETE}}
+                <div class="col-md-6 mt-2">
+                    <label for="{{ cotizacion_form.fecha_caducidad.id_for_label }}">Fecha Caducidad</label>
+                    {{ cotizacion_form.fecha_caducidad }}
                 </div>
             </div>
-            {% endfor %}
-        </div>
 
-        <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir Concepto</button>
+            <div class="mt-2 text-end">
+                <span class="text-primary">Por favor, ingresa las fechas en el formato correcto (por ejemplo: 2024-07-28).</span>
+            </div>
 
-        <div id="totales-section" class="mt-4">
-            <h4>Totales:</h4>
-            <div id="subtotal">Subtotal: {{ cotizacion.subtotal }}</div>
-            <div id="iva">IVA: {{ cotizacion.iva }}</div>
-            <div id="total">Total: {{ cotizacion.total }}</div>
-            <div id="moneda">Moneda: MXN</div>
-        </div>
-    </div>
+            <div class="row">
+                <div class="col-md-6 mt-2">
+                    <label for="metodo_pago">Denominación</label>
+                    <select name="metodo_pago" id="metodo_pago" class="form-select">
+                        <option value="MXN" {% if cotizacion_form.metodo_pago.value == 'MXN' %}selected{% endif %}>MXN</option>
+                        <option value="USD" {% if cotizacion_form.metodo_pago.value == 'USD' %}selected{% endif %}>USD</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mt-2">
+                    <label for="tasa_iva">Tasa del IVA actual</label>
+                    <select name="tasa_iva" id="tasa_iva" class="form-select">
+                        <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%</option>
+                        <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%</option>
+                    </select>
+                </div>            
+            </div>
 
-    <div class="form-group text-right mt-4">
-        <input type="submit" class="btn btn-success" value="{% if cotizacion %}Actualizar Cotización{% else %}Crear Cotización{% endif %}" />
-        <a href="{% url 'cotizaciones_list' %}" class="btn btn-secondary">Cancelar</a>
-    </div>
-</form>
-
-<div id="empty_form" style="display: none;">
-    <div class="concepto-form border-custom border-custom-left p-3 bg-light mt-5">
-        <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
-        <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Servicio:</label>
-        <div class="row">
-            <div class="col auto">
-                <div class="auto">
-                    {{concepto_formset.empty_form.servicio}}
+            <div class="row mt-2">
+                <div class="col-12">
+                    <label for="{{ cotizacion_form.notas.id_for_label }}">Notas</label>
+                    {{ cotizacion_form.notas }}
                 </div>
             </div>
-            <div class="col col-1">
-                <div>
-                    <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" class="text-end">
-                        <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" class="text-end" style="filter: invert(1);" >
-                    </a>
+
+            <div class="row mt-2">
+                <div class="col-12">
+                    <label for="{{ cotizacion_form.correos_adicionales.id_for_label }}">Correos Adicionales</label>
+                    {{ cotizacion_form.correos_adicionales }}
                 </div>
+            </div>
+
+            <br>
+
+            <h4>Agregar Conceptos</h4>
+            <div class="mt-2 text-end">
+                <span class="text-primary">Por favor, ingresa los conceptos necesarios ingresando la información solicitada. <br> Si has creado un concepto que no deseas, marca la casilla de eliminar para no tomar en cuenta ese concepto.</span>
+            </div>
+
+            {{ concepto_formset.management_form }}
+
+            <div id="concepto_formset">
+                {% for form in concepto_formset %}
+                <div class="concepto-form border-custom border-custom-left p-3 bg-light mt-5">
+                    <h5 class="mt-3">Concepto {{ forloop.counter }}</h5>
+                    <label for="{{ form.servicio.id_for_label }}">Servicio:</label>
+                    <div class="row">
+                        <div class="col auto">
+                            <div class="auto">
+                                {{form.servicio}}
+                            </div>
+                        </div>
+                        <div class="col col-1">
+                            <div>
+                                <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" class="text-end">
+                                    <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" class="text-end" style="filter: invert(1);" >
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="">
+                        <p id="servicio-datos-{{ forloop.counter0 }}" class="alert-primary mt-2">
+                        </p>
+                    </div>
+                    <div class="mt-2">
+                        <label for="{{ form.cantidad.id_for_label }}">Cantidad de servicios:</label>
+                        {{form.cantidad_servicios}}
+                    </div>
+                    <div class="mt-2">
+                        <label for="{{ form.precio.id_for_label }}">Precio de servicio:</label>
+                        {{form.precio}}
+                    </div>
+                    <div class="mt-2">
+                        <label for="{{ form.notas.id_for_label }}">Notas del servicio:</label>
+                        {{form.notas}}
+                    </div>
+                    <div class="mt-2">
+                        <label for="{{form.DELETE.id_for_label}}"> Eliminar: </label>
+                        {{form.DELETE}}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-concepto-form" class="btn btn-primary mt-3">Añadir Concepto</button>
+
+            <div id="totales-section" class="mt-4">
+                <h4>Totales:</h4>
+                <div id="subtotal">Subtotal: {{ cotizacion.subtotal }}</div>
+                <div id="iva">IVA: {{ cotizacion.iva }}</div>
+                <div id="total">Total: {{ cotizacion.total }}</div>
+                <div id="moneda">Moneda: MXN</div>
             </div>
         </div>
 
-        <div>
-            <p id="servicio-datos-__prefix__" class="alert-primary mt-2"></p>
+        <div class="form-group text-right mt-4">
+            <input type="submit" class="btn btn-success" value="{% if cotizacion %}Actualizar Cotización{% else %}Crear Cotización{% endif %}" />
+            <a href="{% url 'cotizaciones_list' %}" class="btn btn-secondary">Cancelar</a>
         </div>
-        <div class="mt-2">
-            <label for="{{ concepto_formset.empty_form.cantidad_servicios.id_for_label }}">Cantidad de servicios:</label>
-            {{concepto_formset.empty_form.cantidad_servicios}}
-        </div>
-        <div class="mt-2">
-            <label for="{{ concepto_formset.empty_form.precio.id_for_label }}">Precio de servicio:</label>
-            {{concepto_formset.empty_form.precio}}
-        </div>
-        <div class="mt-2">
-            <label for="{{ concepto_formset.empty_form.notas.id_for_label }}">Notas del servicio:</label>
-            {{concepto_formset.empty_form.notas}}
-        </div>
+    </form>
 
-        <div class="mt-2">
-            <label for="{{ concepto_formset.empty_form.DELETE.id_for_label }}">Eliminar:</label>
-            {{concepto_formset.empty_form.DELETE}}
+    <div id="empty_form" style="display: none;">
+        <div class="concepto-form border-custom border-custom-left p-3 bg-light mt-5">
+            <h5>Concepto <span class="concepto-counter">__counter__</span></h5>
+            <label for="{{ concepto_formset.empty_form.servicio.id_for_label }}">Servicio:</label>
+            <div class="row">
+                <div class="col auto">
+                    <div class="auto">
+                        {{concepto_formset.empty_form.servicio}}
+                    </div>
+                </div>
+                <div class="col col-1">
+                    <div>
+                        <a href="#" class="btn btn-success" onclick="abrirVentanaServicio()" class="text-end">
+                            <img src="{% static 'img/plus-lg.svg' %}" alt="" width="20" height="20" class="text-end" style="filter: invert(1);" >
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <p id="servicio-datos-__prefix__" class="alert-primary mt-2"></p>
+            </div>
+            <div class="mt-2">
+                <label for="{{ concepto_formset.empty_form.cantidad_servicios.id_for_label }}">Cantidad de servicios:</label>
+                {{concepto_formset.empty_form.cantidad_servicios}}
+            </div>
+            <div class="mt-2">
+                <label for="{{ concepto_formset.empty_form.precio.id_for_label }}">Precio de servicio:</label>
+                {{concepto_formset.empty_form.precio}}
+            </div>
+            <div class="mt-2">
+                <label for="{{ concepto_formset.empty_form.notas.id_for_label }}">Notas del servicio:</label>
+                {{concepto_formset.empty_form.notas}}
+            </div>
+
+            <div class="mt-2">
+                <label for="{{ concepto_formset.empty_form.DELETE.id_for_label }}">Eliminar:</label>
+                {{concepto_formset.empty_form.DELETE}}
+            </div>
         </div>
     </div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>

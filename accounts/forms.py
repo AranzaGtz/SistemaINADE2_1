@@ -2,7 +2,7 @@ from django import forms
 
 # accounts/forms.py
 from .utils import obtener_configuracion
-from .models import Almacen, Concepto, ConfiguracionSistema, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Sucursal, Titulo
+from .models import  Concepto, ConfiguracionSistema, CustomUser, FormatoCotizacion, FormatoOrden, Metodo, OrdenTrabajo, Organizacion, Persona, Prospecto, Empresa, Direccion, InformacionContacto, Queja, Servicio, Cotizacion, Titulo
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import inlineformset_factory
 
@@ -12,6 +12,19 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'first_name', 'last_name','email', 'celular', 'rol')
+        widgets = {
+            'username': forms.TextInput(attrs={ 'class': 'form-control','placeholder': 'Nombre de usuario','required': 'True' }),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre', 'required': 'False'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos', 'required': 'False'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}),
+            'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
+            'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
+        }
+        
+class CustomUserCreationForm1(UserCreationForm):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'first_name', 'last_name','email', 'celular')
         widgets = {
             'username': forms.TextInput(attrs={ 'class': 'form-control','placeholder': 'Nombre de usuario','required': 'True' }),
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre', 'required': 'False'}),
@@ -248,7 +261,7 @@ class OrganizacionInitialForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'slogan': forms.TextInput(attrs={'class': 'form-control'}),
-            'logo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),  # Widget para manejar la subida de imágenes
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'formKeyFile'}),  # Widget para manejar la subida de imágenes
         }
 
 #   FORMULARIO PARA LA ORGANIZACION
@@ -262,17 +275,16 @@ class OrganizacionForm(forms.ModelForm):
     estado =    forms.CharField(max_length=100,required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
     class Meta:
         model = Organizacion
-        fields = ['nombre','slogan', 'telefono', 'pagina_web', 'logo','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
+        fields = ['nombre','slogan','regimen_fiscal', 'telefono', 'pagina_web', 'logo','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'slogan': forms.TextInput(attrs={'class': 'form-control'}),
+            'regimen_fiscal': forms.Select(attrs={'class': 'form-select'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'pagina_web': forms.URLInput(attrs={'class': 'form-control'}),
-            'logo': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),  # Widget para manejar la subida de imágenes
+            'logo': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'formKeyFile'}),  # Widget para manejar la subida de imágenes
         }
     optional = ['nombre','slogan', 'telefono', 'pagina_web', 'logo']
-    
-    
 
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
 class OrdenPedidoForm(forms.Form):
@@ -286,7 +298,7 @@ class OrdenTrabajoForm(forms.ModelForm):
         model = OrdenTrabajo
         fields = ['receptor','gestion']
         widgets = {
-            'receptor': forms.Select(attrs={'class': 'form-control'})
+            'receptor': forms.Select(attrs={'class': 'form-select'})
         }
         labels = {
             'receptor': 'Seleccione el receptor de la orden:',
@@ -309,7 +321,7 @@ class FormatoCotizacionForm(forms.ModelForm):
             'mensaje_propuesta': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'terminos': forms.Textarea(attrs={'class': 'form-control' , 'rows': 2}),
             'avisos': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'formKeyFile'}),
         }
 
 #   FORMULARIO PARA FORMATOS DE ORDEN DE TRABAJO
@@ -322,7 +334,7 @@ class FormatoOrdenForm(forms.ModelForm):
             'version': forms.TextInput(attrs={'class': 'form-control'}),
             'emision': forms.DateInput(attrs={'class': 'form-control'}),
             'titulo_documento': forms.TextInput(attrs={'class': 'form-control'}),
-            'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'imagen_marca_agua': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'formKeyFile'}),
         }
 
 #   FORMULARIO PARA QUEJAS
@@ -333,8 +345,8 @@ class QuejaForm(forms.ModelForm):
         widgets = {
             'asunto': forms.TextInput(attrs={'class': 'form-control'}),
             'mensaje': forms.Textarea(attrs={'class':'form-control'}),
-            'prioridad': forms.Select(attrs={'class': 'form-control'}),
-            'archivo_adjunto': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
+            'prioridad': forms.Select(attrs={'class': 'form-select'}),
+            'archivo_adjunto': forms.ClearableFileInput(attrs={'class': 'form-control', 'id': 'formKeyFile'}),
         }
 
 # ---       SISTEMA     ---
@@ -343,35 +355,8 @@ class ConfiguracionSistemaForm(forms.ModelForm):
         model = ConfiguracionSistema
         fields = ['moneda_predeterminada', 'tasa_iva_default', 'formato_numero_cotizacion']
         widgets = {
-            'moneda_predeterminada': forms.Select(attrs={'class': 'form-control'}),
-            'tasa_iva_default': forms.Select(attrs={'class': 'form-control'}),
-            'formato_numero_cotizacion': forms.Select(attrs={'class': 'form-control'}),
+            'moneda_predeterminada': forms.Select(attrs={'class': 'form-select'}),
+            'tasa_iva_default': forms.Select(attrs={'class': 'form-select'}),
+            'formato_numero_cotizacion': forms.Select(attrs={'class': 'form-select'}),
         }
         
-#   FORMULARIO PARA SUCURSAL
-class SucursalForm(forms.ModelForm):
-    # Campos de Direccion
-    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
-    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
-    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
-    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
-    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
-    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
-    class Meta:
-        model = Sucursal
-        fields = ['nombre','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
-        widgets = {'nombre':forms.TextInput(attrs={'class':'form-control'})}
-
-#   FORMULARIO PARA ALMACEN
-class AlmacenForm(forms.ModelForm):
-    # Campos de Direccion
-    calle =     forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Calle'}))
-    numero =    forms.CharField(max_length=50, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número'}))
-    colonia =   forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Colonia'}))
-    ciudad =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}))
-    codigo =    forms.CharField(max_length=6, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Código Postal'}))
-    estado =    forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado'}))
-    class Meta:
-        model = Almacen
-        fields = ['nombre','calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
-        widgets = {'nombre':forms.TextInput(attrs={'class':'form-control'})}

@@ -5,85 +5,86 @@
 {% block header %}Usuarios{% endblock %}
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="container">
 <!-- TITULO -->
-<h1 class="text-center">Usuarios del Sistema</h1>
-<hr class="featurette-divider">
+    <h1 class="text-center">Usuarios del Sistema</h1>
+    <hr class="featurette-divider">
 
-<!-- BUSCADOR -->
-<div class="row mb-3 justify-content-center">
-    <div class="col-md-6">
-        <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario..."
-                onkeyup="filterTable('searchInput', 'usuariosTable')">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button"
-                    onclick="filterTable('searchInput', 'usuariosTable')">Buscar</button>
+    <!-- BUSCADOR -->
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar usuario..."
+                    onkeyup="filterTable('searchInput', 'usuariosTable')">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="filterTable('searchInput', 'usuariosTable')">Buscar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- FILTRO POR ROL -->
-<div class="row mb-3 justify-content-center">
-    <div class="col-md-6">
-        <form method="get" action="{% url 'usuario_list' %}" id="rolFilterForm">
-            <div class="input-group mb-3">
-                <select class="form-select" name="rol" id="rolSelect" onchange="document.getElementById('rolFilterForm').submit();">
-                    <option value="todos" {% if rol_seleccionado == 'todos' %}selected{% endif %}>Todos</option>
-                    <option value="admin" {% if rol_seleccionado == 'admin' %}selected{% endif %}>Administrador</option>
-                    <option value="coordinador" {% if rol_seleccionado == 'coordinador' %}selected{% endif %}>Coordinador</option>
-                    <option value="muestras" {% if rol_seleccionado == 'muestras' %}selected{% endif %}>Muestras</option>
-                    <option value="informes" {% if rol_seleccionado == 'informes' %}selected{% endif %}>Informes</option>
-                    <option value="laboratorio" {% if rol_seleccionado == 'laboratorio' %}selected{% endif %}>Laboratorio</option>
-                    <option value="calidad" {% if rol_seleccionado == 'calidad' %}selected{% endif %}>Calidad</option>
-                </select>
-            </div>
-        </form>
+    <!-- FILTRO POR ROL -->
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-6">
+            <form method="get" action="{% url 'usuario_list' %}" id="rolFilterForm">
+                <div class="input-group mb-3">
+                    <select class="form-select" name="rol" id="rolSelect" onchange="document.getElementById('rolFilterForm').submit();">
+                        <option value="todos" {% if rol_seleccionado == 'todos' %}selected{% endif %}>Todos</option>
+                        <option value="admin" {% if rol_seleccionado == 'admin' %}selected{% endif %}>Administrador</option>
+                        <option value="coordinador" {% if rol_seleccionado == 'coordinador' %}selected{% endif %}>Coordinador</option>
+                        <option value="muestras" {% if rol_seleccionado == 'muestras' %}selected{% endif %}>Muestras</option>
+                        <option value="informes" {% if rol_seleccionado == 'informes' %}selected{% endif %}>Informes</option>
+                        <option value="laboratorio" {% if rol_seleccionado == 'laboratorio' %}selected{% endif %}>Laboratorio</option>
+                        <option value="calidad" {% if rol_seleccionado == 'calidad' %}selected{% endif %}>Calidad</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ENTRADA DE BUSQUEDA -->
+    <div class="row mb-3 justify-content-end">
+        <div class="col-auto">
+            <!-- Botón para abrir el modal de creación de nuevo cliente -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal">
+                Añadir Usuario </button>
+        </div>
+    </div>
+
+    <!-- SECCION DE LISTADO DE USUARIOS -->
+    <div class="">
+        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+            <table id="usuariosTable" class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Username</th>
+                        <th>Correo</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Celular</th>
+                        <th>Rol</th>
+                        <th colspan="2">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in usuarios %}
+                    <tr>
+                        <td>{{ c.username }}</td>
+                        <td>{{ c.email }}</td>
+                        <td>{{ c.first_name }}</td>
+                        <td>{{ c.last_name }}</td>
+                        <td>{{ c.celular }}</td>
+                        <td>{{ c.rol }}</td>
+                        <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
+                        <td><a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">Eliminar</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<!-- ENTRADA DE BUSQUEDA -->
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <!-- Botón para abrir el modal de creación de nuevo cliente -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUsuarioModal">
-            Añadir Usuario </button>
-    </div>
-</div>
-
-<!-- SECCION DE LISTADO DE USUARIOS -->
-<div class="">
-    <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-        <table id="usuariosTable" class="table table-hover">
-            <thead class="thead-light">
-                <tr>
-                    <th>Username</th>
-                    <th>Correo</th>
-                    <th>Nombre</th>
-                    <th>Apellidos</th>
-                    <th>Celular</th>
-                    <th>Rol</th>
-                    <th colspan="2">Opciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in usuarios %}
-                <tr>
-                    <td>{{ c.username }}</td>
-                    <td>{{ c.email }}</td>
-                    <td>{{ c.first_name }}</td>
-                    <td>{{ c.last_name }}</td>
-                    <td>{{ c.celular }}</td>
-                    <td>{{ c.rol }}</td>
-                    <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
-                    <td><a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">Eliminar</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
 <!-- Modal para crear un nuevo usuario -->
 <div class="modal fade" id="createUsuarioModal" tabindex="-1" aria-labelledby="createUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog">

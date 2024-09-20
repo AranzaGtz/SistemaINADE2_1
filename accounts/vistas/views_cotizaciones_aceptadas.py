@@ -2,7 +2,7 @@ from datetime import datetime
 from django.db import IntegrityError, transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from accounts.forms import CustomUserCreationForm, DireccionForm, OrdenTrabajoForm
+from accounts.forms import CustomUserCreationForm, CustomUserCreationForm1, DireccionForm, OrdenTrabajoForm
 from accounts.helpers import get_unica_organizacion
 from accounts.models import Concepto, Cotizacion, Direccion, OrdenTrabajo, OrdenTrabajoConcepto
 from django.contrib import messages
@@ -15,9 +15,12 @@ from django.core.paginator import Paginator
 # VISTA PARA GENERAR NUEVO RECEPTOR
 def agregar_receptor(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomUserCreationForm1(request.POST)
         if form.is_valid():
-            receptor = form.save()
+            receptor = form.save(commit=False)
+            receptor.organizacion = request.user.organizacion
+            receptor.rol = 'muestras'
+            receptor.save()
             return HttpResponse(f"""
                 <script>
                     window.opener.actualizarSelectReceptor({{ id: {receptor.id}, nombre: '{receptor.first_name} {receptor.last_name}' }});
@@ -25,7 +28,7 @@ def agregar_receptor(request):
                 </script>
             """)
     else:
-        form = CustomUserCreationForm()
+        form = CustomUserCreationForm1()
 
     return render(request, 'accounts/usuarios/agregar_receptor.html', {'form': form})
 

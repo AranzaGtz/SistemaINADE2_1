@@ -5,135 +5,135 @@
 {% block content %}
 <style>
     .modal-dialog.custom-size {
-        max-width: 80%; /* Ajusta el valor según sea necesario */
+        max-width: 50%; /* Ajusta el valor según sea necesario */
     }
 </style>
+<div class="container">
+    <!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
 
-<!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
-
-<div class="row">
-    <div class="col">
-        <h1 class="text-center">Servicios</h1>
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Servicios</h1>
+        </div>
     </div>
-</div>
 
-<!-- BUSCADOR -->
-<div class="row mb-3 justify-content-center">
-    <div class="col-md-6">
-        <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar servicios..." onkeyup="filterTable('searchInput', 'serviciosTable')">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'serviciosTable')">Buscar</button>
+    <!-- BUSCADOR -->
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar servicios..." onkeyup="filterTable('searchInput', 'serviciosTable')">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'serviciosTable')">Buscar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3 justify-content-end">
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#createServicioModal">Añadir Servicio</button>
+        </div>
+    </div>
+
+    <!-- TABLA DE SERVICIOS -->
+    <div class="row">
+        <div class="col">
+            <div class="table-responsive" style="max-height: 90vh; overflow-y: auto;">
+                <table id="serviciosTable" class="table table-hover">
+                    <!-- ENCABEZADO DE TABLA -->
+                    <thead class="thead-light">
+                        <tr>
+                            <th><a class="link-secondary" href="?order_by=codigo">Codigo</a></th>
+                            <th><a class="link-secondary" href="?order_by=nombre_servicio">Nombre</a></th>
+                            <th><a class="link-secondary" href="?order_by=metodo__metodo">Método</a></th>
+                            <th><a class="link-secondary" href="?order_by=descripcion">Descripción</a></th>
+                            <th><a class="link-secondary" href="?order_by=precio_unitario">Precio sugerido</a></th>
+                            <th><a class="link-secondary" href="?order_by=acreditado">Acreditado</a></th>
+                            <th colspan="2" class="col-md-1"></th>
+                        </tr>
+                    </thead>
+                    <!-- CUERPO DE TABLA -->
+                    <tbody>
+                        {% for s in servicios_page %}
+                        <tr>
+                            <td>{{ s.codigo }}</td>
+                            <td>{{ s.nombre_servicio }}</td>
+                            <td>{{ s.metodo.metodo }}</td>
+                            <td>{{ s.descripcion }}</td>
+                            <td>{{ s.precio_unitario }}</td>
+                            <td>{% if s.acreditado %}Acreditado{% else %}No Acreditado{% endif %}</td>
+                            <td>
+                                <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">Eliminar</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    {% if servicios_page.has_previous %}
+                        <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                        <a href="?page={{ servicios_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+                    {% endif %}
+                    <div class="m-1">Página {{ servicios_page.number }} de {{ servicios_page.paginator.num_pages }}.</div>
+                    {% if servicios_page.has_next %}
+                        <a href="?page={{ servicios_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+                        <a href="?page={{ servicios_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SECCIÓN DE MÉTODOS -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Métodos</h1>
+        </div>
+    </div>
+
+    <div class="row mb-3 justify-content-end">
+        <div class="col-auto">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMetodoModal">Añadir
+                Metodo</button>
+        </div>
+    </div>
+
+
+    <!-- TABLA DE MÉTODOS -->
+    <div class="row">
+        <div class="col">
+            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                <table id="metodoTable" class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th class="col-md-1">#</th>
+                            <th>Métodos</th>
+                            <th class="col-md-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in metodos %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ m.metodo }}</td>
+                            <td>
+                                <a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-            data-bs-target="#createServicioModal">Añadir Servicio</button>
-    </div>
-</div>
-
-<!-- TABLA DE SERVICIOS -->
-<div class="row">
-    <div class="col">
-        <div class="table-responsive" style="max-height: 90vh; overflow-y: auto;">
-            <table id="serviciosTable" class="table table-hover">
-                <!-- ENCABEZADO DE TABLA -->
-                <thead class="thead-light">
-                    <tr>
-                        <th><a class="link-secondary" href="?order_by=codigo">Codigo</a></th>
-                        <th><a class="link-secondary" href="?order_by=nombre_servicio">Nombre</a></th>
-                        <th><a class="link-secondary" href="?order_by=metodo__metodo">Método</a></th>
-                        <th><a class="link-secondary" href="?order_by=descripcion">Descripción</a></th>
-                        <th><a class="link-secondary" href="?order_by=precio_unitario">Precio sugerido</a></th>
-                        <th><a class="link-secondary" href="?order_by=acreditado">Acreditado</a></th>
-                        <th colspan="2" class="col-md-1"></th>
-                    </tr>
-                </thead>
-                <!-- CUERPO DE TABLA -->
-                <tbody>
-                    {% for s in servicios_page %}
-                    <tr>
-                        <td>{{ s.codigo }}</td>
-                        <td>{{ s.nombre_servicio }}</td>
-                        <td>{{ s.metodo.metodo }}</td>
-                        <td>{{ s.descripcion }}</td>
-                        <td>{{ s.precio_unitario }}</td>
-                        <td>{% if s.acreditado %}Acreditado{% else %}No Acreditado{% endif %}</td>
-                        <td>
-                            <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">Eliminar</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <div class="pagination">
-                {% if servicios_page.has_previous %}
-                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-                    <a href="?page={{ servicios_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
-                {% endif %}
-                <div class="m-1">Página {{ servicios_page.number }} de {{ servicios_page.paginator.num_pages }}.</div>
-                {% if servicios_page.has_next %}
-                    <a href="?page={{ servicios_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
-                    <a href="?page={{ servicios_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
-                {% endif %}
-            </div>
-            
-        </div>
-    </div>
-</div>
-
-
-<!-- SECCIÓN DE MÉTODOS -->
-<div class="row">
-    <div class="col">
-        <h1 class="text-center">Métodos</h1>
-    </div>
-</div>
-
-<div class="row mb-3 justify-content-end">
-    <div class="col-auto">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMetodoModal">Añadir
-            Metodo</button>
-    </div>
-</div>
-
-
-<!-- TABLA DE MÉTODOS -->
-<div class="row">
-    <div class="col">
-        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-            <table id="metodoTable" class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th class="col-md-1">#</th>
-                        <th>Métodos</th>
-                        <th class="col-md-1"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in metodos %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ m.metodo }}</td>
-                        <td>
-                            <a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 <!-- Modal para crear un nuevo servicio -->
 <div class="modal fade" id="createServicioModal" tabindex="-1" aria-labelledby="createServicioLabel" aria-hidden="true">
     <div class="modal-dialog custom-size">

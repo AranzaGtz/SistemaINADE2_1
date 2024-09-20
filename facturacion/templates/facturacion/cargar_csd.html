@@ -7,6 +7,9 @@
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+     {% load static %}
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
      <title>Cargar CSD</title>
      <script>
           function validateForm() {
@@ -43,8 +46,22 @@
 </head>
 
 <body>
-     <div class="container mt-5">
-          <h1>Cargar Certificado de Sello Digital (CSD)</h1>
+     <header class="">
+          <nav class="navbar bg-body-tertiary fixed-top">
+               <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                         <!-- Botón del Regreso -->
+                         <a class="navbar-toggler ms-2" type="button" href="{% url 'config_org' %}"">
+                              <span class=""><img src="{% static 'img/arrow-left-square.svg' %}" style="width: 20pt;" alt=""></span>
+                         </a>
+                    </div>
+               </div>
+          </nav>
+     </header>
+
+     <div class="container mt-5" style="margin-top: 200pt;">
+          <h1 style="margin-top: 90pt;">Cargar Certificado de Sello Digital (CSD)</h1>
+
           {% if messages %}
           <ul class="messages">
                {% for message in messages %}

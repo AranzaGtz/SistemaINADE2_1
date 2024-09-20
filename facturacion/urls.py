@@ -8,6 +8,4 @@ urlpatterns = [
     path('success/', views.success, name='success'),  # Define esta vista de éxito
     path('cf/', views.CF, name='cf'),
     path('obtener-datos-cotizacion/<int:cotizacion_id>/', views.obtener_datos_cotizacion, name='obtener_datos_cotizacion'),
-    path('agregar-sucursal/',views.agregar_sucursal, name='agregar_sucursal'),
-    path('agregar_almacen/',views.agregar_almacen, name='agregar_almacen'),
 ]
