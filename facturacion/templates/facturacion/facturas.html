@@ -1,0 +1,67 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Facturas{% endblock %}
+{% block header %}Facturas{% endblock %}
+{% block content %}
+<div class="container">
+     <!-- SECCION DE TITULO ENCABEZANDO -->
+     <div class="row">
+          <div class="col">
+               <h1 class="text-center">Facturas</h1>
+               <hr />
+          </div>
+     </div>
+     <!-- BUSCADOR -->
+     <div class="row mb-3 justify-content-center">
+          <div class="col-md-6">
+               <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Buscar cotizaciones..."
+                         onkeyup="filterTable('searchInput', 'cotizacionesTable')">
+                    <div class="input-group-append">
+                         <button class="btn btn-outline-secondary" type="button"
+                              onclick="filterTable('searchInput', 'cotizacionesTable')">Buscar</button>
+                    </div>
+               </div>
+          </div>
+     </div>
+     <div class="row mb-3 justify-content-end">
+          <div class="col-auto">
+               <a href="/" class="btn btn-primary mx-1">Nueva Factura</a>
+          </div>
+     </div>
+     <!-- TABLA -->
+    <div class="row">
+          <div class="col">
+               <div class="table-responsive" style="min-height: 75vh; overflow-y: auto;">
+                    <table id="cotizacionesTable" class="table table-hover">
+                         <!-- ENCABEZADO DE TABLA -->
+                         <thead class="thead-light">
+                              <tr>
+                                   <th colspan="2" ><a href="" class="link-secondary">Factura</a></th>
+                                   <th><a href="" class="link-secondary">Fecha</a></th>
+                                   <th><a href="" class="link-secondary">Emisor</a></th>
+                                   <th><a href="" class="link-secondary">Importe</a></th>
+                                   <th><a href="" class="link-secondary">Estado</a></th>
+                                   <th></th>
+                              </tr>
+                         </thead>
+                         <!-- CUERPO DE TABLA -->
+                         <tbody>
+                              {% for factura in facturas %}
+                              <tr>
+                                   <td><a href="">{{ factura.id }}</a></td>
+                                   <td>{{ factura.cfdi_id}}</td>
+                                   <td>{{ factura.fecha_creacion}}</td>
+                                   <td>{{ factura.emisor}}</td>
+                                   <td>$ {{ factura.total}}</td>
+                                   <td>{{ factura.estado}}</td>
+                                   <th><a href="{% url 'factura_detalle' factura.cfdi_id %}" class="btn btn-primary btn-sm">Detalles</a></th>
+                              </tr>
+                              {% endfor %}
+                         </tbody>
+                    </table>
+               </div>
+          </div> 
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import json
+import os
 from django.contrib.auth.decorators import login_required
 from pyexpat.errors import messages
 from django.http import  JsonResponse
@@ -10,8 +12,15 @@ from facturacion.models import CSD, Factura
 from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
-import json
-from django.db.models import Max
+import requests
+import base64
+
+def generar_factura_pdf(request,id_factura):
+        # Construir la URL del endpoint
+    url = f"https://apisandbox.facturama.mx/cfdi/pdf/issuedLite/{id_factura}" 
+
+
+
 
 
 def obtener_datos_cotizacion(request, cotizacion_id):
@@ -300,6 +309,9 @@ def crear_factura(request, id_personalizado):
                 )
                 nueva_factura.save() # Asegúrate de guardar la factura
                 # verificar si con la API se puede crear o manejar los <comprobantes de pagos
+                
+                
+                
                 # Redirigir a una página de éxito
                 return redirect('home')
             else:
@@ -414,3 +426,19 @@ def CF(request):
         'cotizaciones': cotizaciones,
     }
     return render(request, "cotizaciones.html", context)
+
+
+def facturas_list(request):
+    context ={
+        'facturas' :  Factura.objects.all()
+    }
+    return render (request, "facturacion/facturas.html",context)
+
+
+def factura_detalle(request, cfdi_id):
+    factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
+    context = {
+        'factura' : factura,
+        'id': f'{factura.id:04}'
+    }
+    return render(request, 'facturacion/factura_detalle.html', context)

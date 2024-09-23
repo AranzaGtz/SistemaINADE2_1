@@ -1,0 +1,109 @@
+{% extends 'accounts/base_dashboard.html' %}
+{% load static %}
+{% block title %}Facturas{% endblock %}
+{% block header %}Facturas{% endblock %}
+{% block content %}
+<div class="container">
+     <!-- SECCION DE TITULO ENCABEZANDO -->
+     <div class="row">
+          <div class="col">
+               <h1 class="text-center">Factura {{ id }} </h1>
+               <hr />
+          </div>
+     </div>
+     <!-- BOTONES DE ACCIÓN -->
+     <div class="dropdown text-end dropleft m-3">
+          <!-- Botón para activar el dropdown -->
+          <button class="btn btn-success dropdown-toggle mt-3" type="button" id="dropdownMenuButton"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              Acciones para factura
+          </button>
+          <!-- Elementos del dropdown -->
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+              <li><a class="dropdown-item" href="">Cancelar</a></li>
+              <li><a class="dropdown-item" href="">Comprobar pago</a></li>
+              <li><a class="dropdown-item" href="" target="_blank">Abrir archivos</a></li>
+              </li>
+          </ul>
+      </div>
+     <table class="table table-bordered">
+          <thead>
+               <tr>
+                    <th colspan="2" class="text-center">FACTURA</th>
+               </tr>
+          </thead>
+          <tbody>
+               <tr>
+                    <th scope="row">ID</th>
+                    <td>factura {{ id }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">CFDI ID</th>
+                    <td> {{ factura.cfdi_id }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Orden de Trabajo</th>
+                    <td> {{ factura.orden }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Receptor / Cliente</th>
+                    <td> {{ factura.emisor }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Tipo Moneda</th>
+                    <td> {{ factura.tipo_moneda }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Uso CFDI</th>
+                    <td> {{ factura.uso_cfdi }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Forma de Pago</th>
+                    <td> {{ factura.forma_pago }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Metodo de Pago</th>
+                    <td> {{ factura.metodo_pago }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">ExchangeRate</th>
+                    <td> {{ factura.ExchangeRate }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Descuento</th>
+                    <td> {{ factura.Discount }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Subtotal</th>
+                    <td> {{ factura.subtotal }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Tasa IVA</th>
+                    <td> {{ factura.tasa_iva }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">IVA</th>
+                    <td> {{ factura.iva }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Total</th>
+                    <td> {{ factura.total }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Fecha</th>
+                    <td> {{ factura.fecha_creacion }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">Estado</th>
+                    <td> {{ factura.estado }}</td>
+               </tr>
+               <tr>
+                    <th scope="row">ExpeditionPlace</th>
+                    <td> {{ factura.ExpeditionPlace }}</td>
+               </tr>
+
+          </tbody>
+     </table>
+</div>
+{% endblock %}

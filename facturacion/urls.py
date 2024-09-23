@@ -8,4 +8,8 @@ urlpatterns = [
     path('success/', views.success, name='success'),  # Define esta vista de éxito
     path('cf/', views.CF, name='cf'),
     path('obtener-datos-cotizacion/<int:cotizacion_id>/', views.obtener_datos_cotizacion, name='obtener_datos_cotizacion'),
+    path('facturas/',views.facturas_list, name = 'facturas_list'),
+    path('factura/detalle/<cfdi_id>/', views.factura_detalle, name='factura_detalle'),
+    path('factura/<id_factura>', views.generar_factura_pdf, name='generar_factura_pdf'),
+    
 ]
