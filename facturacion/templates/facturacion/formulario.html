@@ -62,11 +62,11 @@
                          </div>
 
                          <div class="form-group">
-                              {{ encabezado_form.orden_compra.label_tag }}
-                              {{ encabezado_form.orden_compra }}
-                              {% if encabezado_form.orden_compra.errors %}
+                              {{ encabezado_form.OrderNumber.label_tag }}
+                              {{ encabezado_form.OrderNumber }}
+                              {% if encabezado_form.OrderNumber.errors %}
                               <div class="text-danger">
-                                   {{ encabezado_form.orden_compra.errors }}
+                                   {{ encabezado_form.OrderNumber.errors }}
                               </div>
                               {% endif %}
                          </div>
