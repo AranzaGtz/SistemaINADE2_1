@@ -35,6 +35,8 @@ class Factura(models.Model):
     metodo_pago = models.CharField(max_length=5,choices=[('PUE', 'Pago en una sola exhibición'), ('PPD', 'Pago en parcialidades o diferido')] , default='PUE')
     
     # Información de los totales de la factura
+    ExchangeRate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    Discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     opciones_iva = [
         ('0.08', '8%'),
@@ -55,11 +57,24 @@ class Factura(models.Model):
     pdf_file = models.FileField(upload_to='cfdis/pdf/', null=True, blank=True)
     
     # Información adicional de la factura
-    orden_compra = models.CharField(max_length=255, blank=True, null=True)
+    ExpeditionPlace = models.CharField(max_length=5, blank=True, null=True)
+    cfdi_type = models.CharField(max_length=20, blank=True, null=True)
+    Type = models.CharField(max_length=20, blank=True, null=True)
+    OrderNumber = models.CharField(max_length=20, blank=True, null=True)
     comentarios = models.CharField(blank=True, null=True, max_length=255)
     correos = models.CharField(max_length=255, blank= True, null=True)
     
+    #   Cadena Original del Complemento de Certificación Digital del SAT
+    OriginalString = models.TextField(blank= True, null=True)
+    #   Sello Digital del CFDI
+    CfdiSign = models.TextField(blank= True, null=True)
+    #   Sello Digital del SAT
+    SatSign = models.TextField(blank= True, null=True)
+    
+    def formatted_id(self):
+        # Formatea el ID para que tenga siempre cuatro dígitos con ceros a la izquierda
+        return f'{self.id:04}'
+    
     def __str__(self):
-        if self.cotizacion and self.cotizacion.id_personalizado:
-            return f"Factura {self.uuid} para Cotización {self.cotizacion.id_personalizado}"
-        return f"Factura {self.uuid}"
+        # Utiliza el método formatted_id para mostrar la factura con el ID formateado
+        return f'Factura {self.formatted_id()}'

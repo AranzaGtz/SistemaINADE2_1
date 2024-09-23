@@ -11,6 +11,8 @@ from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, 
 from django.contrib import messages
 import base64
 import json
+from django.db.models import Max
+
 
 def obtener_datos_cotizacion(request, cotizacion_id):
     try:
@@ -88,6 +90,15 @@ def crear_factura(request, id_personalizado):
                     'conceptos': conceptos,
                 }
                 return render(request, 'facturacion/formulario.html', context)
+            
+            # Obtener el último ID existente
+            ultimo_id = Factura.objects.aggregate(Max('id'))['id__max']
+            # Manejar el caso donde no haya registros (el primer ID será 1)
+            siguiente_id = (ultimo_id or 0) + 1  
+            # Formatear el ID a cuatro dígitos
+            siguiente_id_formateado = f'{siguiente_id:04}'
+            # Imprimir o utilizar el siguiente ID
+            print(f"El siguiente ID será: {siguiente_id_formateado}")
 
             cliente_rfc = request.POST.get('id_cliente_rfc')
             cliente_regimen = request.POST.get('id_cliente_reg')
@@ -104,7 +115,7 @@ def crear_factura(request, id_personalizado):
             emisor_cp = emisor.organizacion.direccion.codigo
 
             tipo_moneda = datos_e['tipo_moneda']
-            orden_compra = datos_e['orden_compra']
+            orden_compra = datos_e['OrderNumber']
             uso_cfdi = datos_e['uso_cfdi']
             forma_pago = datos_e['forma_pago']
             metodo_pago = datos_e['metodo_pago']
@@ -172,7 +183,7 @@ def crear_factura(request, id_personalizado):
                 # ( Strg )Tipo de cambio de la moneda en caso de ser diferente de MXN
                 "Currency": "MXN",
                 # ( string ) Folio: Atributo para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de 1 a 40 caracteres.
-                "Folio": "1",
+                "Folio": siguiente_id_formateado,
                 "Date": now_tijuana.isoformat(),  # Fecha actual en formato ISO 8601
                 # ( string ) Atributo requerido para expresar el efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado Required Data type: TextMatching regular expression pattern: I|E|T|N|P
                 "CfdiType": "I",
@@ -257,13 +268,38 @@ def crear_factura(request, id_personalizado):
                 messages.success(request, 'CFDI timbrado correctamente.')
                 print(request , messages)
                 print("Guardando en la BD")
+
                 
                 # Guarda factrura en la BD
                 nueva_factura = Factura(
                     # Aquí debes agregar los campos necesarios para la factura
+                    id=response_data.get("Folio"),
+                    cfdi_id=response_data.get("Id"),
+                    cfdi_type = response_data.get("CfdiType"),
+                    Type = response_data.get("Type"),
+                    orden=orden,
+                    OrderNumber=orden_compra,
+                    cliente=cliente,
+                    emisor=emisor.organizacion,
+                    forma_pago=response_data.get("PaymentTerms"),
+                    metodo_pago=response_data.get("PaymentMethod"),
+                    ExpeditionPlace = response_data.get("ExpeditionPlace"),
+                    ExchangeRate = response_data.get("ExchangeRate"),
+                    tipo_moneda=orden.cotizacion.metodo_pago,#tipo_moneda=tipo_moneda,
+                    subtotal=response_data.get("Subtotal"),
+                    tasa_iva = datos_t['tasa_iva'],
+                    Discount = response_data.get("Discount"),
+                    iva=datos_t['iva'],
+                    total=response_data.get("Total"),
+                    comentarios=response_data.get("Observations"),
+                    correos=correos,
+                    estado=response_data.get("Status"),
+                    OriginalString=response_data.get("OriginalString"),
+                    CfdiSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("CfdiSign"),
+                    SatSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("SatSign"),
                 )
-                # nueva_factura.save()  Asegúrate de guardar la factura
-    
+                nueva_factura.save() # Asegúrate de guardar la factura
+                # verificar si con la API se puede crear o manejar los <comprobantes de pagos
                 # Redirigir a una página de éxito
                 return redirect('home')
             else:
