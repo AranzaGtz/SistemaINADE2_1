@@ -20,11 +20,27 @@
           </button>
           <!-- Elementos del dropdown -->
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-
-              <li><a class="dropdown-item" href="">Cancelar</a></li>
-              <li><a class="dropdown-item" href="">Comprobar pago</a></li>
-              <li><a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">Abrir PDF</a></li>
-              </li>
+          
+               <li><a class="dropdown-item" href="">Cancelar</a></li>
+               <li><a class="dropdown-item" href="">Comprobar pago</a></li>
+               <li>
+                    <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
+                         {% if factura.pdf_file %}
+                              Descargar PDF
+                         {% else %}
+                              Generar PDF
+                         {% endif %}
+                    </a>
+               </li>
+               <li>
+                    <a class="dropdown-item" href="{% url 'generar_factura_xml' factura.cfdi_id %}">
+                         {% if factura.xml_file %}
+                              Descargar XML
+                         {% else %}
+                              Generar XML
+                         {% endif %}
+                    </a>
+               </li>
           </ul>
       </div>
      <table class="table table-bordered">

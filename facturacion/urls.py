@@ -11,5 +11,6 @@ urlpatterns = [
     path('facturas/',views.facturas_list, name = 'facturas_list'),
     path('factura/detalle/<cfdi_id>/', views.factura_detalle, name='factura_detalle'),
     path('factura/<id_factura>', views.generar_factura_pdf, name='generar_factura_pdf'),
+    path('factura/xml/<id_factura>', views.generar_factura_xml, name='generar_factura_xml'),
     
 ]
