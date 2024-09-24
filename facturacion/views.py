@@ -16,6 +16,51 @@ import requests
 from django.core.files.base import ContentFile
 
 @login_required
+def generar_factura_xml(request, id_factura):
+    factura = get_object_or_404(Factura, cfdi_id=id_factura)
+
+    # Verificar si ya existe un archivo XML asignado
+    if not factura.xml_file:
+        # Construir la URL del endpoint para obtener el XML
+        url = f"https://apisandbox.facturama.mx/cfdi/xml/issuedLite/{id_factura}"
+        username = "AranzaInade"  # nombre de usuario
+        password = "Puebla4990"
+
+        # Solicitud al API de Facturama
+        response = requests.get(url, auth=(username, password))
+
+        # Manejar una respuesta API
+        if response.status_code == 200:
+            # Recuperar XML de response
+            xml_content = response.content
+
+            # Guardar el archivo XML en la carpeta media/facturas/
+            factura.xml_file.save(f'factura_{id_factura}.xml', ContentFile(xml_content))
+
+            # Guardar cambios en la instancia
+            factura.save()
+            messages.success(request, "XML generado y asignado correctamente.")
+            return redirect('detalle_factura', id_factura=id_factura)  # Redirige al detalle
+        else:
+            # Manejar el error si no se pudo obtener el XML
+            error_code = response.status_code
+            error_message = response.json().get("message", "Ocurrió un error inesperado.")
+            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+            messages.error(request, full_error_message)
+            print(full_error_message)
+            return redirect('detalle_factura', id_factura=id_factura)
+
+    elif factura.xml_file:
+        # Retornamos el archivo XML guardado para descargar
+        response = FileResponse(factura.xml_file.open(), content_type='application/xml')
+        response['Content-Disposition'] = f'attachment; filename="factura_{id_factura}.xml"'
+        return response
+
+    else:
+        raise Http404("El archivo XML no se encuentra.")
+
+
+@login_required
 def generar_factura_pdf(request,id_factura):
     factura = get_object_or_404(Factura, cfdi_id=id_factura)
     
@@ -37,7 +82,7 @@ def generar_factura_pdf(request,id_factura):
             pdf_content = base64.b64decode(response_data.get("Content"))
             
             # Guardar el archivo PDF en la carpeta media/facturas/
-            factura.pdf_file.save('factura_{id_factura}.pdf', ContentFile(pdf_content))
+            factura.pdf_file.save(f'factura_{id_factura}.pdf', ContentFile(pdf_content))
             
             # Guardar cambios en la instancia
             factura.save()
@@ -55,9 +100,6 @@ def generar_factura_pdf(request,id_factura):
             return redirect('detalle_factura', id_factura=id_factura)
            
     elif factura.pdf_file:
-        
-        # Si el PDF ya existe, redirigir al detalle
-        messages.info(request, "El PDF ya fue generado previamente.")
         # Retornamos el archivo PDF guardado
         return FileResponse(factura.pdf_file.open(), content_type='application/pdf')
     
@@ -65,7 +107,6 @@ def generar_factura_pdf(request,id_factura):
         
         raise Http404("El archivo PDF no se encuentra.")
     
-
 
 def obtener_datos_cotizacion(request, cotizacion_id):
     try:
