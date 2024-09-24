@@ -6,6 +6,20 @@ from .models import CSD, Factura
 from django.forms import  formset_factory
 from .models import Factura
 
+#   FORMULARIO PARA CANCELAR FACTURA
+class CancelarCFDI(forms.Form):
+    
+    MOTIVOS = [
+        ('01','01 - Comprovante emitido con errores con relación.'),
+        ('02','02 - Comprovante emitido con errores sin relación.'),
+        ('03','03 - No se llevó a cabo la operación.'),
+        ('04','04 - Operación nominativa relacionada en una global.')
+    ]
+    
+    motive = forms.ChoiceField(choices=MOTIVOS, label='Selecciona el motivo por la que se realizara la cancelación.', widget=forms.Select(attrs={'class':'form-select', 'id': 'select_opciones'}))
+    uuid_replacement = forms.CharField(required=False, label='UUID que va a remplazar', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'uuid_replacement'}))
+    factura_id = forms.CharField(required=True,widget=forms.HiddenInput())
+
 class SeleccionForm(forms.Form):
     TIPO_OPCIONES = [
         ('cotizacion', 'Cotización'),
@@ -134,7 +148,6 @@ class FacturaTotalesForm(forms.ModelForm):
         configuracion = obtener_configuracion()
         if configuracion:
             self.fields['tasa_iva'].initial = configuracion.tasa_iva_default
-
 
 #   FORMULARIO SET PARA SERVIVIO
 ServicioFormset = formset_factory(

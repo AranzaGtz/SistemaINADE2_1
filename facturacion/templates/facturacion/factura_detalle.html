@@ -21,7 +21,7 @@
           <!-- Elementos del dropdown -->
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           
-               <button class="dropdown-item">Cancelar</button>
+               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI">Cancelar factura</button>
                <li><a class="dropdown-item" href="">Comprobar pago</a></li>
                <li>
                     <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
@@ -123,4 +123,62 @@
           </tbody>
      </table>
 </div>
+
+<!-- Modal para cancelar cfdi -->
+<div class="modal fade" id="CancelarCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+          <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Cancelando Factura</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               
+               <div class="modal-body">
+                    
+                    <form action="" method="post" id="cancelarCFDIForm">
+                         {% csrf_token %}
+                         {% csrf_token %}
+                         <div class="mb-3">
+                              {{ form_cancel.motive.label }}
+                              {{ form_cancel.motive }} <!-- Asegúrate de que esto tenga un ID -->
+                              <div id="uuidFieldContainer" style="display: none;" class="mt-2">
+                                   <!-- Imprimir el label y el campo uuid_replacement manualmente -->
+                                   {{ form_cancel.uuid_replacement.label }}
+                                   {{ form_cancel.uuid_replacement }} <!-- Renderizar el campo de UUID -->
+                              </div>
+                         </div>
+                    </form>
+               </div>
+
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" form="cancelarCFDIForm">Guardar Cambios</button>
+               </div>
+          </div>
+     </div>
+</div>
+
+<script>
+     document.addEventListener('DOMContentLoaded', function () {
+         const selectOpciones = document.getElementById('select_opciones'); // Asegúrate de que este ID coincida
+         const uuidFieldContainer = document.getElementById('uuidFieldContainer');
+         const uuidReplacementField = document.getElementById('uuid_replacement');
+ 
+         function toggleUUIDField() {
+             if (selectOpciones.value === '01') {
+                 uuidFieldContainer.style.display = 'block'; // Mostrar el campo
+             } else {
+                 uuidFieldContainer.style.display = 'none'; // Ocultar el campo
+                 uuidReplacementField.value = ''; // Limpiar el campo si se oculta
+             }
+         }
+ 
+         // Inicialmente ocultamos el campo
+         toggleUUIDField();
+ 
+         // Escuchar cambios en el select
+         selectOpciones.addEventListener('change', toggleUUIDField);
+     });
+ </script>
+ 
 {% endblock %}
