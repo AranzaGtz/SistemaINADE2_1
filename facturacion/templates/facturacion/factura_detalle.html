@@ -23,7 +23,7 @@
 
               <li><a class="dropdown-item" href="">Cancelar</a></li>
               <li><a class="dropdown-item" href="">Comprobar pago</a></li>
-              <li><a class="dropdown-item" href="" target="_blank">Abrir archivos</a></li>
+              <li><a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">Abrir PDF</a></li>
               </li>
           </ul>
       </div>
