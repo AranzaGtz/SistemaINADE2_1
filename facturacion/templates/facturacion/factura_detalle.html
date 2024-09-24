@@ -21,7 +21,7 @@
           <!-- Elementos del dropdown -->
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           
-               <li><a class="dropdown-item" href="">Cancelar</a></li>
+               <button class="dropdown-item">Cancelar</button>
                <li><a class="dropdown-item" href="">Comprobar pago</a></li>
                <li>
                     <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
@@ -41,6 +41,7 @@
                          {% endif %}
                     </a>
                </li>
+               
           </ul>
       </div>
      <table class="table table-bordered">
