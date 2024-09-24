@@ -9,11 +9,13 @@ import requests
 from accounts.helpers import get_unica_organizacion
 from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
 from facturacion.models import CSD, Factura
-from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
+from .forms import CSDForm, CancelarCFDI, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
 import requests
 from django.core.files.base import ContentFile
+from django.conf import settings  # Asegúrate de tener tu configuración adecuada
+
 
 @login_required
 def generar_factura_xml(request, id_factura):
@@ -420,6 +422,7 @@ def crear_factura(request, id_personalizado):
     }
     return render(request, 'facturacion/formulario.html', context)
 
+
 @login_required
 def cargar_csd(request):
     # https://apisandbox.facturama.mx/guias/api-multi/csds
@@ -519,12 +522,57 @@ def facturas_list(request):
     }
     return render (request, "facturacion/facturas.html",context)
 
-
+@login_required
 def factura_detalle(request, cfdi_id):
+    
     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
+    
+    form_cancel = CancelarCFDI(initial={'factura_id':cfdi_id})
+    
+    # Maneja el metodo post de cancelar factura
+    if request.method == 'POST':
+        form_cancel = CancelarCFDI(request.POST)
+        if form_cancel.is_valid():
+            # Obteniendo datos del formulario
+            motive = form_cancel.cleaned_data['motive']
+            uuid_replacement = form_cancel.cleaned_data['uuid_remplacement']
+            factura_id = form_cancel.cleaned_data['factura_id']
+            
+            # Imprimiendo en consola
+            print(motive,uuid_replacement,factura_id)
+            
+            # Llama a la función para cancelar la factura
+            success, response = cancelar_factura_api(factura_id, motive, uuid_replacement)
+            
+            if success:
+                # Manejo en caso de éxito (puedes redirigir o mostrar un mensaje)
+                messages.success(request, "Factura cancelada exitosamente.")
+                return redirect('factura_detalle', cfdi_id=cfdi_id)
+            else:
+                # Manejo en caso de error (puedes mostrar un mensaje de error)
+                messages.error(request, f"Error al cancelar la factura: {response}")
+    
     context = {
         'factura' : factura,
-        'id': f'{factura.id:04}'
+        'id': f'{factura.id:04}',
+        'form_cancel': form_cancel
     }
+    
     return render(request, 'facturacion/factura_detalle.html', context)
 
+def cancelar_factura_api(factura_id, motive, uuid_replacement):
+    url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
+    
+    # Realiza la llamada a la API (usa el método que necesites, por ejemplo POST)
+    try:
+        response = requests.post(url, headers={'Authorization': f'Bearer {settings.FACTURAMA_API_TOKEN}'})
+        
+        if response.status_code == 200:
+            # La solicitud fue exitosa
+            return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas
+        else:
+            # Manejo de errores
+            return False, response.json()  # Puedes devolver el mensaje de error
+    except requests.exceptions.RequestException as e:
+        # Manejo de excepciones
+        return False, str(e)
