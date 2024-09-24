@@ -3,7 +3,7 @@ import json
 import os
 from django.contrib.auth.decorators import login_required
 from pyexpat.errors import messages
-from django.http import  JsonResponse
+from django.http import  FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import requests
 from accounts.helpers import get_unica_organizacion
@@ -13,14 +13,58 @@ from .forms import CSDForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, 
 from django.contrib import messages
 import base64
 import requests
-import base64
+from django.core.files.base import ContentFile
 
+@login_required
 def generar_factura_pdf(request,id_factura):
+    factura = get_object_or_404(Factura, cfdi_id=id_factura)
+    
+    # Verificar si ya existe un archivo PDF asignado
+    if not factura.pdf_file:
+    
         # Construir la URL del endpoint
-    url = f"https://apisandbox.facturama.mx/cfdi/pdf/issuedLite/{id_factura}" 
-
-
-
+        url = f"https://apisandbox.facturama.mx/cfdi/pdf/issuedLite/{id_factura}"
+        username = "AranzaInade"  # nombre de usuario
+        password = "Puebla4990"
+        # Solicitud al API de Facturama
+        response = requests.get(url, auth=(username, password))
+        
+        # Manejar una respuesta API 
+        if response.status_code == 200:
+            
+            # Recuperar pdf de response
+            response_data = response.json()
+            pdf_content = base64.b64decode(response_data.get("Content"))
+            
+            # Guardar el archivo PDF en la carpeta media/facturas/
+            factura.pdf_file.save('factura_{id_factura}.pdf', ContentFile(pdf_content))
+            
+            # Guardar cambios en la instancia
+            factura.save()
+            messages.success(request, "PDF generado y asignado correctamente.")
+            return redirect('detalle_factura', id_factura=id_factura)  # Redirige a la vi
+        else:
+            
+            # Manejar el error si no se pudo obtener el PDF
+            error_code = response.status_code
+            error_message = response.json().get("message", "Ocurrió un error inesperado.")
+            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+            messages.error(request, full_error_message)
+            print(request, full_error_message)
+            # Renderizar el template de error
+            return redirect('detalle_factura', id_factura=id_factura)
+           
+    elif factura.pdf_file:
+        
+        # Si el PDF ya existe, redirigir al detalle
+        messages.info(request, "El PDF ya fue generado previamente.")
+        # Retornamos el archivo PDF guardado
+        return FileResponse(factura.pdf_file.open(), content_type='application/pdf')
+    
+    else:
+        
+        raise Http404("El archivo PDF no se encuentra.")
+    
 
 
 def obtener_datos_cotizacion(request, cotizacion_id):
@@ -442,3 +486,4 @@ def factura_detalle(request, cfdi_id):
         'id': f'{factura.id:04}'
     }
     return render(request, 'facturacion/factura_detalle.html', context)
+
