@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
 import json
-import os
 from django.contrib.auth.decorators import login_required
 from pyexpat.errors import messages
-from django.http import  FileResponse, Http404, HttpResponse, JsonResponse
+from django.http import  FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import requests
 from accounts.helpers import get_unica_organizacion
@@ -14,7 +13,17 @@ from django.contrib import messages
 import base64
 import requests
 from django.core.files.base import ContentFile
-from django.conf import settings  # Asegúrate de tener tu configuración adecuada
+from django.db.models import Max
+
+# Trato que el modal mande a esta vista toda la información para poder hacer uso del endpoint, que es basicamente crear una nueva factura, pero un tipo de factura diferente, clasificandolas por "NameId", asi que solamente la vistra usara la API y regresara a factura_dertalle para mostrar mensajes.
+# @login_required
+# def comprobante_pago(request, cfdi_id):
+#     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
+#     context={
+#         'factura':factura,
+#         'id': f'{factura.id:04}',
+#     }
+#     return render(request, 'facturacion/formulario_comprobante.html', context)
 
 
 @login_required
@@ -42,7 +51,7 @@ def generar_factura_xml(request, id_factura):
             # Guardar cambios en la instancia
             factura.save()
             messages.success(request, "XML generado y asignado correctamente.")
-            return redirect('detalle_factura', id_factura=id_factura)  # Redirige al detalle
+            return redirect('factura_detalle', id_factura=id_factura)  # Redirige al detalle
         else:
             # Manejar el error si no se pudo obtener el XML
             error_code = response.status_code
@@ -50,7 +59,7 @@ def generar_factura_xml(request, id_factura):
             full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
             messages.error(request, full_error_message)
             print(full_error_message)
-            return redirect('detalle_factura', id_factura=id_factura)
+            return redirect('factura_detalle', id_factura=id_factura)
 
     elif factura.xml_file:
         # Retornamos el archivo XML guardado para descargar
@@ -89,7 +98,7 @@ def generar_factura_pdf(request,id_factura):
             # Guardar cambios en la instancia
             factura.save()
             messages.success(request, "PDF generado y asignado correctamente.")
-            return redirect('detalle_factura', id_factura=id_factura)  # Redirige a la vi
+            return redirect('factura_detalle', id_factura=id_factura)  # Redirige a la vi
         else:
             
             # Manejar el error si no se pudo obtener el PDF
@@ -99,7 +108,7 @@ def generar_factura_pdf(request,id_factura):
             messages.error(request, full_error_message)
             print(request, full_error_message)
             # Renderizar el template de error
-            return redirect('detalle_factura', id_factura=id_factura)
+            return redirect('factura_detalle', id_factura=id_factura)
            
     elif factura.pdf_file:
         # Retornamos el archivo PDF guardado
@@ -134,6 +143,7 @@ def obtener_datos_cotizacion(request, cotizacion_id):
         return JsonResponse(data)
     except Cotizacion.DoesNotExist:
         return JsonResponse({'error': 'Cotización no encontrada'}, status=404)
+
 
 @login_required
 def crear_factura(request, id_personalizado):
@@ -522,6 +532,7 @@ def facturas_list(request):
     }
     return render (request, "facturacion/facturas.html",context)
 
+
 @login_required
 def factura_detalle(request, cfdi_id):
     
@@ -529,28 +540,6 @@ def factura_detalle(request, cfdi_id):
     
     form_cancel = CancelarCFDI(initial={'factura_id':cfdi_id})
     
-    # Maneja el metodo post de cancelar factura
-    if request.method == 'POST':
-        form_cancel = CancelarCFDI(request.POST)
-        if form_cancel.is_valid():
-            # Obteniendo datos del formulario
-            motive = form_cancel.cleaned_data['motive']
-            uuid_replacement = form_cancel.cleaned_data['uuid_remplacement']
-            factura_id = form_cancel.cleaned_data['factura_id']
-            
-            # Imprimiendo en consola
-            print(motive,uuid_replacement,factura_id)
-            
-            # Llama a la función para cancelar la factura
-            success, response = cancelar_factura_api(factura_id, motive, uuid_replacement)
-            
-            if success:
-                # Manejo en caso de éxito (puedes redirigir o mostrar un mensaje)
-                messages.success(request, "Factura cancelada exitosamente.")
-                return redirect('factura_detalle', cfdi_id=cfdi_id)
-            else:
-                # Manejo en caso de error (puedes mostrar un mensaje de error)
-                messages.error(request, f"Error al cancelar la factura: {response}")
     
     context = {
         'factura' : factura,
@@ -560,19 +549,55 @@ def factura_detalle(request, cfdi_id):
     
     return render(request, 'facturacion/factura_detalle.html', context)
 
-def cancelar_factura_api(factura_id, motive, uuid_replacement):
-    url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
+@login_required
+def cancelar_factura(request):
     
-    # Realiza la llamada a la API (usa el método que necesites, por ejemplo POST)
-    try:
-        response = requests.post(url, headers={'Authorization': f'Bearer {settings.FACTURAMA_API_TOKEN}'})
-        
-        if response.status_code == 200:
-            # La solicitud fue exitosa
-            return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas
+    # Maneja el metodo post de cancelar factura
+    if request.method == 'POST':
+        form_cancel = CancelarCFDI(request.POST)
+        if form_cancel.is_valid():
+            # Obteniendo datos del formulario
+            motive = form_cancel.cleaned_data.get('motive')
+            uuid_replacement = form_cancel.cleaned_data.get('uuid_remplacement', None)
+            factura_id = form_cancel.cleaned_data.get('factura_id')
+            
+            # Imprimiendo en consola
+            print(f"Aqui los datos para cancelar: ",motive,uuid_replacement ,factura_id )
+            
+            
+            # Construir la URL para la API
+            url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
+            username = "AranzaInade"  # nombre de usuario
+            password = "Puebla4990"
+    
+            # Realiza la llamada a la API (usa el método que necesites, por ejemplo POST)
+            try:
+                response = requests.delete(url, auth=(username, password))
+                if response.status_code == 200:
+                    # La solicitud fue exitosa
+                    factura = get_object_or_404(Factura, cfdi_id=factura_id)
+                    factura.estado = 'canceled'
+                    factura.save()  # Asegúrate de guardar los cambios en la base de datos
+                    messages.success(request, "Factura cancelada exitosamente.")
+                    return redirect('factura_detalle', cfdi_id=factura_id)  # Redirigir a la vista de detalles de la factura
+                else:
+                    # Manejar errores si la respuesta no fue 200 OK
+                    # Manejar el error si no se pudo obtener el PDF
+                    error_code = response.status_code
+                    error_message = response.json().get("message", "Ocurrió un error inesperado.")
+                    full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+                    messages.error(request, full_error_message)
+                    print(request, full_error_message)
+                    return redirect('factura_detalle', cfdi_id=factura_id)
+            except requests.exceptions.RequestException as e:
+                # Manejar errores de conexión
+                messages.error(request, f"Error de conexión: {str(e)}")
+                return redirect('factura_detalle', cfdi_id=factura_id)
         else:
-            # Manejo de errores
-            return False, response.json()  # Puedes devolver el mensaje de error
-    except requests.exceptions.RequestException as e:
-        # Manejo de excepciones
-        return False, str(e)
+            # Si el formulario no es válido
+            messages.error(request, "El formulario no es válido.")
+            return redirect('factura_detalle', cfdi_id=form_cancel.cleaned_data.get('factura_id', None))
+    # Si no es POST, crear una instancia vacía del formulario
+    # Si no es POST, mostrar un error o redirigir
+    messages.error(request, "Método no permitido.")
+    return redirect('facturas_list')

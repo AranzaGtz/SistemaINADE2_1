@@ -65,8 +65,6 @@ class Organizacion(models.Model):
     def __str__(self):
         return self.nombre
 
-
-
 # MODELO PARA USUARIOS ADMINISTRADORES
 class CustomUserManager(BaseUserManager):
     

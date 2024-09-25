@@ -21,8 +21,10 @@
           <!-- Elementos del dropdown -->
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
           
+               {% if factura.estado == 'active' %}
                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI">Cancelar factura</button>
-               <li><a class="dropdown-item" href="">Comprobar pago</a></li>
+               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI">Generar comprobante de pago</button>
+               <li><a class="dropdown-item" href="{% url 'comprobante_pago' factura.cfdi_id %}">Comprobar pago</a></li>
                <li>
                     <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
                          {% if factura.pdf_file %}
@@ -41,7 +43,27 @@
                          {% endif %}
                     </a>
                </li>
-               
+               {% else %}
+               <li>
+                    <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
+                         {% if factura.pdf_file %}
+                              Descargar PDF
+                         {% else %}
+                              Generar PDF
+                         {% endif %}
+                    </a>
+               </li>
+               <li>
+                    <a class="dropdown-item" href="{% url 'generar_factura_xml' factura.cfdi_id %}">
+                         {% if factura.xml_file %}
+                              Descargar XML
+                         {% else %}
+                              Generar XML
+                         {% endif %}
+                    </a>
+               </li>
+               {% endif %}
+
           </ul>
       </div>
      <table class="table table-bordered">
@@ -135,10 +157,10 @@
                
                <div class="modal-body">
                     
-                    <form action="" method="post" id="cancelarCFDIForm">
-                         {% csrf_token %}
+                    <form action="{% url 'cancelar_factura' %}" method="post" id="cancelarCFDIForm">
                          {% csrf_token %}
                          <div class="mb-3">
+                              {{ form_cancel.factura_id }}
                               {{ form_cancel.motive.label }}
                               {{ form_cancel.motive }} <!-- Asegúrate de que esto tenga un ID -->
                               <div id="uuidFieldContainer" style="display: none;" class="mt-2">
@@ -153,6 +175,27 @@
                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-primary" form="cancelarCFDIForm">Guardar Cambios</button>
+               </div>
+          </div>
+     </div>
+</div>
+ Aqui esta el modal para pedir 
+<div class="modal" id="ComprobanteCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+          <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Comprobante de pago</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                    <form action="" method="post" id="comprobanteForm">
+                         {% csrf_token %}
+
+                    </form>
+               </div>
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" form="comprobanteForm">Generar Comprobante</button>
                </div>
           </div>
      </div>

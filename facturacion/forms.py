@@ -6,15 +6,28 @@ from .models import CSD, Factura
 from django.forms import  formset_factory
 from .models import Factura
 
+MOTIVOS = [
+    ('01','01 - Comprovante emitido con errores con relación.'),
+    ('02','02 - Comprovante emitido con errores sin relación.'),
+    ('03','03 - No se llevó a cabo la operación.'),
+    ('04','04 - Operación nominativa relacionada en una global.')
+]
+
+# Aqui estoy haciendo el formulario para pasar directamente los datos que se necesitan para hacer un comprobante de pago basico, pude verse como en el workspace
+# #   FORMULARIO PARA COMPROBAR PAGOS
+# class ComprobanteForm(forms.Form):
+#     NameId = forms.CharField(required=True, widget=forms.HiddenInput)
+#     Folio = forms.CharField(required=True, widget=forms.HiddenInput)
+#     Serie = forms.CharField(required=True, widget=forms.HiddenInput)
+#     CfdiType = forms.CharField(required=True, widget=forms.HiddenInput)
+#     OrderNumber = forms.CharField(required=True, widget=forms.HiddenInput)
+#     ExpeditionPlace = forms.CharField(required=True, widget=forms.HiddenInput)
+#     Date = forms.DateInput(required=True, widget=forms.HiddenInput)
+#     Observations = forms.DateInput(required=True, widget=forms.HiddenInput)
+#     Issuer = 
+
 #   FORMULARIO PARA CANCELAR FACTURA
 class CancelarCFDI(forms.Form):
-    
-    MOTIVOS = [
-        ('01','01 - Comprovante emitido con errores con relación.'),
-        ('02','02 - Comprovante emitido con errores sin relación.'),
-        ('03','03 - No se llevó a cabo la operación.'),
-        ('04','04 - Operación nominativa relacionada en una global.')
-    ]
     
     motive = forms.ChoiceField(choices=MOTIVOS, label='Selecciona el motivo por la que se realizara la cancelación.', widget=forms.Select(attrs={'class':'form-select', 'id': 'select_opciones'}))
     uuid_replacement = forms.CharField(required=False, label='UUID que va a remplazar', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'uuid_replacement'}))

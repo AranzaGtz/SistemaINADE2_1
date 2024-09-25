@@ -3,7 +3,64 @@ from django.db import models
 from accounts.models import   OrdenTrabajo, Organizacion, Persona
 from django.utils import timezone
 
+METODOS_PAGO_CHOICES = [
+    ("01", "Efectivo"),
+    ("02", "Cheque nominativo"),
+    ("03", "Transferencia electrónica de fondos"),
+    ("04", "Tarjeta de crédito"),
+    ("05", "Monedero electrónico"),
+    ("06", "Dinero electrónico"),
+    ("08", "Vales de despensa"),
+    ("12", "Dación en pago"),
+    ("13", "Pago por subrogación"),
+    ("14", "Pago por consignación"),
+    ("15", "Condonación"),
+    ("17", "Compensación"),
+    ("23", "Novación"),
+    ("24", "Confusión"),
+    ("25", "Remisión de deuda"),
+    ("26", "Prescripción o caducidad"),
+    ("27", "A satisfacción del acreedor"),
+    ("28", "Tarjeta de débito"),
+    ("29", "Tarjeta de servicios"),
+    ("30", "Aplicación de anticipos"),
+    ("31", "Intermediarios"),
+    ("99", "Por definir"),
+]
+    
+PAYMENT_METHOD_CHOICES = [
+    ('PPD', 'Pago en parcialidades ó diferido'),
+    ('PUE', 'Pago en una sola exhibición'),
+]
 
+CFDIUSES = [
+    ("CN01", "Nómina"),
+    ("CP01", "Pagos"),
+    ("D01", "Honorarios médicos, dentales y gastos hospitalarios."),
+    ("D02", "Gastos médicos por incapacidad o discapacidad"),
+    ("D03", "Gastos funerales."),
+    ("D04", "Donativos."),
+    ("D05", "Intereses reales efectivamente pagados por créditos hipotecarios (casa habitación)."),
+    ("D06", "Aportaciones voluntarias al SAR."),
+    ("D07", "Primas por seguros de gastos médicos."),
+    ("D08", "Gastos de transportación escolar obligatoria."),
+    ("D09", "Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones."),
+    ("D10", "Pagos por servicios educativos (colegiaturas)"),
+    ("G01", "Adquisición de mercancias"),
+    ("G02", "Devoluciones, descuentos o bonificaciones"),
+    ("G03", "Gastos en general"),
+    ("I01", "Construcciones"),
+    ("I02", "Mobilario y equipo de oficina por inversiones"),
+    ("I03", "Equipo de transporte"),
+    ("I04", "Equipo de computo y accesorios"),
+    ("I05", "Dados, troqueles, moldes, matrices y herramental"),
+    ("I06", "Comunicaciones telefónicas"),
+    ("I07", "Comunicaciones satelitales"),
+    ("I08", "Otra maquinaria y equipo"),
+    ("P01", "Por Definir"),
+    ("S01", "Sin efectos fiscales"),
+]
+    
 class CSD(models.Model):
     organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, blank=True, null=True)  # Relación con Organización
     rfc = models.CharField(max_length=13, unique=True)#Aqui Organizacion.rfc sea guardado automaticamente
@@ -13,8 +70,9 @@ class CSD(models.Model):
 
 class Factura(models.Model):
     
+
     # ID interno de la factura en tu sistema
-    id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True,max_length=4, unique=True) # Folio
     
     # ID devuelto por la API de Facturama 
     cfdi_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
@@ -30,9 +88,9 @@ class Factura(models.Model):
         ('USD', 'USD - Dolar Estadunidense')
     ]
     tipo_moneda = models.CharField(max_length=100, choices=tm)
-    uso_cfdi = models.CharField(max_length=5, choices=[('G01', 'Adquisición de mercancias'), ('G03', 'Gastos en general')], default='G03')
-    forma_pago = models.CharField(max_length=5,choices=[('01', 'Efectivo'), ('03', 'Transferencia electrónica de fondos'),('99','Por definir')] , default='99')
-    metodo_pago = models.CharField(max_length=5,choices=[('PUE', 'Pago en una sola exhibición'), ('PPD', 'Pago en parcialidades o diferido')] , default='PUE')
+    uso_cfdi = models.CharField(max_length=5, choices=CFDIUSES, default='G03')
+    forma_pago = models.CharField(max_length=5,choices=METODOS_PAGO_CHOICES , default='99')
+    metodo_pago = models.CharField(max_length=5,choices=PAYMENT_METHOD_CHOICES , default='PUE')
     
     # Información de los totales de la factura
     ExchangeRate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
@@ -71,9 +129,18 @@ class Factura(models.Model):
     #   Sello Digital del SAT
     SatSign = models.TextField(blank= True, null=True)
     
-    def formatted_id(self):
-        # Formatea el ID para que tenga siempre cuatro dígitos con ceros a la izquierda
-        return f'{self.id:04}'
+    def generate_new_id(self, formato):
+        last_cotizacion = Factura.objects.order_by('id').last()
+        new_id = '0001' if not last_cotizacion else str(int(last_cotizacion.id_personalizado) + 1).zfill(4)
+        
+        return formato.format(seq=new_id)
+    
+    def save(self, *args, **kwargs):
+        factura = Factura.objects.first()
+        
+        if factura:
+            if not self.id:
+                self.id = self.generate_new_id()
     
     def __str__(self):
         # Utiliza el método formatted_id para mostrar la factura con el ID formateado
