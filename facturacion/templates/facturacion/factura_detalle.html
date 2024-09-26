@@ -24,7 +24,6 @@
                {% if factura.estado == 'active' %}
                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI">Cancelar factura</button>
                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI">Generar comprobante de pago</button>
-               <li><a class="dropdown-item" href="{% url 'comprobante_pago' factura.cfdi_id %}">Comprobar pago</a></li>
                <li>
                     <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
                          {% if factura.pdf_file %}
@@ -63,7 +62,6 @@
                     </a>
                </li>
                {% endif %}
-
           </ul>
       </div>
      <table class="table table-bordered">
@@ -118,28 +116,28 @@
                     <td> {{ factura.subtotal }}</td>
                </tr>
                <tr>
-                    <th scope="row">Tasa IVA</th>
-                    <td> {{ factura.tasa_iva }}</td>
+                    <th scope="row">Tasa IVA</node>
+                    <td> {{ factura.tasa_iva }}</node>
                </tr>
                <tr>
-                    <th scope="row">IVA</th>
-                    <td> {{ factura.iva }}</td>
+                    <th scope="row">IVA</node>
+                    <td> {{ factura.iva }}</node>
                </tr>
                <tr>
-                    <th scope="row">Total</th>
-                    <td> {{ factura.total }}</td>
+                    <th scope="row">Total</node>
+                    <td> {{ factura.total }}</node>
                </tr>
                <tr>
-                    <th scope="row">Fecha</th>
-                    <td> {{ factura.fecha_creacion }}</td>
+                    <th scope="row">Fecha</node>
+                    <td> {{ factura.fecha_creacion }}</node>
                </tr>
                <tr>
-                    <th scope="row">Estado</th>
-                    <td> {{ factura.estado }}</td>
+                    <th scope="row">Estado</node>
+                    <td> {{ factura.estado }}</node>
                </tr>
                <tr>
-                    <th scope="row">ExpeditionPlace</th>
-                    <td> {{ factura.ExpeditionPlace }}</td>
+                    <th scope="row">ExpeditionPlace</node>
+                    <td> {{ factura.ExpeditionPlace }}</node>
                </tr>
 
           </tbody>
@@ -154,9 +152,7 @@
                     <h5 class="modal-title" id="modalLabel">Cancelando Factura</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
-               
                <div class="modal-body">
-                    
                     <form action="{% url 'cancelar_factura' %}" method="post" id="cancelarCFDIForm">
                          {% csrf_token %}
                          <div class="mb-3">
@@ -171,7 +167,6 @@
                          </div>
                     </form>
                </div>
-
                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-primary" form="cancelarCFDIForm">Guardar Cambios</button>
@@ -179,30 +174,63 @@
           </div>
      </div>
 </div>
- Aqui esta el modal para pedir 
-<div class="modal" id="ComprobanteCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-     <div class="modal-dialog">
-          <div class="modal-content">
-               <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Comprobante de pago</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-               </div>
-               <div class="modal-body">
-                    <form action="" method="post" id="comprobanteForm">
-                         {% csrf_token %}
 
-                    </form>
-               </div>
-               <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" form="comprobanteForm">Generar Comprobante</button>
-               </div>
-          </div>
+<!-- Modal para comprobante de pago -->
+<div class="modal fade" id="ComprobanteCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+         <div class="modal-content">
+             <div class="modal-header">
+                 <h5 class="modal-title" id="modalLabel">Generar Comprobante de Pago</h5>
+                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+             </div>
+             <div class="modal-body">
+                 <form action="{% url 'generar_comprobante_pago' factura.cfdi_id %}" method="post" id="comprobanteForm">
+                     {% csrf_token %}
+                     <div class="mb-3">
+                         <label for="payment_date" class="form-label">Fecha de Pago</label>
+                         <input type="datetime-local" class="form-control" id="payment_date" name="payment_date" required>
+                     </div>
+                     <div class="mb-3">
+                         <label for="payment_form" class="form-label">Forma de Pago</label>
+                         <select class="form-control" id="payment_form" name="payment_form" required>
+                             <option value="01">Efectivo</option>
+                             <option value="02">Cheque nominativo</option>
+                             <option value="03">Transferencia electrónica de fondos</option>
+                             <!-- Agrega más opciones según sea necesario -->
+                         </select>
+                     </div>
+                     <div class="mb-3">
+                         <label for="amount" class="form-label">Monto</label>
+                         <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                     </div>
+                     <div class="mb-3">
+                         <label for="operation_number" class="form-label">Número de Operación</label>
+                         <input type="text" class="form-control" id="operation_number" name="operation_number" required>
+                     </div>
+                     <!-- Campos adicionales según sea necesario -->
+                 </form>
+             </div>
+             <div class="modal-footer">
+                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                 <button type="submit" class="btn btn-primary" form="comprobanteForm">Generar Comprobante</button>
+             </div>
+         </div>
      </div>
-</div>
+ </div>
 
 <script>
      document.addEventListener('DOMContentLoaded', function () {
+         // Inicialmente establecer la fecha y hora actuales en el campo de fecha de pago
+         const paymentDateInput = document.getElementById('payment_date');
+         const now = new Date();
+         const year = now.getFullYear();
+         const month = String(now.getMonth() + 1).padStart(2, '0');
+         const day = String(now.getDate()).padStart(2, '0');
+         const hours = String(now.getHours()).padStart(2, '0');
+         const minutes = String(now.getMinutes()).padStart(2, '0');
+         const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+         paymentDateInput.value = formattedDate;
+
          const selectOpciones = document.getElementById('select_opciones'); // Asegúrate de que este ID coincida
          const uuidFieldContainer = document.getElementById('uuidFieldContainer');
          const uuidReplacementField = document.getElementById('uuid_replacement');
