@@ -3,7 +3,6 @@ from django.db import models
 from accounts.models import   OrdenTrabajo, Organizacion, Persona
 from django.utils import timezone
 
-
 class CSD(models.Model):
     organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, blank=True, null=True)  # Relación con Organización
     rfc = models.CharField(max_length=13, unique=True)#Aqui Organizacion.rfc sea guardado automaticamente
@@ -11,10 +10,11 @@ class CSD(models.Model):
     key_file = models.FileField(upload_to='csds/key/')
     password = models.CharField(max_length=255)
 
+
 class Factura(models.Model):
     
     # ID interno de la factura en tu sistema
-    id = models.AutoField(primary_key=True)
+    id = models.CharField(max_length=4, unique=True, blank=True,primary_key=True)
     
     # ID devuelto por la API de Facturama 
     cfdi_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
@@ -70,6 +70,7 @@ class Factura(models.Model):
     CfdiSign = models.TextField(blank= True, null=True)
     #   Sello Digital del SAT
     SatSign = models.TextField(blank= True, null=True)
+    
     
     def formatted_id(self):
         # Formatea el ID para que tenga siempre cuatro dígitos con ceros a la izquierda

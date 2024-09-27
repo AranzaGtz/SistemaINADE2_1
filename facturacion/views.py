@@ -15,7 +15,10 @@ import base64
 import requests
 from django.core.files.base import ContentFile
 from django.conf import settings  # Asegúrate de tener tu configuración adecuada
+from django.db.models import Max
+from django.db import transaction
 
+SANDBOX_URL = "https://apisandbox.facturama.mx"
 
 @login_required
 def generar_factura_xml(request, id_factura):
@@ -135,292 +138,325 @@ def obtener_datos_cotizacion(request, cotizacion_id):
     except Cotizacion.DoesNotExist:
         return JsonResponse({'error': 'Cotización no encontrada'}, status=404)
 
+
 @login_required
+@transaction.atomic
 def crear_factura(request, id_personalizado):
-    # Buscar orden de trabajo
-    orden = OrdenTrabajo.objects.get(id_personalizado=id_personalizado)
-    cliente = orden.cotizacion.persona
-    emisor = orden.cotizacion.usuario
+    
+# Obtener la orden de trabajo
+        orden = OrdenTrabajo.objects.get(id_personalizado=id_personalizado)
+        cliente = orden.cotizacion.persona
+        emisor = orden.cotizacion.usuario
+        conceptos = OrdenTrabajoConcepto.objects.filter(orden_de_trabajo=id_personalizado)
 
-    # Buscar conceptos de la orden de trabajo
-    conceptos = OrdenTrabajoConcepto.objects.filter(orden_de_trabajo=id_personalizado)
-
-    # En este caso inicializamos los formularios vacios
-    encabezado_form = FacturaEncabezadoForm(initial={'orden': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
-    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
-    totales_form = FacturaTotalesForm()
-    servicio_formset = ServicioFormset()
-
-    if request.method == 'POST':
-        print("Facturando...")
-        # Inicializamos los formularios con POST
-        encabezado_form = FacturaEncabezadoForm(request.POST, initial={'orden': orden.id_personalizado})
-        pie_form = FacturaPieForm(request.POST, initial={'direccion': orden.direccion})
-        totales_form = FacturaTotalesForm(request.POST)
-        print("Validando formularios...")
-
-        if encabezado_form.is_valid() and pie_form.is_valid() and totales_form.is_valid():
-
-            # Obteniendo datos de formularios
-            datos_e = encabezado_form.cleaned_data
-            datos_p = pie_form.cleaned_data
-            datos_t = totales_form.cleaned_data
+        if request.method == 'POST':
             
-            # Intentar obtener el CSD de la organización
-            try:
-                # Puedes acceder a los datos así
-                organizacion = orden.cotizacion.usuario.organizacion
-                csd = CSD.objects.get(organizacion=organizacion)
-            except CSD.DoesNotExist:
-                # Mostrar mensaje de error si no se encuentra un CSD
-                messages.error(request, "No se encontró un CSD asociado a la organización. Por favor, cargue un CSD de manera correcta antes de continuar.")
-                # Redirigir al usuario a una página adecuada o devolver la misma página con el mensaje de error
+            encabezado_form = FacturaEncabezadoForm(request.POST, initial={'orden': orden.id_personalizado})
+            pie_form = FacturaPieForm(request.POST, initial={'direccion': orden.direccion})
+            totales_form = FacturaTotalesForm(request.POST)
+            
+            if encabezado_form.is_valid() and pie_form.is_valid() and totales_form.is_valid():
+
+                # Obteniendo datos de formularios
+                datos_e = encabezado_form.cleaned_data
+                datos_p = pie_form.cleaned_data
+                datos_t = totales_form.cleaned_data
                 
-                # Renderizar la misma vista con los formularios y el mensaje de error
-                context = {
-                    'orden': orden,
-                    'cliente': cliente,
-                    'encabezado_form': encabezado_form,
-                    'pie_form': pie_form,
-                    'totales_form': totales_form,
-                    'conceptos': conceptos,
+                # Intentar obtener el CSD de la organización
+                try:
+                    organizacion = orden.cotizacion.usuario.organizacion
+                    csd = CSD.objects.get(organizacion=organizacion)
+                except CSD.DoesNotExist:
+                    messages.error(request, "No se encontró un CSD asociado a la organización. Por favor, cargue un CSD de manera correcta antes de continuar.")
+                    context = {
+                        'orden': orden,
+                        'cliente': cliente,
+                        'encabezado_form': encabezado_form,
+                        'pie_form': pie_form,
+                        'totales_form': totales_form,
+                        'conceptos': conceptos,
+                    }
+                    return render(request, 'facturacion/formulario.html', context)
+                
+                # Obtener el último ID existente
+                el_id = Factura.objects.aggregate(Max('id'))['id__max']
+                emisor_rfc = csd.rfc
+                siguiente_id_formateado = buscar_cfdi_id(request, emisor_rfc ,el_id)
+                # Imprimir o utilizar el siguiente ID
+                print(f"El siguiente ID será: {siguiente_id_formateado}")
+
+                cliente_rfc = request.POST.get('id_cliente_rfc')
+                cliente_regimen = request.POST.get('id_cliente_reg')
+                cliente_nombre = request.POST.get('id_cliente_nombre')
+                cliente_cp = cliente.empresa.direccion.codigo
+                cliente_calle = cliente.empresa.direccion.calle
+                cliente_colonia = cliente.empresa.direccion.colonia
+                cliente_ciudad = cliente.empresa.direccion.ciudad
+                cliente_estado = cliente.empresa.direccion.estado
+
+                emisor_rfc = csd.rfc
+                emisor_nombre = emisor.organizacion.nombre
+                emisor_regimen = emisor.organizacion.regimen_fiscal
+                emisor_cp = emisor.organizacion.direccion.codigo
+
+                tipo_moneda = datos_e['tipo_moneda']
+                orden_compra = datos_e['OrderNumber']
+                uso_cfdi = datos_e['uso_cfdi']
+                forma_pago = datos_e['forma_pago']
+                metodo_pago = datos_e['metodo_pago']
+                direccion = datos_p['direccion']
+                comentarios = datos_p['comentarios']
+                notificacion = datos_p['notificacion']
+                correos = datos_p['correos']
+                subtotal = datos_t['subtotal']
+                iva = datos_t['iva']
+                tasa_iva = datos_t['tasa_iva']
+                total = datos_t['total']
+                
+                # Obtener la hora UTC actual
+                now_utc = datetime.utcnow()
+
+                # Ajustar la hora a UTC-8 para Tijuana (horario estándar)
+                offset = timedelta(hours=-8)  # Usa -7 si estás en horario de verano
+                now_tijuana = now_utc + offset
+
+                # Iteramos sobre los conceptos
+                conceptos_data = []
+                # Suponiendo que el contador empieza en 1 y termina en el último concepto
+                for i in range(1, len(request.POST) + 1):
+                    # Obtenemos los datos de cada concepto desde el formulario
+                    codigo_servicio = request.POST.get(f'concepto.concepto.servicio.codigo_{i}')
+                    nombre_servicio = request.POST.get(f'nombre_servicio_{i}')
+                    metodo = request.POST.get(f'metodo_{i}')
+                    cantidad_servicios = request.POST.get(f'cantidad_servicios_{i}')
+                    precio = request.POST.get(f'precio_{i}')
+                    importe = request.POST.get(f'importe_{i}')
+
+                    # Buscamos el servicio en la base de datos a partir del código
+                    if codigo_servicio:
+                        try:
+                            servicio = Servicio.objects.get(codigo=codigo_servicio)
+
+                            # Verificamos si existen valores para el servicio y la cantidad
+                            if servicio and cantidad_servicios:
+                                # Convertimos a float si es necesario
+                                cantidad_servicios = float(cantidad_servicios)
+                                precio_unitario = float(servicio.precio_unitario)
+                                importe = precio_unitario * cantidad_servicios
+
+                                # Agregamos los datos del servicio a conceptos_data
+                                conceptos_data.append({
+                                    'id': servicio.codigo,
+                                    'codigo': servicio.clave_cfdi,  # Código CFDI que es el que necesita el SAT
+                                    'nombre': servicio.nombre_servicio,  # Nombre del servicio
+                                    'unit': servicio.unidad,
+                                    'unit_cfdi': servicio.unidad_cfdi,
+                                    'precio': precio,  # Precio unitario del servicio
+                                    'metodo': servicio.metodo,  # Método asociado al servicio
+                                    'cantidad': cantidad_servicios,  # Cantidad de servicios
+                                    'objeto_imp': servicio.objeto_impuesto,
+                                    'importe': importe  # Importe total para ese servicio
+                                })
+                        except Servicio.DoesNotExist:
+                            # Si el servicio no existe, podrías lanzar una excepción o manejar el error de otra forma
+                            raise ValueError(f"El servicio con el código {codigo_servicio} no existe.")
+
+                cfdi_data = {
+                    # "CfdiType":"I"
+                    # ( integer ) Atributo para especificar el nombre que se establecera en el pdf (default 1 = factura) [ Vea la documentación de "Nombres del CFDI" ]
+                    "NameId": "1",
+                    # ( Strg )Tipo de cambio de la moneda en caso de ser diferente de MXN
+                    "Currency": "MXN",
+                    # ( string ) Folio: Atributo para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de 1 a 40 caracteres.
+                    "Folio": siguiente_id_formateado,
+                    "Date": now_tijuana.isoformat(),  # Fecha actual en formato ISO 8601
+                    # ( string ) Atributo requerido para expresar el efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado Required Data type: TextMatching regular expression pattern: I|E|T|N|P
+                    "CfdiType": "I",
+                    # ( string ) Url del logo, ej. https://dominio.com/mi-logo.png
+                    "LogoUrl": "",
+                    # ( string ) Atributo obligatorio y de catálogo, para expresar la forma de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: 01, 02, 03, 99
+                    "PaymentForm": forma_pago,
+                    # ( string ) Atributo obligatorio y de catálogo, para expresar el método de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: PPD, PUE
+                    "PaymentMethod": metodo_pago,
+                    # ( string ) Lugar de Expedición (Codigo Postal desde donde se expide el comprobante)
+                    "ExpeditionPlace": emisor_cp,
+                    # ( string ) Descripcion no fiscal del pdf
+                    "Observations": comentarios,
+                    # ( string ) Numero de Orden, propiedad no fiscal (opcional)Max length: 100
+                    "OrderNumber": orden_compra,
+
+                    "Issuer": {  # ( TaxEntityInfoViewModel ) Nodo que contiene el detalle del emisor.
+                        "Rfc": emisor_rfc,
+                        "Name": emisor_nombre,
+                        "FiscalRegime": emisor_regimen
+                    },
+
+                    "Receiver": {  # Receiver ( ReceiverV4BindingModel ) Cliente a quien se emitirá el CFDi, Atributo Requerido
+                        # No se cual es el CFDI use, hay que buscarlo en la Bd si no hay que agregarlo
+                        "Rfc": cliente_rfc,
+                        "Name": cliente_nombre,
+                        "CfdiUse": uso_cfdi,
+                        "FiscalRegime": cliente_regimen,
+                        "TaxZipCode": cliente_cp,
+
+                        "Address": {
+                            "Street": cliente_calle,
+                            "Neighborhood": cliente_colonia,
+                            "ZipCode": cliente_cp,
+                            "Municipality": cliente_ciudad,
+                            "State": cliente_estado,
+                            "Country": "MEX"
+                        }
+                    },
+                    "Items": [
+                        {
+                            "IdProduct": concepto['id'],
+                            "ProductCode": concepto['codigo'],
+                            "Description": concepto['nombre'],
+                            "Unit": concepto['unit'],
+                            "UnitCode": concepto['unit_cfdi'],
+                            "UnitPrice": float(concepto['precio']),
+                            "Quantity": float(concepto['cantidad']),
+                            "Subtotal": float(concepto['importe']),
+                            "TaxObject": concepto['objeto_imp'],
+                            "Taxes": [
+                                {
+                                    "Total": float(concepto['importe']) * 0.16,
+                                    "Name": "IVA",
+                                    "Base": float(concepto['importe']),
+                                    "Rate": 0.16,
+                                    "IsRetention": False
+                                }
+                            ],
+                            "Total": round(float(concepto['importe']) * 1.16, 2)
+                        }
+                        for concepto in conceptos_data
+                    ]
                 }
-                return render(request, 'facturacion/formulario.html', context)
+                print(cfdi_data)
+                # URL de la API de Facturama
+                url = "https://apisandbox.facturama.mx/api-lite/3/cfdis"
+                username = "AranzaInade"  # nombre de usuario
+                password = "Puebla4990"
+                response = requests.post(url, json=cfdi_data, auth=(username, password))
+
+                # Manejar la respuesta de la API
+                if response.status_code == 201:
+                    # Si se carga correctamente
+                    response_data = response.json()
+                    # Imprime la respuesta
+                    print(json.dumps(response_data, indent=4))
+                    resp = json.dumps(response_data, indent=4)
+                    # Extrae el "Id"
+                    cfdi_id = response_data.get("Id")
+                    print(f"El ID del CFDI es: {cfdi_id}")
+                    messages.success(request, 'CFDI timbrado correctamente.')
+                    print(request , messages)
+                    print("Guardando en la BD")
+
+                    
+                    # Guarda factrura en la BD
+                    nueva_factura = Factura(
+                        # Aquí debes agregar los campos necesarios para la factura
+                        id=response_data.get("Folio"),
+                        cfdi_id=response_data.get("Id"),
+                        cfdi_type = response_data.get("CfdiType"),
+                        Type = response_data.get("Type"),
+                        orden=orden,
+                        OrderNumber=orden_compra,
+                        cliente=cliente,
+                        emisor=emisor.organizacion,
+                        forma_pago=response_data.get("PaymentTerms"),
+                        metodo_pago=response_data.get("PaymentMethod"),
+                        ExpeditionPlace = response_data.get("ExpeditionPlace"),
+                        ExchangeRate = response_data.get("ExchangeRate"),
+                        tipo_moneda=orden.cotizacion.metodo_pago,#tipo_moneda=tipo_moneda,
+                        subtotal=response_data.get("Subtotal"),
+                        tasa_iva = datos_t['tasa_iva'],
+                        Discount = response_data.get("Discount"),
+                        iva=datos_t['iva'],
+                        total=response_data.get("Total"),
+                        comentarios=response_data.get("Observations"),
+                        correos=correos,
+                        estado=response_data.get("Status"),
+                        OriginalString=response_data.get("OriginalString"),
+                        CfdiSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("CfdiSign"),
+                        SatSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("SatSign"),
+                    )
+                    nueva_factura.save() # Asegúrate de guardar la factura
+                    # verificar si con la API se puede crear o manejar los <comprobantes de pagos
+                    
+                    
+                    
+                    # Redirigir a una página de éxito
+                    return redirect('home')
+                else:
+                    # Si ocurre un error, mostrar un mensaje detallado
+                    error_code = response.status_code
+                    error_message = response.json().get("message", "Ocurrió un error inesperado.")
+                    full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+                    messages.error(request, full_error_message)
+                    print(request, full_error_message)
+                
+            # Aquí envías `cfdi_data` a la API de Facturama utilizando tu cliente HTTP (requests u otro)
+
+            return redirect('home')
+        
+        encabezado_form = FacturaEncabezadoForm(initial={'orden': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
+        pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
+        totales_form = FacturaTotalesForm()
+        
+        context = {
+            'orden': orden,
+            'cliente': cliente,
+            'encabezado_form': encabezado_form,
+            'pie_form': pie_form,
+            'totales_form': totales_form,
+            'conceptos': conceptos,
+        }
+        
+        return render(request, 'facturacion/formulario.html', context)
+
+
+def buscar_cfdi_id(request, emisor_rfc,id):
+    try:
+        username = "AranzaInade"  # nombre de usuario
+        password = "Puebla4990"
+        # CONSTRUIR LA URL DEL ENDPOINT
+        url = f"{SANDBOX_URL}/cfdi?type=issuedLite&rfcIssuer={emisor_rfc}&cfdiId={id}"
+        
+        response = requests.get(url, auth=(username, password))
+        
+        if response.status_code == 200:
+            data=response.json()
             
-            # Obtener el último ID existente
-            ultimo_id = Factura.objects.aggregate(Max('id'))['id__max']
-            # Manejar el caso donde no haya registros (el primer ID será 1)
-            siguiente_id = (ultimo_id or 0) + 1  
-            # Formatear el ID a cuatro dígitos
-            siguiente_id_formateado = f'{siguiente_id:04}'
-            # Imprimir o utilizar el siguiente ID
-            print(f"El siguiente ID será: {siguiente_id_formateado}")
-
-            cliente_rfc = request.POST.get('id_cliente_rfc')
-            cliente_regimen = request.POST.get('id_cliente_reg')
-            cliente_nombre = request.POST.get('id_cliente_nombre')
-            cliente_cp = cliente.empresa.direccion.codigo
-            cliente_calle = cliente.empresa.direccion.calle
-            cliente_colonia = cliente.empresa.direccion.colonia
-            cliente_ciudad = cliente.empresa.direccion.ciudad
-            cliente_estado = cliente.empresa.direccion.estado
-
-            emisor_rfc = csd.rfc
-            emisor_nombre = emisor.organizacion.nombre
-            emisor_regimen = emisor.organizacion.regimen_fiscal
-            emisor_cp = emisor.organizacion.direccion.codigo
-
-            tipo_moneda = datos_e['tipo_moneda']
-            orden_compra = datos_e['OrderNumber']
-            uso_cfdi = datos_e['uso_cfdi']
-            forma_pago = datos_e['forma_pago']
-            metodo_pago = datos_e['metodo_pago']
-            direccion = datos_p['direccion']
-            comentarios = datos_p['comentarios']
-            notificacion = datos_p['notificacion']
-            correos = datos_p['correos']
-            subtotal = datos_t['subtotal']
-            iva = datos_t['iva']
-            tasa_iva = datos_t['tasa_iva']
-            total = datos_t['total']
+            print(data)  # o usa logging.debug(data)
             
-            # Obtener la hora UTC actual
-            now_utc = datetime.utcnow()
-
-            # Ajustar la hora a UTC-8 para Tijuana (horario estándar)
-            offset = timedelta(hours=-8)  # Usa -7 si estás en horario de verano
-            now_tijuana = now_utc + offset
-
-            # Iteramos sobre los conceptos
-            conceptos_data = []
-            # Suponiendo que el contador empieza en 1 y termina en el último concepto
-            for i in range(1, len(request.POST) + 1):
-                # Obtenemos los datos de cada concepto desde el formulario
-                codigo_servicio = request.POST.get(f'concepto.concepto.servicio.codigo_{i}')
-                nombre_servicio = request.POST.get(f'nombre_servicio_{i}')
-                metodo = request.POST.get(f'metodo_{i}')
-                cantidad_servicios = request.POST.get(f'cantidad_servicios_{i}')
-                precio = request.POST.get(f'precio_{i}')
-                importe = request.POST.get(f'importe_{i}')
-
-                # Buscamos el servicio en la base de datos a partir del código
-                if codigo_servicio:
-                    try:
-                        servicio = Servicio.objects.get(codigo=codigo_servicio)
-
-                        # Verificamos si existen valores para el servicio y la cantidad
-                        if servicio and cantidad_servicios:
-                            # Convertimos a float si es necesario
-                            cantidad_servicios = float(cantidad_servicios)
-                            precio_unitario = float(servicio.precio_unitario)
-                            importe = precio_unitario * cantidad_servicios
-
-                            # Agregamos los datos del servicio a conceptos_data
-                            conceptos_data.append({
-                                'id': servicio.codigo,
-                                'codigo': servicio.clave_cfdi,  # Código CFDI que es el que necesita el SAT
-                                'nombre': servicio.nombre_servicio,  # Nombre del servicio
-                                'unit': servicio.unidad,
-                                'unit_cfdi': servicio.unidad_cfdi,
-                                'precio': precio,  # Precio unitario del servicio
-                                'metodo': servicio.metodo,  # Método asociado al servicio
-                                'cantidad': cantidad_servicios,  # Cantidad de servicios
-                                'objeto_imp': servicio.objeto_impuesto,
-                                'importe': importe  # Importe total para ese servicio
-                            })
-                    except Servicio.DoesNotExist:
-                        # Si el servicio no existe, podrías lanzar una excepción o manejar el error de otra forma
-                        raise ValueError(f"El servicio con el código {codigo_servicio} no existe.")
-
-            cfdi_data = {
-                # "CfdiType":"I"
-                # ( integer ) Atributo para especificar el nombre que se establecera en el pdf (default 1 = factura) [ Vea la documentación de "Nombres del CFDI" ]
-                "NameId": "1",
-                # ( Strg )Tipo de cambio de la moneda en caso de ser diferente de MXN
-                "Currency": "MXN",
-                # ( string ) Folio: Atributo para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de 1 a 40 caracteres.
-                "Folio": siguiente_id_formateado,
-                "Date": now_tijuana.isoformat(),  # Fecha actual en formato ISO 8601
-                # ( string ) Atributo requerido para expresar el efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado Required Data type: TextMatching regular expression pattern: I|E|T|N|P
-                "CfdiType": "I",
-                # ( string ) Url del logo, ej. https://dominio.com/mi-logo.png
-                "LogoUrl": "",
-                # ( string ) Atributo obligatorio y de catálogo, para expresar la forma de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: 01, 02, 03, 99
-                "PaymentForm": forma_pago,
-                # ( string ) Atributo obligatorio y de catálogo, para expresar el método de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: PPD, PUE
-                "PaymentMethod": metodo_pago,
-                # ( string ) Lugar de Expedición (Codigo Postal desde donde se expide el comprobante)
-                "ExpeditionPlace": emisor_cp,
-                # ( string ) Descripcion no fiscal del pdf
-                "Observations": comentarios,
-                # ( string ) Numero de Orden, propiedad no fiscal (opcional)Max length: 100
-                "OrderNumber": orden_compra,
-
-                "Issuer": {  # ( TaxEntityInfoViewModel ) Nodo que contiene el detalle del emisor.
-                    "Rfc": emisor_rfc,
-                    "Name": emisor_nombre,
-                    "FiscalRegime": emisor_regimen
-                },
-
-                "Receiver": {  # Receiver ( ReceiverV4BindingModel ) Cliente a quien se emitirá el CFDi, Atributo Requerido
-                    # No se cual es el CFDI use, hay que buscarlo en la Bd si no hay que agregarlo
-                    "Rfc": cliente_rfc,
-                    "Name": cliente_nombre,
-                    "CfdiUse": uso_cfdi,
-                    "FiscalRegime": cliente_regimen,
-                    "TaxZipCode": cliente_cp,
-
-                    "Address": {
-                        "Street": cliente_calle,
-                        "Neighborhood": cliente_colonia,
-                        "ZipCode": cliente_cp,
-                        "Municipality": cliente_ciudad,
-                        "State": cliente_estado,
-                        "Country": "MEX"
-                    }
-                },
-                "Items": [
-                    {
-                        "IdProduct": concepto['id'],
-                        "ProductCode": concepto['codigo'],
-                        "Description": concepto['nombre'],
-                        "Unit": concepto['unit'],
-                        "UnitCode": concepto['unit_cfdi'],
-                        "UnitPrice": float(concepto['precio']),
-                        "Quantity": float(concepto['cantidad']),
-                        "Subtotal": float(concepto['importe']),
-                        "TaxObject": concepto['objeto_imp'],
-                        "Taxes": [
-                            {
-                                "Total": float(concepto['importe']) * 0.16,
-                                "Name": "IVA",
-                                "Base": float(concepto['importe']),
-                                "Rate": 0.16,
-                                "IsRetention": False
-                            }
-                        ],
-                        "Total": round(float(concepto['importe']) * 1.16, 2)
-                    }
-                    for concepto in conceptos_data
-                ]
-            }
-            print(cfdi_data)
-            # URL de la API de Facturama
-            url = "https://apisandbox.facturama.mx/api-lite/3/cfdis"
-            username = "AranzaInade"  # nombre de usuario
-            password = "Puebla4990"
-            response = requests.post(url, json=cfdi_data, auth=(username, password))
-
-            # Manejar la respuesta de la API
-            if response.status_code == 201:
-                # Si se carga correctamente
-                response_data = response.json()
-                # Imprime la respuesta
-                print(json.dumps(response_data, indent=4))
-                resp = json.dumps(response_data, indent=4)
-                # Extrae el "Id"
-                cfdi_id = response_data.get("Id")
-                print(f"El ID del CFDI es: {cfdi_id}")
-                messages.success(request, 'CFDI timbrado correctamente.')
-                print(request , messages)
-                print("Guardando en la BD")
-
-                
-                # Guarda factrura en la BD
-                nueva_factura = Factura(
-                    # Aquí debes agregar los campos necesarios para la factura
-                    id=response_data.get("Folio"),
-                    cfdi_id=response_data.get("Id"),
-                    cfdi_type = response_data.get("CfdiType"),
-                    Type = response_data.get("Type"),
-                    orden=orden,
-                    OrderNumber=orden_compra,
-                    cliente=cliente,
-                    emisor=emisor.organizacion,
-                    forma_pago=response_data.get("PaymentTerms"),
-                    metodo_pago=response_data.get("PaymentMethod"),
-                    ExpeditionPlace = response_data.get("ExpeditionPlace"),
-                    ExchangeRate = response_data.get("ExchangeRate"),
-                    tipo_moneda=orden.cotizacion.metodo_pago,#tipo_moneda=tipo_moneda,
-                    subtotal=response_data.get("Subtotal"),
-                    tasa_iva = datos_t['tasa_iva'],
-                    Discount = response_data.get("Discount"),
-                    iva=datos_t['iva'],
-                    total=response_data.get("Total"),
-                    comentarios=response_data.get("Observations"),
-                    correos=correos,
-                    estado=response_data.get("Status"),
-                    OriginalString=response_data.get("OriginalString"),
-                    CfdiSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("CfdiSign"),
-                    SatSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("SatSign"),
-                )
-                nueva_factura.save() # Asegúrate de guardar la factura
-                # verificar si con la API se puede crear o manejar los <comprobantes de pagos
-                
-                
-                
-                # Redirigir a una página de éxito
-                return redirect('home')
+            # Extraer todos los datos de factura
+            folios = [factura['Folio'] for factura in data]
+            
+            if folios:
+                # Convertir los datos a enteros para encontrar el mas grande
+                folios_int = [int(folio) for folio in folios]
+                # Obtener el folio mas grande
+                mayor_folio = max(folios_int)
+                # Generar el siguiente folio, incrementando el mayor por 1
+                siguiente_folio = mayor_folio + 1
+                # Formatear el siguiente folio como una cadena con ceros a la izquierda
+                siguiente_folio_str = str(siguiente_folio).zfill(4)
+                return siguiente_folio_str
             else:
-                # Si ocurre un error, mostrar un mensaje detallado
-                error_code = response.status_code
-                error_message = response.json().get("message", "Ocurrió un error inesperado.")
-                full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
-                messages.error(request, full_error_message)
-                print(request, full_error_message)
+                # Si no hay facturas, el siguiente folio sería 1
+                    return '0001'
+        else:
+            # Manejar errores de la API
+            print(f"Error al hacer la solicitud a la API: {response.status_code}")
+            return redirect('error', message="Error en la solicitud a la API")
             
-        # Aquí envías `cfdi_data` a la API de Facturama utilizando tu cliente HTTP (requests u otro)
-
-        return redirect('home')
-    context = {
-        'orden': orden,
-        'cliente': cliente,
-        'encabezado_form': encabezado_form,
-        'pie_form': pie_form,
-        'totales_form': totales_form,
-        'conceptos': conceptos,
-    }
-    return render(request, 'facturacion/formulario.html', context)
+    except requests.RequestException as e:
+        # Manejar errores de conexión o de la API
+        print(f"Error al hacer la solicitud a la API: {e}")
+        return redirect('error', message="Error en la solicitud a la API")
 
 
 @login_required
@@ -559,6 +595,7 @@ def factura_detalle(request, cfdi_id):
     }
     
     return render(request, 'facturacion/factura_detalle.html', context)
+
 
 def cancelar_factura_api(factura_id, motive, uuid_replacement):
     url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
