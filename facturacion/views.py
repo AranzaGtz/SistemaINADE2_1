@@ -9,7 +9,7 @@ import requests
 from accounts.helpers import get_unica_organizacion
 from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
 from facturacion.models import CSD, Factura
-from .forms import CSDForm, CancelarCFDI, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
+from .forms import CSDForm, CancelarCFDI, ComprobanteDePagoForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
 import requests
@@ -555,12 +555,13 @@ def factura_detalle(request, cfdi_id):
     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
     
     form_cancel = CancelarCFDI(initial={'factura_id': factura.cfdi_id})
-
+    form_comprobante = ComprobanteDePagoForm(initial={'Amount':factura.total})
     
     context = {
         'factura' : factura,
         'id': f'{factura.id:04}',
         'form_cancel': form_cancel,
+        'form_comprobante': form_comprobante,
     }
     
     return render(request, 'facturacion/factura_detalle.html', context)
@@ -612,3 +613,34 @@ def cancelar_factura_api(factura_id, motive, uuid_replacement):
         # Manejo de excepciones
         return False, str(e) 
     
+def comprobante_factura(request):
+    if request.method == 'POST':
+        form_comprobante = ComprobanteDePagoForm(request.POST)
+        if form_comprobante.is_valid():
+            # Obtener Datos
+            cfdi_id = form_comprobante.cleaned_data['cfdi_id']
+            # Llama la funcion para generar comprobante de pago
+            
+            if success:
+                messages.success(request, "Comprobante de pago generado.")
+            else:
+                messages.error(request, "Error al generar comprobante de pago.")
+            return redirect('factura_detalle',cfdi_id=cfdi_id)    
+        else:
+            cfdi_id = request.POST.get('factura_id')
+            messages.error(request, "Error en el formulario")
+            return redirect('factura_detalle', cfdi_id=cfdi_id)
+        
+def comprobar_pago_factura_api(request, cfdi_id):
+    
+    if request.method == 'POST':
+        
+        factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
+        
+        payment_date = request.POST.get('payment_date')
+        
+    context = {
+        'factura' : factura,
+        'id': f'{factura.id:04}',
+    }
+    return render(request, 'facturacion/comprobar_pago.html', context)

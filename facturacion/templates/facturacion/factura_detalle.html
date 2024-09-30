@@ -24,7 +24,7 @@
                {% if factura.estado == 'active' %}
                
                     <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI">Cancelar factura</button>
-                    <li><a class="dropdown-item" href="">Comprobar pago</a></li>
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI">Generar comprobante de pago</button>
                     <li>
                          <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
                               {% if factura.pdf_file %}
@@ -181,7 +181,7 @@
 </div>
 
 <!-- Modal para generar comprobante de pagos -->
-<div class="modal" id="ComprobanteCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true"></div>
+<div class="modal fade" id="ComprobanteCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
      <div class="modal-dialog">
           <div class="modal-content">
                <div class="modal-header">
@@ -189,9 +189,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
-                    <form action="" method="post" id="comprobanteForm">
+                    <form action="{% url 'comprobante_factura'  %}" method="post" id="comprobanteForm">
                          {% csrf_token %}
-
+                         {{ form_comprobante.as_p }}
                     </form>
                </div>
                <div class="modal-footer">
