@@ -20,98 +20,140 @@ from django.db import transaction
 
 SANDBOX_URL = "https://apisandbox.facturama.mx"
 
-@login_required
-def generar_factura_xml(request, id_factura):
-    factura = get_object_or_404(Factura, cfdi_id=id_factura)
-
-    # Verificar si ya existe un archivo XML asignado
-    if not factura.xml_file:
-        # Construir la URL del endpoint para obtener el XML
-        url = f"https://apisandbox.facturama.mx/cfdi/xml/issuedLite/{id_factura}"
+def buscar_cfdi_id(request, emisor_rfc,id):
+    try:
         username = "AranzaInade"  # nombre de usuario
         password = "Puebla4990"
-
-        # Solicitud al API de Facturama
+        # CONSTRUIR LA URL DEL ENDPOINT
+        url = f"{SANDBOX_URL}/cfdi?type=issuedLite&rfcIssuer={emisor_rfc}&cfdiId={id}"
+        
         response = requests.get(url, auth=(username, password))
-
-        # Manejar una respuesta API
+        
         if response.status_code == 200:
-            # Recuperar XML de response
-            xml_content = response.content
-
-            # Guardar el archivo XML en la carpeta media/facturas/
-            factura.xml_file.save(f'factura_{id_factura}.xml', ContentFile(xml_content))
-
-            # Guardar cambios en la instancia
-            factura.save()
-            messages.success(request, "XML generado y asignado correctamente.")
-            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
+            data=response.json()
+            
+            print(data)  # o usa logging.debug(data)
+            
+            # Extraer todos los datos de factura
+            folios = [factura['Folio'] for factura in data]
+            
+            if folios:
+                # Convertir los datos a enteros para encontrar el mas grande
+                folios_int = [int(folio) for folio in folios]
+                # Obtener el folio mas grande
+                mayor_folio = max(folios_int)
+                # Generar el siguiente folio, incrementando el mayor por 1
+                siguiente_folio = mayor_folio + 1
+                # Formatear el siguiente folio como una cadena con ceros a la izquierda
+                siguiente_folio_str = str(siguiente_folio).zfill(4)
+                return siguiente_folio_str
+            else:
+                # Si no hay facturas, el siguiente folio sería 1
+                    return '0001'
         else:
-            # Manejar el error si no se pudo obtener el XML
-            error_code = response.status_code
-            error_message = response.json().get("message", "Ocurrió un error inesperado.")
-            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
-            messages.error(request, full_error_message)
-            print(full_error_message)
-            return redirect('factura_detalle', cfdi_id=id_factura)
-
-    elif factura.xml_file:
-        # Retornamos el archivo XML guardado para descargar
-        response = FileResponse(factura.xml_file.open(), content_type='application/xml')
-        response['Content-Disposition'] = f'attachment; filename="factura_{id_factura}.xml"'
-        return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
-
-    else:
-        raise Http404("El archivo XML no se encuentra.")
-
+            # Manejar errores de la API
+            print(f"Error al hacer la solicitud a la API: {response.status_code}")
+            return redirect('error', message="Error en la solicitud a la API")
+            
+    except requests.RequestException as e:
+        # Manejar errores de conexión o de la API
+        print(f"Error al hacer la solicitud a la API: {e}")
+        return redirect('error', message="Error en la solicitud a la API")
 
 @login_required
-def generar_factura_pdf(request,id_factura):
-    factura = get_object_or_404(Factura, cfdi_id=id_factura)
-    
-    # Verificar si ya existe un archivo PDF asignado
-    if not factura.pdf_file:
-    
-        # Construir la URL del endpoint
-        url = f"https://apisandbox.facturama.mx/cfdi/pdf/issuedLite/{id_factura}"
-        username = "AranzaInade"  # nombre de usuario
-        password = "Puebla4990"
-        # Solicitud al API de Facturama
-        response = requests.get(url, auth=(username, password))
-        
-        # Manejar una respuesta API 
-        if response.status_code == 200:
+def cargar_csd(request):
+    # https://apisandbox.facturama.mx/guias/api-multi/csds
+    if request.method == 'POST':
+        form = CSDForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Guardar en la BD
+            csd = form.save(commit=False)
+
+            # Obtener la organización seleccionada en el formulario
+            # El formulario incluiría un campo para seleccionar la organización
+            organizacion = get_unica_organizacion()
+
+            # Asignar la única organización automáticamente
+            csd.organizacion = organizacion
+
+            # Guardar los archivos, rfc y contraseña del formulario
+            rfc = form.cleaned_data['rfc']
+            cer_file = form.cleaned_data['cer_file']
+            key_file = form.cleaned_data['key_file']
+            key_password = form.cleaned_data['password']
+
+            # Convertir los archivos a base64
+            cer_base64 = convertir_a_base64(cer_file)
+            key_base64 = convertir_a_base64(key_file)
+
+            # Preparar los datos para el API de Facturama
+            csd_data = {
+                "Rfc": rfc,
+                "Certificate": cer_base64,
+                "PrivateKey": key_base64,
+                "PrivateKeyPassword": key_password,
+            }
             
-            # Recuperar pdf de response
-            response_data = response.json()
-            pdf_content = base64.b64decode(response_data.get("Content"))
-            
-            # Guardar el archivo PDF en la carpeta media/facturas/
-            factura.pdf_file.save(f'factura_{id_factura}.pdf', ContentFile(pdf_content))
-            
-            # Guardar cambios en la instancia
-            factura.save()
-            messages.success(request, "PDF generado y asignado correctamente.")
-            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige a la vi
-        else:
-            
-            # Manejar el error si no se pudo obtener el PDF
-            error_code = response.status_code
-            error_message = response.json().get("message", "Ocurrió un error inesperado.")
-            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
-            messages.error(request, full_error_message)
-            print(request, full_error_message)
-            # Renderizar el template de error
-            return redirect('factura_detalle', cfdi_id=id_factura)
-           
-    elif factura.pdf_file:
-        # Retornamos el archivo PDF guardado
-        return FileResponse(factura.pdf_file.open(), content_type='application/pdf')
-    
+            # URL de la API de Facturama
+            url = "https://apisandbox.facturama.mx/api-lite/csds"
+            username = "AranzaInade"  # nombre de usuario
+            password = "Puebla4990"
+            response = requests.post(url, json=csd_data, auth=(username, password))
+
+            # Manejar la respuesta de la API
+            if response.status_code == 200:
+                # Si se carga correctamente
+                csd.is_uploaded = True  # Marcar cargado exitorsamente en Facturama
+                csd.save()  # Ahora sí guardamos en la BD
+                messages.success(request, 'CSD cargado correctamente.')
+                # Redirigir a una página de éxito
+                return redirect('cargar_csd')
+            else:
+                    # Si ocurre un error, intenta extraer un mensaje más claro
+                try:
+                    # Intenta cargar el contenido como JSON
+                    error_data = response.json()
+                    message = error_data.get("Message", "Error desconocido al cargar CSD.")
+                    model_state = error_data.get("ModelState", {})
+                    
+                    # Construir un mensaje de error más detallado si hay información en ModelState
+                    model_errors = []
+                    for field, errors in model_state.items():
+                        for error in errors:
+                            model_errors.append(f"{field}: {error}")
+
+                    # Combinar los mensajes
+                    detailed_error = message + (" Detalles: " + "; ".join(model_errors) if model_errors else "")
+                except (ValueError, KeyError):
+                    # Si no es un JSON válido o faltan claves, mostrar el texto completo
+                    detailed_error = response.text
+
+                # Mostrar el mensaje de error
+                messages.error(request, f"Error al cargar CSD: {detailed_error}")
     else:
-        
-        raise Http404("El archivo PDF no se encuentra.")
-    
+        form = CSDForm()
+    return render(request, 'facturacion/cargar_csd.html', {'form': form})
+
+def convertir_a_base64(file):
+    return base64.b64encode(file.read()).decode('utf-8')
+
+def success(request):
+    return render(request, 'facturacion/success.html', {'message': 'CSD cargado exitosamente.'})
+
+def CF(request):
+    form = FacturaForm()
+    cotizaciones = Cotizacion.objects.all()
+    context = {
+        'form': form,
+        'cotizaciones': cotizaciones,
+    }
+    return render(request, "cotizaciones.html", context)
+
+def facturas_list(request):
+    context ={
+        'facturas' :  Factura.objects.all()
+    }
+    return render (request, "facturacion/facturas.html",context)
 
 def obtener_datos_cotizacion(request, cotizacion_id):
     try:
@@ -137,7 +179,6 @@ def obtener_datos_cotizacion(request, cotizacion_id):
         return JsonResponse(data)
     except Cotizacion.DoesNotExist:
         return JsonResponse({'error': 'Cotización no encontrada'}, status=404)
-
 
 @login_required
 @transaction.atomic
@@ -417,201 +458,150 @@ def crear_factura(request, id_personalizado):
         
         return render(request, 'facturacion/formulario.html', context)
 
+@login_required
+def generar_factura_xml(request, id_factura):
+    factura = get_object_or_404(Factura, cfdi_id=id_factura)
 
-def buscar_cfdi_id(request, emisor_rfc,id):
-    try:
+    # Verificar si ya existe un archivo XML asignado
+    if not factura.xml_file:
+        # Construir la URL del endpoint para obtener el XML
+        url = f"https://apisandbox.facturama.mx/cfdi/xml/issuedLite/{id_factura}"
         username = "AranzaInade"  # nombre de usuario
         password = "Puebla4990"
-        # CONSTRUIR LA URL DEL ENDPOINT
-        url = f"{SANDBOX_URL}/cfdi?type=issuedLite&rfcIssuer={emisor_rfc}&cfdiId={id}"
-        
-        response = requests.get(url, auth=(username, password))
-        
-        if response.status_code == 200:
-            data=response.json()
-            
-            print(data)  # o usa logging.debug(data)
-            
-            # Extraer todos los datos de factura
-            folios = [factura['Folio'] for factura in data]
-            
-            if folios:
-                # Convertir los datos a enteros para encontrar el mas grande
-                folios_int = [int(folio) for folio in folios]
-                # Obtener el folio mas grande
-                mayor_folio = max(folios_int)
-                # Generar el siguiente folio, incrementando el mayor por 1
-                siguiente_folio = mayor_folio + 1
-                # Formatear el siguiente folio como una cadena con ceros a la izquierda
-                siguiente_folio_str = str(siguiente_folio).zfill(4)
-                return siguiente_folio_str
-            else:
-                # Si no hay facturas, el siguiente folio sería 1
-                    return '0001'
-        else:
-            # Manejar errores de la API
-            print(f"Error al hacer la solicitud a la API: {response.status_code}")
-            return redirect('error', message="Error en la solicitud a la API")
-            
-    except requests.RequestException as e:
-        # Manejar errores de conexión o de la API
-        print(f"Error al hacer la solicitud a la API: {e}")
-        return redirect('error', message="Error en la solicitud a la API")
 
+        # Solicitud al API de Facturama
+        response = requests.get(url, auth=(username, password))
+
+        # Manejar una respuesta API
+        if response.status_code == 200:
+            # Recuperar XML de response
+            xml_content = response.content
+
+            # Guardar el archivo XML en la carpeta media/facturas/
+            factura.xml_file.save(f'factura_{id_factura}.xml', ContentFile(xml_content))
+
+            # Guardar cambios en la instancia
+            factura.save()
+            messages.success(request, "XML generado y asignado correctamente.")
+            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
+        else:
+            # Manejar el error si no se pudo obtener el XML
+            error_code = response.status_code
+            error_message = response.json().get("message", "Ocurrió un error inesperado.")
+            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+            messages.error(request, full_error_message)
+            print(full_error_message)
+            return redirect('factura_detalle', cfdi_id=id_factura)
+
+    elif factura.xml_file:
+        # Retornamos el archivo XML guardado para descargar
+        response = FileResponse(factura.xml_file.open(), content_type='application/xml')
+        response['Content-Disposition'] = f'attachment; filename="factura_{id_factura}.xml"'
+        return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
+
+    else:
+        raise Http404("El archivo XML no se encuentra.")
 
 @login_required
-def cargar_csd(request):
-    # https://apisandbox.facturama.mx/guias/api-multi/csds
-    if request.method == 'POST':
-        form = CSDForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Guardar en la BD
-            csd = form.save(commit=False)
-
-            # Obtener la organización seleccionada en el formulario
-            # El formulario incluiría un campo para seleccionar la organización
-            organizacion = get_unica_organizacion()
-
-            # Asignar la única organización automáticamente
-            csd.organizacion = organizacion
-
-            # Guardar los archivos, rfc y contraseña del formulario
-            rfc = form.cleaned_data['rfc']
-            cer_file = form.cleaned_data['cer_file']
-            key_file = form.cleaned_data['key_file']
-            key_password = form.cleaned_data['password']
-
-            # Convertir los archivos a base64
-            cer_base64 = convertir_a_base64(cer_file)
-            key_base64 = convertir_a_base64(key_file)
-
-            # Preparar los datos para el API de Facturama
-            csd_data = {
-                "Rfc": rfc,
-                "Certificate": cer_base64,
-                "PrivateKey": key_base64,
-                "PrivateKeyPassword": key_password,
-            }
+def generar_factura_pdf(request,id_factura):
+    factura = get_object_or_404(Factura, cfdi_id=id_factura)
+    
+    # Verificar si ya existe un archivo PDF asignado
+    if not factura.pdf_file:
+    
+        # Construir la URL del endpoint
+        url = f"https://apisandbox.facturama.mx/cfdi/pdf/issuedLite/{id_factura}"
+        username = "AranzaInade"  # nombre de usuario
+        password = "Puebla4990"
+        # Solicitud al API de Facturama
+        response = requests.get(url, auth=(username, password))
+        
+        # Manejar una respuesta API 
+        if response.status_code == 200:
             
-            # URL de la API de Facturama
-            url = "https://apisandbox.facturama.mx/api-lite/csds"
-            username = "AranzaInade"  # nombre de usuario
-            password = "Puebla4990"
-            response = requests.post(url, json=csd_data, auth=(username, password))
-
-            # Manejar la respuesta de la API
-            if response.status_code == 200:
-                # Si se carga correctamente
-                csd.is_uploaded = True  # Marcar cargado exitorsamente en Facturama
-                csd.save()  # Ahora sí guardamos en la BD
-                messages.success(request, 'CSD cargado correctamente.')
-                # Redirigir a una página de éxito
-                return redirect('cargar_csd')
-            else:
-                    # Si ocurre un error, intenta extraer un mensaje más claro
-                try:
-                    # Intenta cargar el contenido como JSON
-                    error_data = response.json()
-                    message = error_data.get("Message", "Error desconocido al cargar CSD.")
-                    model_state = error_data.get("ModelState", {})
-                    
-                    # Construir un mensaje de error más detallado si hay información en ModelState
-                    model_errors = []
-                    for field, errors in model_state.items():
-                        for error in errors:
-                            model_errors.append(f"{field}: {error}")
-
-                    # Combinar los mensajes
-                    detailed_error = message + (" Detalles: " + "; ".join(model_errors) if model_errors else "")
-                except (ValueError, KeyError):
-                    # Si no es un JSON válido o faltan claves, mostrar el texto completo
-                    detailed_error = response.text
-
-                # Mostrar el mensaje de error
-                messages.error(request, f"Error al cargar CSD: {detailed_error}")
+            # Recuperar pdf de response
+            response_data = response.json()
+            pdf_content = base64.b64decode(response_data.get("Content"))
+            
+            # Guardar el archivo PDF en la carpeta media/facturas/
+            factura.pdf_file.save(f'factura_{id_factura}.pdf', ContentFile(pdf_content))
+            
+            # Guardar cambios en la instancia
+            factura.save()
+            messages.success(request, "PDF generado y asignado correctamente.")
+            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige a la vi
+        else:
+            
+            # Manejar el error si no se pudo obtener el PDF
+            error_code = response.status_code
+            error_message = response.json().get("message", "Ocurrió un error inesperado.")
+            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+            messages.error(request, full_error_message)
+            print(request, full_error_message)
+            # Renderizar el template de error
+            return redirect('factura_detalle', cfdi_id=id_factura)
+           
+    elif factura.pdf_file:
+        # Retornamos el archivo PDF guardado
+        return FileResponse(factura.pdf_file.open(), content_type='application/pdf')
+    
     else:
-        form = CSDForm()
-    return render(request, 'facturacion/cargar_csd.html', {'form': form})
-
-
-def convertir_a_base64(file):
-    return base64.b64encode(file.read()).decode('utf-8')
-
-
-def success(request):
-    return render(request, 'facturacion/success.html', {'message': 'CSD cargado exitosamente.'})
-
-
-def CF(request):
-    form = FacturaForm()
-    cotizaciones = Cotizacion.objects.all()
-    context = {
-        'form': form,
-        'cotizaciones': cotizaciones,
-    }
-    return render(request, "cotizaciones.html", context)
-
-
-def facturas_list(request):
-    context ={
-        'facturas' :  Factura.objects.all()
-    }
-    return render (request, "facturacion/facturas.html",context)
-
+        
+        raise Http404("El archivo PDF no se encuentra.")
+    
 
 @login_required
 def factura_detalle(request, cfdi_id):
     
     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
     
-    form_cancel = CancelarCFDI(initial={'factura_id':cfdi_id})
-    
-    # Maneja el metodo post de cancelar factura
-    if request.method == 'POST':
-        form_cancel = CancelarCFDI(request.POST)
-        if form_cancel.is_valid():
-            # Obteniendo datos del formulario
-            motive = form_cancel.cleaned_data['motive']
-            uuid_replacement = form_cancel.cleaned_data['uuid_remplacement']
-            factura_id = form_cancel.cleaned_data['factura_id']
-            
-            # Imprimiendo en consola
-            print(motive,uuid_replacement,factura_id)
-            
-            # Llama a la función para cancelar la factura
-            success, response = cancelar_factura_api(factura_id, motive, uuid_replacement)
-            
-            if success:
-                # Manejo en caso de éxito (puedes redirigir o mostrar un mensaje)
-                messages.success(request, "Factura cancelada exitosamente.")
-                return redirect('factura_detalle', cfdi_id=cfdi_id)
-            else:
-                # Manejo en caso de error (puedes mostrar un mensaje de error)
-                messages.error(request, f"Error al cancelar la factura: {response}")
-        else:
-            # Manejo en caso de éxito (puedes redirigir o mostrar un mensaje)
-                messages.error(request, "Error con formulario.")
-                return redirect('factura_detalle', cfdi_id=cfdi_id)
+    form_cancel = CancelarCFDI(initial={'factura_id': cfdi_id})
+
     
     context = {
         'factura' : factura,
         'id': f'{factura.id:04}',
-        'form_cancel': form_cancel
+        'form_cancel': form_cancel,
     }
     
     return render(request, 'facturacion/factura_detalle.html', context)
 
+
+def cancelar_factura(request):
+    
+    if request.method == 'POST':
+        form_cancel = CancelarCFDI(request.POST)
+        
+        if form_cancel.is_valid():
+            # Obteniendo datos del formulario
+            motive = form_cancel.cleaned_data['motive']
+            uuid_replacement = form_cancel.cleaned_data.get('uuid_replacement')  # uuid_replacement podría ser opcional
+            cfdi_id = form_cancel.cleaned_data['factura_id']
+            
+            # Llama a la función para cancelar la factura
+            success, response = cancelar_factura_api(cfdi_id, motive, uuid_replacement)
+            
+            if success:
+                messages.success(request, "Factura cancelada exitosamente.")
+            else:
+                messages.error(request, f"Error al cancelar la factura: {response}")
+            
+            return redirect('factura_detalle', cfdi_id=cfdi_id)
+        else:
+            cfdi_id = request.POST.get('factura_id')
+            messages.error(request, "Error en el formulario")
+            return redirect('factura_detalle', cfdi_id=cfdi_id)
+            
 
 def cancelar_factura_api(factura_id, motive, uuid_replacement):
     url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
     
     # Realiza la llamada a la API (usa el método que necesites, por ejemplo POST)
     try:
-        response = requests.post(url, headers={'Authorization': f'Bearer {settings.FACTURAMA_API_TOKEN}'})
         username = "AranzaInade"  # nombre de usuario
         password = "Puebla4990"
         # Solicitud al API de Facturama
-        response = requests.get(url, auth=(username, password))
+        response = requests.delete(url, auth=(username, password))
         if response.status_code == 200:
             # La solicitud fue exitosa
             return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas

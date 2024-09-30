@@ -10,7 +10,6 @@ class CSD(models.Model):
     key_file = models.FileField(upload_to='csds/key/')
     password = models.CharField(max_length=255)
 
-
 class Factura(models.Model):
     
     # ID interno de la factura en tu sistema

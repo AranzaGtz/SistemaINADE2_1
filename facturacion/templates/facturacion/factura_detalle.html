@@ -27,7 +27,7 @@
                     <li><a class="dropdown-item" href="">Comprobar pago</a></li>
                     <li>
                          <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
-                              {% if factura.pdf_file %}active
+                              {% if factura.pdf_file %}
                                    Descargar PDF
                               {% else %}
                                    Generar PDF
@@ -156,7 +156,7 @@
                
                <div class="modal-body">
                     
-                    <form action="" method="post" id="cancelarCFDIForm">
+                    <form action="{% url 'cancelar_factura' %}" method="POST" id="cancelarCFDIForm">
                          {% csrf_token %}
                          <div class="mb-3">
                               {{ form_cancel.motive.label }}
@@ -166,13 +166,15 @@
                                    {{ form_cancel.uuid_replacement.label }}
                                    {{ form_cancel.uuid_replacement }} <!-- Renderizar el campo de UUID -->
                               </div>
+                              <!-- Campo oculto para factura_id -->
+                              <input type="hidden" name="factura_id" value="{{ factura.cfdi_id }}">
                          </div>
                     </form>
                </div>
 
                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" form="cancelarCFDIForm">Guardar Cambios</button>
+                    <button type="submit" class="btn btn-primary" form="cancelarCFDIForm">Cancelar</button>
                </div>
           </div>
      </div>
