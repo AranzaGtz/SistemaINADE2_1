@@ -20,7 +20,7 @@ from django.db import transaction
 
 SANDBOX_URL = "https://apisandbox.facturama.mx"
 
-def buscar_cfdi_id(request, emisor_rfc,id):
+def buscar_cfdi_id( emisor_rfc,id):
     try:
         username = "AranzaInade"  # nombre de usuario
         password = "Puebla4990"
@@ -549,7 +549,6 @@ def generar_factura_pdf(request,id_factura):
         
         raise Http404("El archivo PDF no se encuentra.")
     
-
 @login_required
 def factura_detalle(request, cfdi_id):
     
@@ -565,7 +564,6 @@ def factura_detalle(request, cfdi_id):
     }
     
     return render(request, 'facturacion/factura_detalle.html', context)
-
 
 def cancelar_factura(request):
     
@@ -592,7 +590,6 @@ def cancelar_factura(request):
             messages.error(request, "Error en el formulario")
             return redirect('factura_detalle', cfdi_id=cfdi_id)
             
-
 def cancelar_factura_api(factura_id, motive, uuid_replacement):
     url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
     
@@ -613,4 +610,5 @@ def cancelar_factura_api(factura_id, motive, uuid_replacement):
             return False, response.json()  # Puedes devolver el mensaje de error
     except requests.exceptions.RequestException as e:
         # Manejo de excepciones
-        return False, str(e)
+        return False, str(e) 
+    

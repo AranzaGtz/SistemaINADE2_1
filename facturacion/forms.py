@@ -5,17 +5,55 @@ from accounts.utils import obtener_configuracion
 from .models import CSD, Factura
 from django.forms import  formset_factory
 from .models import Factura
+from datetime import datetime, timedelta, timezone
+
+MOTIVOS = [
+    ('01','01 - Comprovante emitido con errores con relación.'),
+    ('02','02 - Comprovante emitido con errores sin relación.'),
+    ('03','03 - No se llevó a cabo la operación.'),
+    ('04','04 - Operación nominativa relacionada en una global.')
+]
+
+METODOS_PAGO_CHOICES = [
+    ("01", "01 - Efectivo"),
+    ("02", "02 - Cheque nominativo"),
+    ("03", "03 - Transferencia electrónica de fondos"),
+    ("04", "04 - Tarjeta de crédito"),
+    ("05", "05 - Monedero electrónico"),
+    ("06", "06 - Dinero electrónico"),
+    ("08", "08 - Vales de despensa"),
+    ("12", "12 - Dación en pago"),
+    ("13", "13 - Pago por subrogación"),
+    ("14", "14 - Pago por consignación"),
+    ("15", "15 - Condonación"),
+    ("17", "17 - Compensación"),
+    ("23", "23 - Novación"),
+    ("24", "24 - Confusión"),
+    ("25", "25 - Remisión de deuda"),
+    ("26", "26 - Prescripción o caducidad"),
+    ("27", "27 - A satisfacción del acreedor"),
+    ("28", "28 - Tarjeta de débito"),
+    ("29", "29 - Tarjeta de servicios"),
+    ("30", "30 - Aplicación de anticipos"),
+    ("31", "31 - Intermediarios"),
+    ("99", "99 - Por definir"),
+]
+
+#   FORMULARIO PARA GENERAR COMPROBANTE DE PAGO
+class ComprobanteDePagoForm(forms.Form):
+    cfdi_id = forms.CharField(widget=forms.HiddenInput())
+    Date = forms.DateTimeField(label='Fecha de Pago', initial=datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=-6))),widget=forms.DateTimeInput(attrs={'type': 'datetime-local','class': 'form-control', 'id': 'fecha_pago'}))
+    PaymentForm = forms.ChoiceField(choices=METODOS_PAGO_CHOICES, label='Método de pago', widget=forms.Select(attrs={'class':'form-select', 'id': 'select_opciones'}))
+    Amount = forms.DecimalField(label='Monto', widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'monto_pago'}))
+    OperationNumber = forms.CharField(label='Referencia', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'numero_operacion'}))
+    ForeignAccountNamePayer = forms.CharField(label='Nombre de la cuenta del pagador', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'nombre_cuenta_pagador'}))
+    PayerAccount = forms.CharField(label='Cuenta del pagador', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'cuenta_pagador'}))
+    RfcReceiverBeneficiaryAccount = forms.CharField(label='RFC del beneficiario de la cuenta', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'rfc_beneficiario'}))
+    BeneficiaryAccount = forms.CharField(label='Cuenta del beneficiario', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'cuenta_beneficiario'}))
 
 #   FORMULARIO PARA CANCELAR FACTURA
 class CancelarCFDI(forms.Form):
-    
-    MOTIVOS = [
-        ('01','01 - Comprovante emitido con errores con relación.'),
-        ('02','02 - Comprovante emitido con errores sin relación.'),
-        ('03','03 - No se llevó a cabo la operación.'),
-        ('04','04 - Operación nominativa relacionada en una global.')
-    ]
-    
+
     motive = forms.ChoiceField(choices=MOTIVOS, label='Selecciona el motivo por la que se realizara la cancelación.', widget=forms.Select(attrs={'class':'form-select', 'id': 'select_opciones'}))
     uuid_replacement = forms.CharField(required=False, label='UUID que va a remplazar', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'uuid_replacement'}))
     factura_id = forms.CharField(required=True,widget=forms.HiddenInput())
