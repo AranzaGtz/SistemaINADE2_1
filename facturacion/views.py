@@ -555,7 +555,7 @@ def factura_detalle(request, cfdi_id):
     
     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
     
-    form_cancel = CancelarCFDI(initial={'factura_id': cfdi_id})
+    form_cancel = CancelarCFDI(initial={'factura_id': factura.cfdi_id})
 
     
     context = {
@@ -604,6 +604,9 @@ def cancelar_factura_api(factura_id, motive, uuid_replacement):
         response = requests.delete(url, auth=(username, password))
         if response.status_code == 200:
             # La solicitud fue exitosa
+            factura = get_object_or_404(Factura, cfdi_id=factura_id)
+            factura.estado = 'canceled'
+            factura.save()  # Asegúrate de guardar los cambios en la base de datos
             return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas
         else:
             # Manejo de errores
