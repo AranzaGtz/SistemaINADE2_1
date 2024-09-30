@@ -45,7 +45,7 @@ def generar_factura_xml(request, id_factura):
             # Guardar cambios en la instancia
             factura.save()
             messages.success(request, "XML generado y asignado correctamente.")
-            return redirect('detalle_factura', id_factura=id_factura)  # Redirige al detalle
+            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
         else:
             # Manejar el error si no se pudo obtener el XML
             error_code = response.status_code
@@ -53,13 +53,13 @@ def generar_factura_xml(request, id_factura):
             full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
             messages.error(request, full_error_message)
             print(full_error_message)
-            return redirect('detalle_factura', id_factura=id_factura)
+            return redirect('factura_detalle', cfdi_id=id_factura)
 
     elif factura.xml_file:
         # Retornamos el archivo XML guardado para descargar
         response = FileResponse(factura.xml_file.open(), content_type='application/xml')
         response['Content-Disposition'] = f'attachment; filename="factura_{id_factura}.xml"'
-        return response
+        return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
 
     else:
         raise Http404("El archivo XML no se encuentra.")
@@ -92,7 +92,7 @@ def generar_factura_pdf(request,id_factura):
             # Guardar cambios en la instancia
             factura.save()
             messages.success(request, "PDF generado y asignado correctamente.")
-            return redirect('detalle_factura', id_factura=id_factura)  # Redirige a la vi
+            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige a la vi
         else:
             
             # Manejar el error si no se pudo obtener el PDF
@@ -102,7 +102,7 @@ def generar_factura_pdf(request,id_factura):
             messages.error(request, full_error_message)
             print(request, full_error_message)
             # Renderizar el template de error
-            return redirect('detalle_factura', id_factura=id_factura)
+            return redirect('factura_detalle', cfdi_id=id_factura)
            
     elif factura.pdf_file:
         # Retornamos el archivo PDF guardado
@@ -558,6 +558,7 @@ def facturas_list(request):
     }
     return render (request, "facturacion/facturas.html",context)
 
+
 @login_required
 def factura_detalle(request, cfdi_id):
     
@@ -587,6 +588,10 @@ def factura_detalle(request, cfdi_id):
             else:
                 # Manejo en caso de error (puedes mostrar un mensaje de error)
                 messages.error(request, f"Error al cancelar la factura: {response}")
+        else:
+            # Manejo en caso de éxito (puedes redirigir o mostrar un mensaje)
+                messages.error(request, "Error con formulario.")
+                return redirect('factura_detalle', cfdi_id=cfdi_id)
     
     context = {
         'factura' : factura,
@@ -603,7 +608,10 @@ def cancelar_factura_api(factura_id, motive, uuid_replacement):
     # Realiza la llamada a la API (usa el método que necesites, por ejemplo POST)
     try:
         response = requests.post(url, headers={'Authorization': f'Bearer {settings.FACTURAMA_API_TOKEN}'})
-        
+        username = "AranzaInade"  # nombre de usuario
+        password = "Puebla4990"
+        # Solicitud al API de Facturama
+        response = requests.get(url, auth=(username, password))
         if response.status_code == 200:
             # La solicitud fue exitosa
             return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas
