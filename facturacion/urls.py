@@ -13,5 +13,5 @@ urlpatterns = [
     path('factura/<id_factura>', views.generar_factura_pdf, name='generar_factura_pdf'),
     path('factura/xml/<id_factura>', views.generar_factura_xml, name='generar_factura_xml'),
     path('factura/cancelar_cfdi/', views.cancelar_factura,name='cancelar_factura'),
-    path('factura/comprobante_cfdi/',views.comprobante_factura,name='comprobante_factura')
+    path('factura/comprobante_cfdi/<cfdi_id>',views.comprobante_factura,name='comprobante_factura')
 ]

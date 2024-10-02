@@ -86,7 +86,7 @@
                </tr>
                <tr>
                     <th scope="row">Receptor / Cliente</th>
-                    <td> {{ factura.emisor }}</td>
+                    <td> {{ factura.cliente.empresa.nombre_empresa }}</td>
                </tr>
                <tr>
                     <th scope="row">Tipo Moneda</th>
@@ -189,7 +189,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
-                    <form action="{% url 'comprobante_factura'  %}" method="post" id="comprobanteForm">
+                    <form action="{% url 'comprobante_factura' factura.cfdi_id  %}" method="post" id="comprobanteForm">
                          {% csrf_token %}
                          {{ form_comprobante.as_p }}
                     </form>
