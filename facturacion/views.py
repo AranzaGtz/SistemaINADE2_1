@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 import json
 import os
 from django.contrib.auth.decorators import login_required
@@ -23,6 +24,41 @@ SANDBOX_URL = "https://apisandbox.facturama.mx"
 now_utc = datetime.utcnow()# Obtener la hora UTC actual
 offset = timedelta(hours=-8)  # Usa -7 si estás en horario de verano
 now_tijuana = now_utc + offset
+
+def buscar_cfdi_return(id):
+    try:
+        username = "AranzaInade"  # nombre de usuario
+        password = "Puebla4990"  # contraseña
+        # Construir la URL del endpoint
+        url = f"{SANDBOX_URL}/api-lite/cfdis/{id}"
+        
+        # Hacer la solicitud GET a la API
+        response = requests.get(url, auth=(username, password))
+        
+        # Verificar si la solicitud fue exitosa
+        if response.status_code == 200:
+            # Convertir la respuesta JSON a un diccionario de Python
+            data = response.json()
+            
+            # Acceder a información específica
+            uuid = data.get("Complement", {}).get("TaxStamp", {}).get("Uuid", "UUID no encontrado")
+            folio = data.get("Folio", "Folio no encontrado")
+            total = data.get("Total", "Total no encontrado")
+            issuer_rfc = data.get("Issuer", {}).get("Rfc", "RFC del emisor no encontrado")
+
+            return {
+                "uuid": uuid,
+                "folio": folio,
+                "total": total,
+                "issuer_rfc": issuer_rfc
+            }
+        else:
+            print(f"Error en la solicitud: Código de estado {response.status_code}")
+            return None
+    except requests.RequestException as e:
+        # Manejar errores de conexión o de la API
+        print(f"Error al hacer la solicitud a la API: {e}")
+        return None
 
 def buscar_cfdi_id( emisor_rfc,id):
     try:
@@ -422,8 +458,6 @@ def crear_factura(request, id_personalizado):
                 nueva_factura.save() # Asegúrate de guardar la factura
                 # verificar si con la API se puede crear o manejar los <comprobantes de pagos
                 
-                
-                
                 # Redirigir a una página de éxito
                 return redirect('home')
             else:
@@ -550,13 +584,11 @@ def factura_detalle(request, cfdi_id):
     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
     
     form_cancel = CancelarCFDI(initial={'cfdi_id': factura.cfdi_id})
-    form_comprobante = ComprobanteDePagoForm(initial={'Amount':factura.total,'OperationNumber':factura.id,'ForeignAccountNamePayer':factura.cliente.empresa.nombre_empresa,'RfcReceiverBeneficiaryAccount':factura.cliente.empresa.rfc})
     
     context = {
         'factura' : factura,
         'id': f'{factura.id:04}',
         'form_cancel': form_cancel,
-        'form_comprobante': form_comprobante,
     }
     
     return render(request, 'facturacion/factura_detalle.html', context)
@@ -607,134 +639,116 @@ def cancelar_factura_api(factura_id, motive, uuid_replacement):
     except requests.exceptions.RequestException as e:
         # Manejo de excepciones
         return False, str(e) 
-    
-from django.shortcuts import redirect, get_object_or_404, render
-from django.contrib import messages
 
+
+@login_required
 def comprobante_factura(request, cfdi_id):
-    # Asignar ID
-    factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
-    
-    if request.method == 'POST':
-        form_comprobante = ComprobanteDePagoForm(request.POST)
-        
-        if form_comprobante.is_valid():
-            
-            # Intentar obtener el CSD de la organización
-            try:
-                organizacion = factura.emisor
-                csd = CSD.objects.get(organizacion=organizacion)
-            except CSD.DoesNotExist:
-                messages.error(request, "No se encontró un CSD asociado a la organización. Por favor, cargue un CSD de manera correcta antes de continuar.")
-                return redirect('facturas_list')
-            
-            # Obtener Datos
-            date = form_comprobante.cleaned_data.get('Date')
-            paymentform = form_comprobante.cleaned_data.get('PaymentForm')
-            amount = form_comprobante.cleaned_data.get('Amount')
-            operationnumber = form_comprobante.cleaned_data.get('OperationNumber')
-            ForeignAccountNamePayer = form_comprobante.cleaned_data.get('ForeignAccountNamePayer')
-            PayerAccount = form_comprobante.cleaned_data.get('PayerAccount')
-            RfcReceiverBeneficiaryAccount = form_comprobante.cleaned_data.get('RfcReceiverBeneficiaryAccount')
-            BeneficiaryAccount = form_comprobante.cleaned_data.get('BeneficiaryAccount')
-            
-            el_id = Factura.objects.aggregate(Max('id'))['id__max']
-            emisor_rfc = csd.rfc
-            siguiente_id_formateado = buscar_cfdi_id( emisor_rfc ,el_id)
-            print(f"El siguiente ID será: {siguiente_id_formateado}")
+    factura = get_object_or_404(Factura, cfdi_id=cfdi_id)  # Mover esta línea al inicio
 
-            # Construir el JSON para la API de Facturama
-            complemento_pago = {
-                "NameId": "14",  # Se aplica 14 para complemento de pago
-                "Folio": siguiente_id_formateado,  # Asegúrate de que esta variable tenga valor
-                "Serie": "COP",
-                "CfdiType": "P",
-                "OrderNumber": str(factura.orden.id_personalizado),
-                "ExpeditionPlace": factura.ExpeditionPlace,
-                "Date": now_tijuana.isoformat(),  # Formato correcto
-                "Observations": "Comprobante de pago",
-                "LogoUrl": organizacion.logo,
-                "Exportation": "01",
-                "Issuer": { # Nodo Issuer sólo necesario si se usa API Multiemisor
-                    "Rfc": emisor_rfc,
-                    "Name": factura.emisor.nombre,
-                    "FiscalRegime": factura.emisor.regimen_fiscal
-                },
-                "Receiver": {
-                    "Rfc": factura.cliente.empresa.rfc,
-                    "CfdiUse": "CP01",
-                    "Name": factura.cliente.empresa.nombre_empresa,
-                    "FiscalRegime": factura.cliente.empresa.regimen_fiscal,
-                    "TaxZipCode": factura.cliente.empresa.direccion.codigo
-                },
-                "Complemento": {
-                    "Payments": [
-                        {
-                            "Date": date.isoformat(),
-                            "PaymentForm": paymentform,
-                            "Amount": amount,
-                            "OperationNumber": operationnumber, # Número de operación
-                            "RfcIssuerPayerAccount": emisor_rfc, # RFC Emisor Ordenante
-                            "ForeignAccountNamePayer": ForeignAccountNamePayer, # Nombre Ordenante
-                            "PayerAccount": PayerAccount, # Cuenta Ordenante
-                            "RfcReceiverBeneficiaryAccount": RfcReceiverBeneficiaryAccount, # RFC beneficiario
-                            "BeneficiaryAccount": BeneficiaryAccount, # Nombre beneficiario
-                            "RelatedDocuments": [
-                                # {
-                                #     "TaxObject": "02",
-                                #     "Uuid": "23361131-a0e0-4cf6-85d3-47f37679e874",
-                                #     "PartialityNumber": "1",
-                                #     "Serie": "1111",
-                                #     "Folio": "45",
-                                #     "Currency": "MXN",
-                                #     "PaymentMethod": "PPD",
-                                #     "PreviousBalanceAmount": "111.75",
-                                #     "AmountPaid": "111.75",
-                                #     "ImpSaldoInsoluto": "0",
-                                #     "Taxes": [
-                                #         {
-                                #             "Name": "IVA",
-                                #             "Rate": "0.16",
-                                #             "Total": "16",
-                                #             "Base": "100",
-                                #             "IsRetention": "false"
-                                #         }
-                                #     ]
-                                # }
-                            ]
-                        }
-                    ]
-                }
+    if request.method == 'POST':
+        # Obtener datos del formulario
+        date = request.POST.get('Date')
+        PaymentForm = request.POST.get('PaymentForm')
+        Amount = request.POST.get('Amount')
+        OperationNumber = request.POST.get('OperationNumber')
+        ForeignAccountNamePayer = request.POST.get('ForeignAccountNamePayer')
+        PayerAccount = request.POST.get('PayerAccount')  # Corrección aquí
+        RfcReceiverBeneficiaryAccount = request.POST.get('RfcReceiverBeneficiaryAccount')
+        BeneficiaryAccount = request.POST.get('BeneficiaryAccount')
+        
+        organizacion = factura.emisor
+        csd = get_object_or_404(CSD, organizacion = organizacion)
+        Rfc = csd.rfc
+        
+        # Conversión de valores Decimal a cadena
+        def decimal_to_str(value):
+            return str(value) if isinstance(value, Decimal) else value
+        
+        cfdi_api = buscar_cfdi_return(cfdi_id)
+        
+        # Obtener el último ID existente
+        ultimo_id = Factura.objects.aggregate(Max('id'))['id__max']
+        # Manejar el caso donde no haya registros (el primer ID será 1)
+        siguiente_id = int(ultimo_id or None) + 1  
+        # Formatear el ID a cuatro dígitos
+        siguiente_id_formateado = f'{siguiente_id:04}'
+        # Imprimir o utilizar el siguiente ID
+        print(f"El siguiente ID será: {siguiente_id_formateado}")
+        
+        #Aquí debes construir el JSON para la API de Facturama
+        complemento_pago = {
+            "NameId": "14", # Numero de referencia que  indica tipo de factura comprobante de pago
+            "Folio": str(factura.id),  # Folio de la factura o comprobante
+            "Serie": "COP",
+            "CfdiType": "P",
+            "OrderNumber": str(factura.orden.id_personalizado),  # ID de la orden
+            "ExpeditionPlace": factura.ExpeditionPlace,
+            "Date": date,
+            "Observations": "Comprobante de pago",
+            "Issuer": {
+                "Rfc": Rfc,  # El modelo Organización o Factura debe tener un RFC
+                "Name": factura.emisor.nombre,
+                "FiscalRegime": factura.emisor.regimen_fiscal
+            },
+            "Receiver": {
+                "Rfc": factura.cliente.empresa.rfc, 
+                "CfdiUse": "CP01",  # Ajustado a CP01 para comprobante de pago
+                "Name": factura.cliente.empresa.nombre_empresa,
+                "FiscalRegime": factura.cliente.empresa.regimen_fiscal,
+                "TaxZipCode": factura.cliente.empresa.direccion.codigo,
+            },
+            "Complemento": {
+                "Payments": [
+                    {
+                        "Date": date,
+                        "PaymentForm": PayerAccount,
+                        "Amount": Amount,
+                        "OperationNumber": OperationNumber,
+                        "RfcIssuerPayerAccount": Rfc, 
+                        "ForeignAccountNamePayer": ForeignAccountNamePayer, 
+                        "PayerAccount": PayerAccount, 
+                        "RfcReceiverBeneficiaryAccount": RfcReceiverBeneficiaryAccount, 
+                        "BeneficiaryAccount": BeneficiaryAccount, 
+                        "RelatedDocuments": [
+                            {
+                                "TaxObject": "01",  # Ajustado a 01 para no manerjar impuestos aún :(
+                                "Uuid": cfdi_api.get("uuid"),  # Sacado de GET {{SANDBOX_URL}}/cfdi?type=issuedLite&rfcIssuer=EKU9003173C9
+                                "PartialityNumber": "1",
+                                "Folio": str(factura.id),  # El folio es el id
+                                "Currency": factura.tipo_moneda,
+                                "PaymentMethod": "PUE",  # Ajustar a un método de pago válido
+                                "PreviousBalanceAmount": decimal_to_str(factura.total),
+                                "AmountPaid": Amount,
+                                "ImpSaldoInsoluto": "0"
+                            }
+                        ]
+                    }
+                ]
             }
-                    
-                    
-            print(complemento_pago)
-            # Aquí, agrega la lógica para enviar `complemento_pago` a la API de Facturama.
-            
-            # Después de procesar, redirige o renderiza la respuesta adecuada.
-            messages.success(request, "Comprobante de pago generado exitosamente.")
-            return redirect('facturas_list')  # Redirige a donde necesites
+        }
+        
+        # Imprimir los datos para verificar
+        print(complemento_pago)
 
-        else:
-            print(form_comprobante.errors)
-            messages.error(request, f"Error al generar comprobante de pago. {form_comprobante.errors}")
-            return redirect('facturas_list')  # También puedes optar por volver a mostrar el formulario aquí
-    else:
-        form_comprobante = ComprobanteDePagoForm()  # Crea una instancia del formulario si no es POST
+        # Aquí puedes añadir más lógica para procesar los datos
 
-    # Renderiza el template si es un GET
-    return render(request, 'tu_template.html', {'form_comprobante': form_comprobante, 'factura': factura})
+        # Si todo está correcto, redirigir a una página de éxito o mostrar un mensaje
+        messages.success(request, "Comprobante de pago procesado exitosamente.")
+        return redirect('facturas_list')
 
-      
-def comprobar_pago_factura_api(request, cfdi_id):
+    # Para el caso GET, simplemente renderiza la plantilla con el formulario
+    return render(request, 'tu_template.html', {'factura': factura})
+
+def crear_cfdi_api( data):
     
-    if request.method == 'POST':
-        factura = get_object_or_404(Factura, cfdi_id=cfdi_id)
-        
-        payment_date = request.POST.get('payment_date')
-        
-    context = {
-        'factura' : factura,
-        'id': f'{factura.id:04}',
-    }
-    return render(request, 'facturacion/comprobar_pago.html', context)
+    # URL de la API de Facturama
+    url = f"https://apisandbox.facturama.mx/api-lite/3/cfdis"
+    username = "AranzaInade"  # nombre de usuario
+    password = "Puebla4990"
+    response = requests.post(url, json=data, auth=(username, password))
+    print(response.json())
+    if response.status_code == 200:
+        return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas
+    else:
+        # Manejo de errores
+        return False, response.json()  # Puedes devolver el mensaje de error

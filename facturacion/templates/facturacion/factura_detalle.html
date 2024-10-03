@@ -191,7 +191,54 @@
                <div class="modal-body">
                     <form action="{% url 'comprobante_factura' factura.cfdi_id  %}" method="post" id="comprobanteForm">
                          {% csrf_token %}
-                         {{ form_comprobante.as_p }}
+                         <p>
+                              <label for="fecha_pago">Fecha de Pago:</label>
+                              <input type="datetime-local" name="Date" class="form-control" id="Date" required="true">
+                         </p>
+                         
+                         <p>
+                              <label for="select_opciones">Método de pago:</label>
+                              <select name="PaymentForm" class="form-select" id="PaymentForm">
+                                   <option value="01">01 - Efectivo</option>
+                         
+                                   <option value="02">02 - Cheque nominativo</option>
+                         
+                                   <option value="03">03 - Transferencia electrónica de fondos</option>
+                         
+                                   <option value="99">99 - Por definir</option>
+                         
+                              </select>
+                         </p>
+                         
+                         <p>
+                              <label for="monto_pago">Monto:</label>
+                              <input type="number" name="Amount" value="{{ factura.total }}" class="form-control" id="Amount" step="any" required="">
+                         </p>
+                         
+                         <p>
+                              <label for="numero_operacion">Referencia:</label>
+                              <input type="text" name="OperationNumber" value="{{factura.id}}" class="form-control" id="OperationNumber" required="">
+                         </p>
+                         
+                         <p>
+                              <label for="nombre_cuenta_pagador">Nombre de la cuenta del pagador:</label>
+                              <input type="text" name="ForeignAccountNamePayer" value="{{factura.cliente.empresa.nombre_empresa}}" class="form-control" id="ForeignAccountNamePayer" required="">
+                         </p>
+                         
+                         <p>
+                              <label for="cuenta_pagador">Cuenta del pagador:</label>
+                              <input type="text" name="PayerAccount" class="form-control" id="PayerAccount" required="">
+                         </p>
+                         
+                         <p>
+                              <label for="rfc_beneficiario">RFC del beneficiario de la cuenta:</label>
+                              <input type="text" name="RfcReceiverBeneficiaryAccount" value="{{factura.cliente.empresa.rfc}}" class="form-control" id="RfcReceiverBeneficiaryAccount" required="">
+                         </p>
+                         
+                         <p>
+                              <label for="cuenta_beneficiario">Cuenta del beneficiario:</label>
+                              <input type="text" name="BeneficiaryAccount" class="form-control" id="BeneficiaryAccount" required="">
+                         </p>
                     </form>
                </div>
                <div class="modal-footer">
@@ -223,6 +270,13 @@
          // Escuchar cambios en el select
          selectOpciones.addEventListener('change', toggleUUIDField);
      });
- </script>
+
+     // Obtener la fecha y hora actual
+    const now = new Date();
+    // Formatear la fecha en el formato adecuado para el input datetime-local (YYYY-MM-DDTHH:MM)
+    const formattedDate = now.toISOString().slice(0, 16);
+    // Asignar la fecha formateada al input
+    document.getElementById('Date').value = formattedDate;
+</script>
  
 {% endblock %}
