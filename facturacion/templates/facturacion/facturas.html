@@ -18,8 +18,7 @@
                     <input type="text" id="searchInput" class="form-control" placeholder="Buscar cotizaciones..."
                          onkeyup="filterTable('searchInput', 'cotizacionesTable')">
                     <div class="input-group-append">
-                         <button class="btn btn-outline-secondary" type="button"
-                              onclick="filterTable('searchInput', 'cotizacionesTable')">Buscar</button>
+                         <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'cotizacionesTable')">Buscar</button>
                     </div>
                </div>
           </div>
@@ -29,6 +28,42 @@
                <a href="/" class="btn btn-primary mx-1">Nueva Factura</a>
           </div>
      </div>
+     <table border="1">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Tipo</th>
+                  <th>Folio</th>
+                  <th>Serie</th>
+                  <th>Nombre Fiscal</th>
+                  <th>RFC</th>
+                  <th>RFC Emisor</th>
+                  <th>Fecha</th>
+                  <th>Subtotal</th>
+                  <th>Total</th>
+                  <th>Estatus</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for factura in cdfis %}
+                  <tr>
+                      <td>{{ factura.Id }}</td>
+                      <td>{{ factura.Type }}</td>
+                      <td>{{ factura.Folio }}</td>
+                      <td>{{ factura.Serie }}</td>
+                      <td>{{ factura.TaxName }}</td>
+                      <td>{{ factura.Rfc }}</td>
+                      <td>{{ factura.RfcIssuer }}</td>
+                      <td>{{ factura.Date }}</td>
+                      <td>{{ factura.Subtotal }}</td>
+                      <td>{{ factura.Total }}</td>
+                      <td>{{ factura.Status }}</td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+
+
      <!-- TABLA -->
     <div class="row">
           <div class="col">

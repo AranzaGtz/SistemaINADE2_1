@@ -78,3 +78,8 @@ class Factura(models.Model):
     def __str__(self):
         # Utiliza el método formatted_id para mostrar la factura con el ID formateado
         return f'Factura {self.formatted_id()}'
+    
+class Comprobante(models.Model):
+    folio = models.CharField(primary_key=True, max_length=20)
+    cfdi_id = models.CharField(unique=True, null=True, blank=True, max_length=20)
+    ref_cfdi = models.ForeignKey(Factura, on_delete=models.PROTECT)

@@ -201,11 +201,9 @@
                               <select name="PaymentForm" class="form-select" id="PaymentForm">
                                    <option value="01">01 - Efectivo</option>
                          
-                                   <option value="02">02 - Cheque nominativo</option>
+                                   <option value="02" >02 - Cheque nominativo</option>
                          
-                                   <option value="03">03 - Transferencia electrónica de fondos</option>
-                         
-                                   <option value="99">99 - Por definir</option>
+                                   <option value="03" selected>03 - Transferencia electrónica de fondos</option>
                          
                               </select>
                          </p>
@@ -220,25 +218,39 @@
                               <input type="text" name="OperationNumber" value="{{factura.id}}" class="form-control" id="OperationNumber" required="">
                          </p>
                          
-                         <p>
-                              <label for="nombre_cuenta_pagador">Nombre de la cuenta del pagador:</label>
-                              <input type="text" name="ForeignAccountNamePayer" value="{{factura.cliente.empresa.nombre_empresa}}" class="form-control" id="ForeignAccountNamePayer" required="">
-                         </p>
                          
-                         <p>
-                              <label for="cuenta_pagador">Cuenta del pagador:</label>
-                              <input type="text" name="PayerAccount" class="form-control" id="PayerAccount" required="">
-                         </p>
-                         
-                         <p>
-                              <label for="rfc_beneficiario">RFC del beneficiario de la cuenta:</label>
-                              <input type="text" name="RfcReceiverBeneficiaryAccount" value="{{factura.cliente.empresa.rfc}}" class="form-control" id="RfcReceiverBeneficiaryAccount" required="">
-                         </p>
-                         
-                         <p>
-                              <label for="cuenta_beneficiario">Cuenta del beneficiario:</label>
-                              <input type="text" name="BeneficiaryAccount" class="form-control" id="BeneficiaryAccount" required="">
-                         </p>
+                         <div id="extra-fields">
+
+                              <p class="ForeignAccountNamePayer">
+                                   <label for="nombre_cuenta_pagador">Nombre de la cuenta del pagador:</label>
+                                   <input type="text" name="ForeignAccountNamePayer" value="{{factura.cliente.empresa.nombre_empresa}}" class="form-control" id="ForeignAccountNamePayer" required="">
+                              </p>
+
+                              <p>
+                                   <label for="cuenta_pagador">Cuenta del pagador:</label>
+                                   <input type="text" name="PayerAccount" class="form-control" id="PayerAccount" 
+                                   pattern="^\d{11}|\d{16}|\d{18}$" 
+                                   title="La cuenta debe tener 11, 16 o 18 dígitos numéricos." 
+                                   maxlength="18" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                              </p>
+                              
+                              <p>
+                                   <label for="rfc_beneficiario">RFC del beneficiario de la cuenta:</label>
+                                   <input type="text" name="RfcReceiverBeneficiaryAccount" value="{{factura.cliente.empresa.rfc}}" class="form-control" id="RfcReceiverBeneficiaryAccount" required="">
+                              </p>
+                              
+                              <p>
+                                   <label for="cuenta_beneficiario">Cuenta del beneficiario:</label>
+                                   <input type="text" name="BeneficiaryAccount" class="form-control" id="BeneficiaryAccount" 
+                                   pattern="^\d{11}|\d{16}|\d{18}$" 
+                                   title="La cuenta debe tener 11, 16 o 18 dígitos numéricos." 
+                                   maxlength="18" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                              </p>
+
+                         </div>
+
                     </form>
                </div>
                <div class="modal-footer">
@@ -250,33 +262,48 @@
 </div>
 
 <script>
-     document.addEventListener('DOMContentLoaded', function () {
-         const selectOpciones = document.getElementById('select_opciones'); // Asegúrate de que este ID coincida
-         const uuidFieldContainer = document.getElementById('uuidFieldContainer');
-         const uuidReplacementField = document.getElementById('uuid_replacement');
- 
-         function toggleUUIDField() {
-             if (selectOpciones.value === '01') {
-                 uuidFieldContainer.style.display = 'block'; // Mostrar el campo
-             } else {
-                 uuidFieldContainer.style.display = 'none'; // Ocultar el campo
-                 uuidReplacementField.value = ''; // Limpiar el campo si se oculta
-             }
-         }
- 
-         // Inicialmente ocultamos el campo
-         toggleUUIDField();
- 
-         // Escuchar cambios en el select
-         selectOpciones.addEventListener('change', toggleUUIDField);
+
+     document.addEventListener("DOMContentLoaded", function() {
+          const paymentSelect = document.getElementById("PaymentForm");
+          const extraFields = document.getElementById("extra-fields");
+     
+          // Función para manejar la visibilidad de los campos extra
+          function toggleExtraFields() {
+          if (paymentSelect.value === "01"||paymentSelect.value === "02") {
+               extraFields.style.display = "none"; // Ocultar campos si es efectivo
+          } else {
+               extraFields.style.display = "block"; // Mostrar campos en cualquier otro caso
+          }
+          }
+     
+          // Llamamos a la función al cargar la página para asegurarnos de que los campos tengan el estado correcto
+          toggleExtraFields();
+     
+          // Agregamos un event listener para que cambie la visibilidad cada vez que se selecciona un método de pago
+          paymentSelect.addEventListener("change", toggleExtraFields);
      });
 
-     // Obtener la fecha y hora actual
-    const now = new Date();
-    // Formatear la fecha en el formato adecuado para el input datetime-local (YYYY-MM-DDTHH:MM)
-    const formattedDate = now.toISOString().slice(0, 16);
-    // Asignar la fecha formateada al input
-    document.getElementById('Date').value = formattedDate;
+     document.addEventListener('DOMContentLoaded', function () {
+     const selectOpciones = document.getElementById('select_opciones'); // Asegúrate de que este ID coincida
+     const uuidFieldContainer = document.getElementById('uuidFieldContainer');
+     const uuidReplacementField = document.getElementById('uuid_replacement');
+
+     function toggleUUIDField() {
+          if (selectOpciones.value === '01') {
+               uuidFieldContainer.style.display = 'block'; // Mostrar el campo
+          } else {
+               uuidFieldContainer.style.display = 'none'; // Ocultar el campo
+               uuidReplacementField.value = ''; // Limpiar el campo si se oculta
+          }
+     }
+
+     // Inicialmente ocultamos el campo
+     toggleUUIDField();
+
+     // Escuchar cambios en el select
+     selectOpciones.addEventListener('change', toggleUUIDField);
+     });
+
 </script>
  
 {% endblock %}

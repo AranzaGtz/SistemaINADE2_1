@@ -7,24 +7,47 @@ from pyexpat.errors import messages
 from django.http import  FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 import requests
+from SistemaINADE2.settings import PASSWORD, SANDBOX_URL, USERNAME
 from accounts.helpers import get_unica_organizacion
 from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
-from facturacion.models import CSD, Factura
+from facturacion.models import CSD, Comprobante, Factura
 from .forms import CSDForm, CancelarCFDI, ComprobanteDePagoForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm, ServicioFormset
 from django.contrib import messages
 import base64
 import requests
 from django.core.files.base import ContentFile
-from django.conf import settings  # Asegúrate de tener tu configuración adecuada
 from django.db.models import Max
 from django.db import transaction
 
-SANDBOX_URL = "https://apisandbox.facturama.mx"
 
 now_utc = datetime.utcnow()# Obtener la hora UTC actual
 offset = timedelta(hours=-8)  # Usa -7 si estás en horario de verano
 now_tijuana = now_utc + offset
 
+#   FUNCIONES
+# ------------------------------- #
+
+def emisor(request): #   FUNCION PARA ENCONTRAR EL RFC PARA INDICAR EMISOR EN API  
+    try:
+        if not request.user.is_authenticated:
+            messages.error(request, "Debe iniciar sesión para acceder a esta función.")
+            return redirect('login')
+            
+        user_log = request.user
+        
+        if not hasattr(user_log, 'organizacion'):
+            messages.error(request, "No se encuentra el RFC de la organización por medio del usuario logueado.")
+            return redirect('home')
+        
+        org = user_log.organizacion
+        csd = get_object_or_404(CSD, organizacion = org)
+        rfc = csd.rfc
+        return rfc
+    except Exception as e:
+        # Capturamos cualquier otro error no esperado y lo mostramos
+        messages.error(request, "No se encuentra el RFC de la organización por medio del usuario logueado.")
+        return redirect('home')  # Redirige a la vista 'home'
+    
 def buscar_cfdi_return(id):
     try:
         username = "AranzaInade"  # nombre de usuario
@@ -65,7 +88,7 @@ def buscar_cfdi_id( emisor_rfc,id):
         username = "AranzaInade"  # nombre de usuario
         password = "Puebla4990"
         # CONSTRUIR LA URL DEL ENDPOINT
-        url = f"{SANDBOX_URL}/cfdi?type=issuedLite&rfcIssuer={emisor_rfc}&cfdiId={id}"
+        url = f"{SANDBOX_URL}/cfdi?type=issuedLite&rfcIssuer={emisor_rfc}&cfdiId={id}%status=all"
         
         response = requests.get(url, auth=(username, password))
         
@@ -97,6 +120,31 @@ def buscar_cfdi_id( emisor_rfc,id):
         # Manejar errores de conexión o de la API
         print(f"Error al hacer la solicitud a la API: {e}")
         return redirect('error', message="Error en la solicitud a la API")
+
+def get_new_cfdi_id():
+    # Lógica para obtener el siguiente ID en la base de datos
+    last_factura = Factura.objects.order_by('id').last()
+    
+    if last_factura:
+        next_id = int(last_factura.id) + 1
+    else:
+        next_id = 1
+    print (f"{next_id:04d}")
+    return f"{next_id:04d}"  # Formato '0001', '0002', etc.
+# ------------------------------- #
+
+#   PETICIONES A LA API FACTURAMA
+# ------------------------------- #
+
+def cfdis_all(emisor_rfc):
+    # https://apisandbox.facturama.mx/api-lite/cfdis?status=all&issued=EKU9003173C9
+    url = f"{SANDBOX_URL}/api-lite/cfdis?status=all&issued={emisor_rfc}"
+    response = requests.get(url,auth = (USERNAME, PASSWORD))
+    if response.status_code == 200:
+        return response.json()
+    
+# ------------------------------- #
+
 
 @login_required
 def cargar_csd(request):
@@ -187,11 +235,21 @@ def CF(request):
     }
     return render(request, "cotizaciones.html", context)
 
+#   PETICIONES A LA API FACTURAMA
+# ------------------------------- #
+
+#   FUNCION VIEW LISTA DE FACTURAS
 def facturas_list(request):
-    context ={
-        'facturas' :  Factura.objects.all()
+    
+    emisor_rfc = emisor(request)
+    cdfis_json = cfdis_all(emisor_rfc)
+    context = {
+        'facturas' :  Factura.objects.all(),
+        'cdfis': cdfis_json,
     }
     return render (request, "facturacion/facturas.html",context)
+
+# ------------------------------- #
 
 def obtener_datos_cotizacion(request, cotizacion_id):
     try:
@@ -230,7 +288,7 @@ def crear_factura(request, id_personalizado):
 
     if request.method == 'POST':
         
-        encabezado_form = FacturaEncabezadoForm(request.POST, initial={'orden': orden.id_personalizado})
+        encabezado_form = FacturaEncabezadoForm(request.POST, initial={'OrderNumber': orden.id_personalizado})
         pie_form = FacturaPieForm(request.POST, initial={'direccion': orden.direccion})
         totales_form = FacturaTotalesForm(request.POST)
         
@@ -257,10 +315,8 @@ def crear_factura(request, id_personalizado):
                 }
                 return render(request, 'facturacion/formulario.html', context)
             
-            # Obtener el último ID existente
-            el_id = Factura.objects.aggregate(Max('id'))['id__max']
             emisor_rfc = csd.rfc
-            siguiente_id_formateado = buscar_cfdi_id( emisor_rfc ,el_id)
+            siguiente_id_formateado = get_new_cfdi_id()
             # Imprimir o utilizar el siguiente ID
             print(f"El siguiente ID será: {siguiente_id_formateado}")
 
@@ -335,42 +391,29 @@ def crear_factura(request, id_personalizado):
 
             cfdi_data = {
                 # "CfdiType":"I"
-                # ( integer ) Atributo para especificar el nombre que se establecera en el pdf (default 1 = factura) [ Vea la documentación de "Nombres del CFDI" ]
                 "NameId": "1",
-                # ( Strg )Tipo de cambio de la moneda en caso de ser diferente de MXN
                 "Currency": "MXN",
-                # ( string ) Folio: Atributo para control interno del contribuyente que expresa el folio del comprobante, acepta una cadena de 1 a 40 caracteres.
                 "Folio": siguiente_id_formateado,
+                "Serie": "FAC",
                 "Date": now_tijuana.isoformat(),  # Fecha actual en formato ISO 8601
-                # ( string ) Atributo requerido para expresar el efecto del comprobante fiscal para el contribuyente emisor: ingreso, egreso ó traslado Required Data type: TextMatching regular expression pattern: I|E|T|N|P
                 "CfdiType": "I",
-                # ( string ) Url del logo, ej. https://dominio.com/mi-logo.png
-                "LogoUrl": "",
-                # ( string ) Atributo obligatorio y de catálogo, para expresar la forma de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: 01, 02, 03, 99
+                "LogoUrl": "",# ( string ) Url del logo, ej. https://dominio.com/mi-logo.png
                 "PaymentForm": forma_pago,
-                # ( string ) Atributo obligatorio y de catálogo, para expresar el método de pago de los bienes o servicios amparados por el comprobante. Se entiende como método de pago leyendas tales como: PPD, PUE
                 "PaymentMethod": metodo_pago,
-                # ( string ) Lugar de Expedición (Codigo Postal desde donde se expide el comprobante)
                 "ExpeditionPlace": emisor_cp,
-                # ( string ) Descripcion no fiscal del pdf
                 "Observations": comentarios,
-                # ( string ) Numero de Orden, propiedad no fiscal (opcional)Max length: 100
                 "OrderNumber": orden_compra,
-
                 "Issuer": {  # ( TaxEntityInfoViewModel ) Nodo que contiene el detalle del emisor.
                     "Rfc": emisor_rfc,
                     "Name": emisor_nombre,
                     "FiscalRegime": emisor_regimen
                 },
-
                 "Receiver": {  # Receiver ( ReceiverV4BindingModel ) Cliente a quien se emitirá el CFDi, Atributo Requerido
-                    # No se cual es el CFDI use, hay que buscarlo en la Bd si no hay que agregarlo
                     "Rfc": cliente_rfc,
                     "Name": cliente_nombre,
                     "CfdiUse": uso_cfdi,
                     "FiscalRegime": cliente_regimen,
                     "TaxZipCode": cliente_cp,
-
                     "Address": {
                         "Street": cliente_calle,
                         "Neighborhood": cliente_colonia,
@@ -459,7 +502,7 @@ def crear_factura(request, id_personalizado):
                 # verificar si con la API se puede crear o manejar los <comprobantes de pagos
                 
                 # Redirigir a una página de éxito
-                return redirect('home')
+                return redirect('factura_detalle', cfdi_id)
             else:
                 # Si ocurre un error, mostrar un mensaje detallado
                 error_code = response.status_code
@@ -472,7 +515,7 @@ def crear_factura(request, id_personalizado):
 
         return redirect('home')
     
-    encabezado_form = FacturaEncabezadoForm(initial={'orden': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
+    encabezado_form = FacturaEncabezadoForm(initial={'OrderNumber': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
     pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
     totales_form = FacturaTotalesForm()
     
@@ -640,7 +683,6 @@ def cancelar_factura_api(factura_id, motive, uuid_replacement):
         # Manejo de excepciones
         return False, str(e) 
 
-
 @login_required
 def comprobante_factura(request, cfdi_id):
     factura = get_object_or_404(Factura, cfdi_id=cfdi_id)  # Mover esta línea al inicio
@@ -701,14 +743,14 @@ def comprobante_factura(request, cfdi_id):
                 "Payments": [
                     {
                         "Date": date,
-                        "PaymentForm": PayerAccount,
+                        "PaymentForm": PaymentForm,
                         "Amount": Amount,
                         "OperationNumber": OperationNumber,
+                        
                         "RfcIssuerPayerAccount": Rfc, 
                         "ForeignAccountNamePayer": ForeignAccountNamePayer, 
                         "PayerAccount": PayerAccount, 
                         "RfcReceiverBeneficiaryAccount": RfcReceiverBeneficiaryAccount, 
-                        "BeneficiaryAccount": BeneficiaryAccount, 
                         "RelatedDocuments": [
                             {
                                 "TaxObject": "01",  # Ajustado a 01 para no manerjar impuestos aún :(
@@ -726,11 +768,64 @@ def comprobante_factura(request, cfdi_id):
                 ]
             }
         }
-        
+        # Condicionales para PaymentForm
+        if complemento_pago['Complemento']['Payments'][0]['PaymentForm'] in ['01', '02']:
+            # Si es 01, eliminamos las claves no necesarias
+            complemento_pago['Complemento']['Payments'][0].pop('RfcIssuerPayerAccount', None)
+            complemento_pago['Complemento']['Payments'][0].pop('PayerAccount', None)
+            complemento_pago['Complemento']['Payments'][0].pop('RfcReceiverBeneficiaryAccount', None)
+        else:
+            # Agregar campos relevantes si PaymentForm no es 01
+            complemento_pago['Complemento']['Payments'][0]['RfcIssuerPayerAccount'] = Rfc
+            complemento_pago['Complemento']['Payments'][0]['PayerAccount'] = PayerAccount
+            complemento_pago['Complemento']['Payments'][0]['RfcReceiverBeneficiaryAccount'] = RfcReceiverBeneficiaryAccount
+
+        complemento_pago['Complemento']['Payments'][0]['RelatedDocuments'] = [
+            {
+                "TaxObject": "01",
+                "Uuid": cfdi_api.get("uuid"),
+                "PartialityNumber": "1",
+                "Folio": str(factura.id),
+                "Currency": factura.tipo_moneda,
+                "PaymentMethod": "PUE",
+                "PreviousBalanceAmount": decimal_to_str(factura.total),
+                "AmountPaid": Amount,
+                "ImpSaldoInsoluto": "0"
+            }
+        ]
+
         # Imprimir los datos para verificar
         print(complemento_pago)
-
+        
         # Aquí puedes añadir más lógica para procesar los datos
+        
+        response = crear_cfdi_api(complemento_pago)
+        
+        if response.status_code == 200 or 201:
+            
+            response_data = response.json()
+            folio_cop= response_data.get("Folio")
+            cfdi_id_cop = response_data.get("Id")
+            ref_cfdi = factura.id
+            
+            # Guarda factrura en la BD
+            new_compobante = Comprobante(
+                folio = folio_cop,
+                cfdi_id = cfdi_id_cop,
+                ref_cfdi = factura
+            )
+            new_compobante.save() # Asegúrate de guardar la factura
+            
+            messages.success(request, 'CFDI timbrado correctamente.')
+            print(request , messages)
+            print("Guardando en la BD")  
+        else:
+            # Si ocurre un error, mostrar un mensaje detallado
+            error_code = response.status_code
+            error_message = response.json().get("message", "Ocurrió un error inesperado.")
+            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+            messages.error(request, full_error_message)
+            print(request, full_error_message)
 
         # Si todo está correcto, redirigir a una página de éxito o mostrar un mensaje
         messages.success(request, "Comprobante de pago procesado exitosamente.")
@@ -742,13 +837,9 @@ def comprobante_factura(request, cfdi_id):
 def crear_cfdi_api( data):
     
     # URL de la API de Facturama
-    url = f"https://apisandbox.facturama.mx/api-lite/3/cfdis"
+    url = f"{SANDBOX_URL}/api-lite/3/cfdis"
     username = "AranzaInade"  # nombre de usuario
     password = "Puebla4990"
     response = requests.post(url, json=data, auth=(username, password))
     print(response.json())
-    if response.status_code == 200:
-        return True, response.json()  # Puedes devolver la respuesta en JSON si lo necesitas
-    else:
-        # Manejo de errores
-        return False, response.json()  # Puedes devolver el mensaje de error
+    return response # Puedes devolver la respuesta en JSON si lo necesitas
