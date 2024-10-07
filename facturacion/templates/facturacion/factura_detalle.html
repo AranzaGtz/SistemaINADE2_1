@@ -143,6 +143,24 @@
 
           </tbody>
      </table>
+
+     <div id="comprobantes-container" class="mt-4">
+          {% for comprobante in comprobantes %}
+              <div class="card mb-3">
+                  <div class="card-body">
+                      <h5 class="card-title">Comprobante - Folio: {{ comprobante.folio }}</h5>
+                      <p class="card-text"><strong>Monto Pagado:</strong> ${{ comprobante.monto_pagado }}</p>
+                      <p class="card-text"><strong>Fecha de Pago:</strong> {{ comprobante.fecha_pago }}</p>
+                      <p class="card-text"><strong>Método de Pago:</strong> {{ comprobante.metodo_pago }}</p>
+                  </div>
+              </div>
+          {% empty %}
+              <div class="alert alert-warning" role="alert">
+                  No hay comprobantes disponibles para esta factura.
+              </div>
+          {% endfor %}
+      </div>
+
 </div>
 
 <!-- Modal para cancelar cfdi -->
@@ -229,8 +247,8 @@
                               <p>
                                    <label for="cuenta_pagador">Cuenta del pagador:</label>
                                    <input type="text" name="PayerAccount" class="form-control" id="PayerAccount" 
-                                   pattern="^\d{11}|\d{16}|\d{18}$" 
-                                   title="La cuenta debe tener 11, 16 o 18 dígitos numéricos." 
+                                   pattern="^\d{10}|\d{16}|\d{18}$" 
+                                   title="La cuenta debe tener 10, 16 o 18 dígitos numéricos." 
                                    maxlength="18" 
                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                               </p>
@@ -243,8 +261,8 @@
                               <p>
                                    <label for="cuenta_beneficiario">Cuenta del beneficiario:</label>
                                    <input type="text" name="BeneficiaryAccount" class="form-control" id="BeneficiaryAccount" 
-                                   pattern="^\d{11}|\d{16}|\d{18}$" 
-                                   title="La cuenta debe tener 11, 16 o 18 dígitos numéricos." 
+                                   pattern="^\d{10}|\d{16}|\d{18}$" 
+                                   title="La cuenta debe tener 10, 16 o 18 dígitos numéricos." 
                                    maxlength="18" 
                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                               </p>

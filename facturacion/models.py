@@ -79,7 +79,32 @@ class Factura(models.Model):
         # Utiliza el método formatted_id para mostrar la factura con el ID formateado
         return f'Factura {self.formatted_id()}'
     
+factura_default = Factura.objects.first()  # Si tienes una factura específica
+
 class Comprobante(models.Model):
+    # ID interno de la factura en tu sistema
     folio = models.CharField(primary_key=True, max_length=20)
-    cfdi_id = models.CharField(unique=True, null=True, blank=True, max_length=20)
-    ref_cfdi = models.ForeignKey(Factura, on_delete=models.PROTECT)
+    
+    # ID devuelto por la API de Facturama 
+    cfdi_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    
+    # Relación con el modelo Factura
+    factura = models.ForeignKey(Factura, related_name='comprobantes', on_delete=models.PROTECT, null=True, blank=True)
+    
+    # Fecha de pago
+    fecha_pago = models.DateTimeField(default=timezone.now)
+    
+    # Monto pagado
+    monto_pagado = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    
+    # Método de pago
+    metodo_pago = models.CharField(
+        max_length=5,
+        choices=[
+            ('01', 'Efectivo'),
+            ('02', 'Cheque Nominativo' ),
+            ('03', 'Transferencia electrónica de fondos'),
+        ],
+        default='03'
+    )
+    
