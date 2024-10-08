@@ -40,15 +40,15 @@ METODOS_PAGO_CHOICES = [
 ]
 
 #   FORMULARIO PARA GENERAR COMPROBANTE DE PAGO
-class ComprobanteDePagoForm(forms.Form):
-    Date = forms.DateTimeField(label='Fecha de Pago',widget=forms.DateTimeInput(attrs={'type': 'datetime-local','class': 'form-control', 'id': 'fecha_pago'}))
-    PaymentForm = forms.ChoiceField(choices=METODOS_PAGO_CHOICES, label='Método de pago', widget=forms.Select(attrs={'class':'form-select', 'id': 'select_opciones'}))
-    Amount = forms.DecimalField(label='Monto', widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'monto_pago'}))
-    OperationNumber = forms.CharField(label='Referencia', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'numero_operacion'}))
-    ForeignAccountNamePayer = forms.CharField(label='Nombre de la cuenta del pagador', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'nombre_cuenta_pagador'}))
-    PayerAccount = forms.CharField(label='Cuenta del pagador', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'cuenta_pagador'}))
-    RfcReceiverBeneficiaryAccount = forms.CharField(label='RFC del beneficiario de la cuenta', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'rfc_beneficiario'}))
-    BeneficiaryAccount = forms.CharField(label='Cuenta del beneficiario', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'cuenta_beneficiario'}))
+class ComprobantePagoForm(forms.Form):
+    Date = forms.DateTimeField(label='Fecha de Pago',widget=forms.DateTimeInput(attrs={'type': 'datetime-local','class': 'form-control', 'id': 'Date'}), required=False)
+    PaymentForm = forms.ChoiceField(choices=METODOS_PAGO_CHOICES, label='Método de pago', widget=forms.Select(attrs={'class':'form-select', 'id': 'PaymentForm'}), required=False)
+    Amount = forms.DecimalField(label='Monto', widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'Amount'}), required=False)
+    OperationNumber = forms.CharField(label='Referencia', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'OperationNumber'}), required=False)
+    ForeignAccountNamePayer = forms.CharField(label='Nombre de la cuenta del pagador', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'ForeignAccountNamePayer'}), required=False)
+    PayerAccount = forms.CharField(label='Cuenta del pagador', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'PayerAccount'}), required=False)
+    RfcReceiverBeneficiaryAccount = forms.CharField(label='RFC del beneficiario de la cuenta', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'RfcReceiverBeneficiaryAccount'}), required=False)
+    BeneficiaryAccount = forms.CharField(label='Cuenta del beneficiario', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'BeneficiaryAccount'}), required=False)
 
 #   FORMULARIO PARA CANCELAR FACTURA
 class CancelarCFDI(forms.Form):

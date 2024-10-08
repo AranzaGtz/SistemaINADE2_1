@@ -78,8 +78,6 @@ class Factura(models.Model):
     def __str__(self):
         # Utiliza el método formatted_id para mostrar la factura con el ID formateado
         return f'Factura {self.formatted_id()}'
-    
-factura_default = Factura.objects.first()  # Si tienes una factura específica
 
 class Comprobante(models.Model):
     # ID interno de la factura en tu sistema

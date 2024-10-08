@@ -207,73 +207,66 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
-                    <form action="{% url 'comprobante_factura' factura.cfdi_id  %}" method="post" id="comprobanteForm">
+                    <form action="{% url 'comprobante_factura' factura.cfdi_id  %}" method="post" id="ComprobantePagoForm">
+                         
                          {% csrf_token %}
-                         <p>
-                              <label for="fecha_pago">Fecha de Pago:</label>
-                              <input type="datetime-local" name="Date" class="form-control" id="Date" required="true">
-                         </p>
+                         {{ form.non_field_errors }}
+                     
+                         <div class="mb-3">
+                             {{ form.Date.label_tag }}
+                             {{ form.Date }}
+                             {{ form.Date.errors }}
+                         </div>
                          
-                         <p>
-                              <label for="select_opciones">Método de pago:</label>
-                              <select name="PaymentForm" class="form-select" id="PaymentForm">
-                                   <option value="01">01 - Efectivo</option>
+                         <div class="mb-3">
+                             {{ form.PaymentForm.label_tag }}
+                             {{ form.PaymentForm }}
+                             {{ form.PaymentForm.errors }}
+                         </div>
                          
-                                   <option value="02" >02 - Cheque nominativo</option>
-                         
-                                   <option value="03" selected>03 - Transferencia electrónica de fondos</option>
-                         
-                              </select>
-                         </p>
-                         
-                         <p>
-                              <label for="monto_pago">Monto:</label>
-                              <input type="number" name="Amount" value="{{ factura.total }}" class="form-control" id="Amount" step="any" required="">
-                         </p>
-                         
-                         <p>
-                              <label for="numero_operacion">Referencia:</label>
-                              <input type="text" name="OperationNumber" value="{{factura.id}}" class="form-control" id="OperationNumber" required="">
-                         </p>
-                         
+                         <div class="mb-3">
+                             {{ form.Amount.label_tag }}
+                             {{ form.Amount }}
+                             {{ form.Amount.errors }}
+                         </div>
+                     
+                         <div class="mb-3">
+                             {{ form.OperationNumber.label_tag }}
+                             {{ form.OperationNumber }}
+                             {{ form.OperationNumber.errors }}
+                         </div>
                          
                          <div id="extra-fields">
-
-                              <p class="ForeignAccountNamePayer">
-                                   <label for="nombre_cuenta_pagador">Nombre de la cuenta del pagador:</label>
-                                   <input type="text" name="ForeignAccountNamePayer" value="{{factura.cliente.empresa.nombre_empresa}}" class="form-control" id="ForeignAccountNamePayer" required="">
-                              </p>
-
-                              <p>
-                                   <label for="cuenta_pagador">Cuenta del pagador:</label>
-                                   <input type="text" name="PayerAccount" class="form-control" id="PayerAccount" 
-                                   pattern="^\d{10}|\d{16}|\d{18}$" 
-                                   title="La cuenta debe tener 10, 16 o 18 dígitos numéricos." 
-                                   maxlength="18" 
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                              </p>
-                              
-                              <p>
-                                   <label for="rfc_beneficiario">RFC del beneficiario de la cuenta:</label>
-                                   <input type="text" name="RfcReceiverBeneficiaryAccount" value="{{factura.cliente.empresa.rfc}}" class="form-control" id="RfcReceiverBeneficiaryAccount" required="">
-                              </p>
-                              
-                              <p>
-                                   <label for="cuenta_beneficiario">Cuenta del beneficiario:</label>
-                                   <input type="text" name="BeneficiaryAccount" class="form-control" id="BeneficiaryAccount" 
-                                   pattern="^\d{10}|\d{16}|\d{18}$" 
-                                   title="La cuenta debe tener 10, 16 o 18 dígitos numéricos." 
-                                   maxlength="18" 
-                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                              </p>
-
+                             <div class="mb-3">
+                                 {{ form.ForeignAccountNamePayer.label_tag }}
+                                 {{ form.ForeignAccountNamePayer }}
+                                 {{ form.ForeignAccountNamePayer.errors }}
+                             </div>
+                     
+                             <div class="mb-3">
+                                 {{ form.PayerAccount.label_tag }}
+                                 {{ form.PayerAccount }}
+                                 {{ form.PayerAccount.errors }}
+                             </div>
+                     
+                             <div class="mb-3">
+                                 {{ form.RfcReceiverBeneficiaryAccount.label_tag }}
+                                 {{ form.RfcReceiverBeneficiaryAccount }}
+                                 {{ form.RfcReceiverBeneficiaryAccount.errors }}
+                             </div>
+                     
+                             <div class="mb-3">
+                                 {{ form.BeneficiaryAccount.label_tag }}
+                                 {{ form.BeneficiaryAccount }}
+                                 {{ form.BeneficiaryAccount.errors }}
+                             </div>
                          </div>
 
                     </form>
                </div>
                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" form="comprobanteForm">Generar Comprobante</button>
+                    <button type="submit" class="btn btn-primary" form="ComprobantePagoForm">Generar Comprobante</button>
                </div>
           </div>
      </div>

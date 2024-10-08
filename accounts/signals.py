@@ -1,11 +1,21 @@
+# accounts/apps.py
+from django.apps import AppConfig
+
+class AccountsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'accounts'
+
+    def ready(self):
+        import accounts.signals  # Importar aquí
+
+# accounts/signals.py
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from .models import   Titulo, Metodo
+from .models import Metodo
 
 @receiver(post_migrate)
 def load_initial_data(sender, **kwargs):
     if sender.name == 'accounts':
-        
         # Crear nuevos registros en la tabla Metodo
         Metodo.objects.bulk_create([
             Metodo(metodo='NOM-011-STPS-2001'),
