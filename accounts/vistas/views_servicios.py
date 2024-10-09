@@ -7,9 +7,6 @@ from django.core.paginator import Paginator
 
 # VISTA PARA DIRIGIR A INTERFAZ DE SERVICIOS
 def servicios_list(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
 
     # Parámetro de ordenamiento desde la URL
     order_by = request.GET.get('order_by', 'nombre_servicio')  # Default order
@@ -30,8 +27,6 @@ def servicios_list(request):
     servicio_form = ServicioForm()
 
     context = {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'servicios_page': servicios_page,
         'metodos': metodos,
         'metodo_form': metodo_form,

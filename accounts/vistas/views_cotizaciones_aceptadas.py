@@ -34,9 +34,6 @@ def agregar_receptor(request):
 
 # VISTA PRA DIRIGIR A INTERFAZ DE COTIZACIONES ACEPTADAS
 def cotizaciones_aceptadas_list(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     # Parámetro de ordenamiento desde la URL
     order_by = request.GET.get('order_by', 'id')  # Default order
@@ -62,8 +59,6 @@ def cotizaciones_aceptadas_list(request):
         })
         
     context = {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizaciones_ordenes': cotizaciones_ordenes,
         'cotizaciones_page': cotizaciones_page,  
     }

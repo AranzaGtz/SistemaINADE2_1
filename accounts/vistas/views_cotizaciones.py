@@ -45,9 +45,6 @@ def generate_new_id_personalizado():
 
 # VISTA DE COTIZACIONES
 def cotizaciones_list(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     # Parámetro de ordenamiento desde la URL
     order_by = request.GET.get('order_by', '-id')  # Default order
@@ -64,8 +61,6 @@ def cotizaciones_list(request):
     cotizaciones_page = paginator.get_page(page_number)
 
     context = {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizaciones_page': cotizaciones_page,  # Cambiado a cotizaciones_page
         'cotizaciones':cotizaciones,
     }
@@ -181,9 +176,6 @@ def cotizacion_form(request,persona_id, cotizacion_id=None):
 
 # INTERFAZ DE DETALLES DE CADA COTIZACION
 def cotizacion_detalle(request, pk):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     conceptos = cotizacion.conceptos.all()
@@ -195,8 +187,6 @@ def cotizacion_detalle(request, pk):
     ordenes_trabajo = OrdenTrabajo.objects.filter(cotizacion=cotizacion) 
     
     return render(request, 'accounts/cotizaciones/cotizacion_detalle.html', {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'cotizacion': cotizacion,
         'conceptos': conceptos,
         'tasa_iva': tasa_iva,

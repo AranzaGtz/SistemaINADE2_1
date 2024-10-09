@@ -106,3 +106,7 @@ class Comprobante(models.Model):
         default='03'
     )
     
+    # Campos para almacenar documentos
+    xml_file = models.FileField(upload_to='cfdis/xml/', null=True, blank=True)
+    pdf_file = models.FileField(upload_to='cfdis/pdf/', null=True, blank=True)
+    

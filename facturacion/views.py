@@ -1,26 +1,35 @@
+# Importaciones estándar de Python
 from datetime import datetime
 from decimal import Decimal
+import os
+from django.core.mail import EmailMessage
 import json
-from django.contrib.auth.decorators import login_required
-from pyexpat.errors import messages
-from django.http import  FileResponse, Http404, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+import base64
+
+# Importaciones de bibliotecas de terceros
 import requests
-from SistemaINADE2.settings import PASSWORD, SANDBOX_URL, USERNAME
+import pytz
+
+# Importaciones de Django
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
+from django.db import transaction
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+# Importaciones de tu proyecto
+from SistemaINADE2.settings import EMAIL_HOST_USER, PASSWORD, SANDBOX_URL, USERNAME
 from accounts.helpers import get_unica_organizacion
 from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
 from facturacion.models import CSD, Comprobante, Factura
-from .forms import CSDForm, CancelarCFDI, ComprobantePagoForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm
-from django.contrib import messages
-import base64
-import requests
-from django.core.files.base import ContentFile
-from django.db import transaction
-import pytz
+from .forms import (CSDForm, CancelarCFDI, ComprobantePagoForm, EmailForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm)
+
 
 utc_timezone = pytz.UTC
 naive_datetime = datetime(2024, 10, 8, 8, 15, 0)  # Fecha y hora naive
 aware_datetime = utc_timezone.localize(naive_datetime)  # Ajusta la fecha y hora a la zona horaria UTC
+
 # ------------------------------- #
 #   FUNCIONES
 # ------------------------------- #
@@ -46,7 +55,7 @@ def get_emisor(request): #   FUNCION PARA ENCONTRAR EL RFC PARA INDICAR EMISOR E
         messages.error(request, "No se encuentra el RFC de la organización por medio del usuario logueado.")
         return redirect('home')  # Redirige a la vista 'home'
 
-def buscar_cfdi_return(id):
+def buscar_cfdi_return(id): #   FUNCION PARA BUSCAR EL CFDI Y REGRESARLO
     try:
         
         response = search_cfdi_return(id)
@@ -75,14 +84,13 @@ def buscar_cfdi_return(id):
         print(f"Error al hacer la solicitud a la API: {e}")
         return None
 
-def buscar_cfdi_id( emisor_rfc,id):
+def buscar_cfdi_id( emisor_rfc,id): #   FUNCION PARA BUSCAR EL FOLIO DEL CFDI DEL EMISOR
     try:
-        username = "AranzaInade"  # nombre de usuario
-        password = "Puebla4990"
+
         # CONSTRUIR LA URL DEL ENDPOINT
         url = f"{SANDBOX_URL}/cfdi?type=issuedLite&rfcIssuer={emisor_rfc}&cfdiId={id}%status=all"
         
-        response = requests.get(url, auth=(username, password))
+        response = requests.get(url, auth=(USERNAME, PASSWORD))
         
         if response.status_code == 200:
             data=response.json()
@@ -113,7 +121,7 @@ def buscar_cfdi_id( emisor_rfc,id):
         print(f"Error al hacer la solicitud a la API: {e}")
         return redirect('error', message="Error en la solicitud a la API")
 
-def get_new_cfdi_id():
+def get_new_cfdi_id(): # FUNCION PARA BUSCAR EL SIGUIENTE NUEVO FOLIO DE LA BD
     # Lógica para obtener el siguiente ID en la base de datos
     last_factura = Factura.objects.order_by('id').last()
     
@@ -122,9 +130,8 @@ def get_new_cfdi_id():
     else:
         next_id = 1
     print (f"{next_id:04d}")
-    return f"{next_id:04d}"  # Formato '0001', '0002', etc.
 
-def get_new_cfdi_comp_id():
+def get_new_cfdi_comp_id(): # FUNCION PARA BUSCAR EL SIGUIENTE NUEVO FOLIO DE UN COMPROBANTE DE PAGO DE LA BD
     # Lógica para obtener el siguiente ID en la base de datos
     last_comprobante = Comprobante.objects.order_by('folio').last()
     
@@ -133,7 +140,6 @@ def get_new_cfdi_comp_id():
     else:
         next_id = 1
     print (f"{next_id:04d}")
-    return f"{next_id:04d}"  # Formato '0001', '0002', etc.
 
 def convertir_a_base64(file):
     return base64.b64encode(file.read()).decode('utf-8')
@@ -166,7 +172,7 @@ def obtener_datos_cotizacion(request, cotizacion_id):
     except Cotizacion.DoesNotExist:
         return JsonResponse({'error': 'Cotización no encontrada'}, status=404)
 
-
+@login_required
 def facturas_list(request):
     
     emisor_rfc = get_emisor(request)
@@ -189,15 +195,71 @@ def factura_detalle(request, cfdi_id):
             'ForeignAccountNamePayer': factura.cliente.empresa.nombre_empresa,
             'RfcReceiverBeneficiaryAccount': factura.cliente.empresa.rfc
         })
+    form_send_email = EmailForm()
+    
     context = {
         'factura' : factura,
         'id': f'{factura.id:04}',
         'comprobantes': comprobantes,
         'form_cancel': form_cancel,
         'form' : form,
+        'form_email': form_send_email,
     }
     
     return render(request, 'facturacion/factura_detalle.html', context)
+
+def create_and_save_fac (cfdi, file_type, id_factura):
+    
+    response = get_cfdi_doc(file_type, id_factura)  # Llama a la función que obtiene el documento
+    
+    if response.status_code != 200:
+        raise Exception(f"No se pudo descargar el {file_type.upper()}.")
+    
+    # Decodificar el JSON de la respuesta
+    response_json = response.json()
+
+    # Verifica que el campo 'Content' esté presente
+    if 'Content' not in response_json:
+        raise Exception("La respuesta no contiene el contenido esperado.")
+
+    # Extraer y decodificar el contenido Base64
+    file_base64 = response_json['Content']
+    file_content = base64.b64decode(file_base64)  # Decodifica de Base64 a binario
+
+    # Guardar el archivo en la base de datos
+    if file_type == 'xml':
+        cfdi.xml_file.save(f'CFDI_{id_factura}.xml', ContentFile(file_content))
+    elif file_type == 'pdf':
+        cfdi.pdf_file.save(f'CFDI_{id_factura}.pdf', ContentFile(file_content))
+        
+    # Guardar los cambios en la factura
+    cfdi.save()
+
+def create_and_save_comp ( cfdi, file_type, id_factura ):
+    response = get_cfdi_doc(file_type, id_factura)  # Llama a la función que obtiene el documento
+
+    if response.status_code != 200:
+        raise Exception(f"No se pudo descargar el {file_type.upper()}.")
+
+    # Decodificar el JSON de la respuesta
+    response_json = response.json()
+
+    # Verifica que el campo 'Content' esté presente
+    if 'Content' not in response_json:
+        raise Exception("La respuesta no contiene el contenido esperado.")
+
+    # Extraer y decodificar el contenido Base64
+    file_base64 = response_json['Content']
+    file_content = base64.b64decode(file_base64)  # Decodifica de Base64 a binario
+
+    # Guardar el archivo en la base de datos
+    if file_type == 'xml':
+        cfdi.xml_file.save(f'CFDI_{id_factura}.xml', ContentFile(file_content))
+    elif file_type == 'pdf':
+        cfdi.pdf_file.save(f'CFDI_{id_factura}.pdf', ContentFile(file_content))
+        
+    # Guardar los cambios en el comprobante
+    cfdi.save()
 
 # ------------------------------- #
 #   PETICIONES DEL SISTEMA
@@ -470,86 +532,56 @@ def crear_factura(request, id_personalizado):
 
 @login_required
 @transaction.atomic
-def generar_factura_xml(request, id_factura):
-    factura = get_object_or_404(Factura, cfdi_id=id_factura)
+def download_factura(request, id_factura, file_type):
+    try:
+        # Obtener la factura desde la base de datos
+        cfdi = get_object_or_404(Factura, cfdi_id=id_factura)
 
-    # Verificar si ya existe un archivo XML asignado
-    if not factura.xml_file:
-
-        response = get_cfdi_doc('xml', id_factura)
-
-        # Manejar una respuesta API
-        if response.status_code == 200:
-            # Recuperar XML de response
-            xml_content = response.content
-
-            # Guardar el archivo XML en la carpeta media/facturas/
-            factura.xml_file.save(f'factura_{id_factura}.xml', ContentFile(xml_content))
-
-            # Guardar cambios en la instancia
-            factura.save()
-            messages.success(request, "XML generado y asignado correctamente.")
-            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
-        else:
-            # Manejar el error si no se pudo obtener el XML
-            error_code = response.status_code
-            error_message = response.json().get("message", "Ocurrió un error inesperado.")
-            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
-            messages.error(request, full_error_message)
-            print(full_error_message)
-            return redirect('factura_detalle', cfdi_id=id_factura)
-
-    elif factura.xml_file:
-        # Retornamos el archivo XML guardado para descargar
-        response = FileResponse(factura.xml_file.open(), content_type='application/xml')
-        response['Content-Disposition'] = f'attachment; filename="factura_{id_factura}.xml"'
-        return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige al detalle
-
-    else:
-        raise Http404("El archivo XML no se encuentra.")
-
-@login_required
-@transaction.atomic
-def generar_factura_pdf(request,id_factura):
-    factura = get_object_or_404(Factura, cfdi_id=id_factura)
-    
-    # Verificar si ya existe un archivo PDF asignado
-    if not factura.pdf_file:
-    
-        response = get_cfdi_doc('pdf',id_factura)
+        # Verificar si el archivo ya existe en la base de datos
+        if (file_type == 'xml' and cfdi.xml_file) or (file_type == 'pdf' and cfdi.pdf_file):
+            # Si ya existe, retornamos el archivo guardado
+            file_field = cfdi.xml_file if file_type == 'xml' else cfdi.pdf_file
+            response = FileResponse(file_field.open(), content_type=f'application/{file_type}')
+            response['Content-Disposition'] = f'attachment; filename=CFDI_{id_factura}.{file_type}'
+            return response
         
-        # Manejar una respuesta API 
-        if response.status_code == 200:
-            
-            # Recuperar pdf de response
-            response_data = response.json()
-            pdf_content = base64.b64decode(response_data.get("Content"))
-            
-            # Guardar el archivo PDF en la carpeta media/facturas/
-            factura.pdf_file.save(f'factura_{id_factura}.pdf', ContentFile(pdf_content))
-            
-            # Guardar cambios en la instancia
-            factura.save()
-            messages.success(request, "PDF generado y asignado correctamente.")
-            return redirect('factura_detalle', cfdi_id=id_factura)  # Redirige a la vi
-        else:
-            
-            # Manejar el error si no se pudo obtener el PDF
-            error_code = response.status_code
-            error_message = response.json().get("message", "Ocurrió un error inesperado.")
-            full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
-            messages.error(request, full_error_message)
-            print(request, full_error_message)
-            # Renderizar el template de error
-            return redirect('factura_detalle', cfdi_id=id_factura)
-           
-    elif factura.pdf_file:
-        # Retornamos el archivo PDF guardado
-        return FileResponse(factura.pdf_file.open(), content_type='application/pdf')
-    
-    else:
+        # Descarga XML o PDF basado en el tipo
+        response = get_cfdi_doc(file_type, id_factura)  # Cambia a solo una llamada
+
+        if response.status_code != 200:
+            raise Http404(f"No se pudo descargar el {file_type.upper()}.")
         
-        raise Http404("El archivo PDF no se encuentra.")
+        # Decodificar el JSON de la respuesta
+        response_json = response.json()
+        
+        # Verifica que el campo 'Content' esté presente
+        if 'Content' not in response_json:
+            raise Http404("La respuesta no contiene el contenido esperado.")
+
+        # Extraer y decodificar el contenido Base64
+        file_base64 = response_json['Content']
+        file_content = base64.b64decode(file_base64)  # Decodifica de Base64 a binario
+        
+        # Guardar el archivo en la base de datos
+        if file_type == 'xml':
+            cfdi.xml_file.save(f'CFDI_{id_factura}.xml', ContentFile(file_content))
+        elif file_type == 'pdf':
+            cfdi.pdf_file.save(f'CFDI_{id_factura}.pdf', ContentFile(file_content))
+            
+        # Guardar los cambios en la factura
+        cfdi.save()
+        
+        # Determina el tipo de archivo (PDF o XML)
+        content_type = 'application/xml' if file_type == 'xml' else 'application/pdf'
+        filename = f'CFDI_{id_factura}.{file_type}'
+
+        # Crear la respuesta HTTP con el archivo
+        response = HttpResponse(file_content, content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
+
+    except Exception as e:
+        raise Http404(f"Error al descargar el documento: {str(e)}")
 
 @login_required
 @transaction.atomic
@@ -715,12 +747,14 @@ def comprobante_factura(request, cfdi_id):
                 messages.success(request, 'CFDI Comrpobante de pago timbrado correctamente.')
             if response.status_code == 400:
                 # Error de validación de la API
-                messages.error(request, "Error de validación en la API. Verifica los datos.")
+                response_data = response.json()
+                return JsonResponse({'success': False, 'message': 'Error de validación en la API. Verifica los datos.', 'response_data': response_data}, status=400)  # Método no permitido
             elif response.status_code == 500:
                 # Error interno de la API
-                messages.error(request, "Error en el servidor. Inténtalo de nuevo más tarde.")
+                response_data = response.json()
+                return JsonResponse({'success': False, 'message': 'Error en el servidor. Inténtalo de nuevo más tarde.', 'response_data': response_data}, status=400)  # Método no permitido
         else:
-            messages.error(request, "Formulario inválido. Por favor, corrige los errores.")
+            return JsonResponse({'success': False, 'errors': form.errors})  # En caso de que el formulario no sea válido
     else:
         form = ComprobantePagoForm(initial={
             'Amount': factura.total,
@@ -743,6 +777,124 @@ def CF(request):
     }
     return render(request, "cotizaciones.html", context)
 
+@login_required
+@transaction.atomic
+def download_comprobante(request, id_factura, file_type):
+    try:
+        # Obtener la factura desde la base de datos
+        cfdi = get_object_or_404(Comprobante, cfdi_id=id_factura)
+
+        # Verificar si el archivo ya existe en la base de datos
+        if (file_type == 'xml' and cfdi.xml_file) or (file_type == 'pdf' and cfdi.pdf_file):
+            # Si ya existe, retornamos el archivo guardado
+            file_field = cfdi.xml_file if file_type == 'xml' else cfdi.pdf_file
+            response = FileResponse(file_field.open(), content_type=f'application/{file_type}')
+            response['Content-Disposition'] = f'attachment; filename=CFDI_{id_factura}.{file_type}'
+            return response
+        
+        # Descarga XML o PDF basado en el tipo
+        response = get_cfdi_doc(file_type, id_factura)  # Cambia a solo una llamada
+
+        if response.status_code != 200:
+            raise Http404(f"No se pudo descargar el {file_type.upper()}.")
+        
+        # Decodificar el JSON de la respuesta
+        response_json = response.json()
+        
+        # Verifica que el campo 'Content' esté presente
+        if 'Content' not in response_json:
+            raise Http404("La respuesta no contiene el contenido esperado.")
+
+        # Extraer y decodificar el contenido Base64
+        file_base64 = response_json['Content']
+        file_content = base64.b64decode(file_base64)  # Decodifica de Base64 a binario
+        
+        # Guardar el archivo en la base de datos
+        if file_type == 'xml':
+            cfdi.xml_file.save(f'CFDI_{id_factura}.xml', ContentFile(file_content))
+        elif file_type == 'pdf':
+            cfdi.pdf_file.save(f'CFDI_{id_factura}.pdf', ContentFile(file_content))
+            
+        # Guardar los cambios en la factura
+        cfdi.save()
+        
+        # Determina el tipo de archivo (PDF o XML)
+        content_type = 'application/xml' if file_type == 'xml' else 'application/pdf'
+        filename = f'CFDI_{id_factura}.{file_type}'
+
+        # Crear la respuesta HTTP con el archivo
+        response = HttpResponse(file_content, content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        return response
+
+    except Exception as e:
+        raise Http404(f"Error al descargar el documento: {str(e)}")
+
+@login_required
+@transaction.atomic
+def send_email_view(request):
+    if request.method == 'POST':
+        form = EmailForm(request.POST)  # Crear una instancia del formulario con los datos del POST
+        if form.is_valid():  # Verificar que el formulario sea válido
+            # Obtener los datos del formulario
+            cfdi_id = form.cleaned_data['cfdi_id']  # Obtener el cfdi_id
+            recipient_emails = form.cleaned_data['emails'].split(',')
+            bcc_emails = form.cleaned_data['bcc_emails'].split(',')
+            need_factura = form.cleaned_data['need_factura']
+            need_comprobante = form.cleaned_data['need_comprobante']
+            mensaje = form.cleaned_data['mensaje']  # Obtener el mensaje
+
+            # Buscar la factura usando el cfdi_id
+            factura = get_object_or_404(Factura, cfdi_id = cfdi_id)   # Cambia 'id' por el campo correcto si es necesario
+            
+            # Verificar y crear los archivos si no existen
+            if need_factura:
+                if not factura.xml_file or not os.path.exists(factura.xml_file.path):
+                    create_and_save_fac(factura, 'xml', cfdi_id)
+
+                if not factura.pdf_file or not os.path.exists(factura.pdf_file.path):
+                    create_and_save_fac(factura, 'pdf', cfdi_id)
+                    
+            # Verificar y crear los archivos de los comprobantes si se necesitan
+            if need_comprobante:
+                comprobantes = factura.comprobantes.all()  # Obtener todos los comprobantes
+                for comprobante in comprobantes:
+                    if not comprobante.xml_file or not os.path.exists(comprobante.xml_file.path):
+                        create_and_save_comp(comprobante, 'xml', comprobante.cfdi_id)  # Cambia cfdi_id si es necesario
+
+                    if not comprobante.pdf_file or not os.path.exists(comprobante.pdf_file.path):
+                        create_and_save_comp(comprobante, 'pdf', comprobante.cfdi_id)  # Cambia cfdi_id si es necesario
+
+            # Configuración del correo
+            email = EmailMessage(
+                subject='Documentos adjuntos',
+                body=mensaje,  # Mensaje del usuario
+                from_email=EMAIL_HOST_USER,  # Cambia esto por tu correo
+                to=[email.strip() for email in recipient_emails if email.strip()],  # Limpiar espacios en blanco y eliminar correos vacíos
+                bcc=[bcc_email.strip() for bcc_email in bcc_emails if bcc_email.strip()]  # CCO
+            )
+
+            # Adjuntar documentos si se solicitan
+            if need_factura:
+                email.attach_file(factura.xml_file.path)
+                email.attach_file(factura.pdf_file.path)
+
+            if need_comprobante:
+                # Obtener todos los comprobantes asociados a la factura
+                comprobantes = factura.comprobantes.all()  # Obtener todos los comprobantes
+                for comprobante in comprobantes:
+                    email.attach_file(comprobante.xml_file.path)  # Adjuntar archivo XML
+                    email.attach_file(comprobante.pdf_file.path)  # Adjuntar archivo PDF
+
+            # Enviar el correo
+            email.send()
+            messages.success(request, "Correo enviado con éxito")
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        return JsonResponse({'success': False, 'errors': form.errors})  # En caso de que el formulario no sea válido
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)  # Método no permitido
+
 # ------------------------------- #
 #   PETICIONES A LA API FACTURAMA
 # ------------------------------- #
@@ -762,19 +914,17 @@ def crear_cfdi_api( data):
  
 def get_cfdi_doc(doc, id_factura):
     
-    url = f"https://apisandbox.facturama.mx/cfdi/{doc}/issuedLite/{id_factura}"
+    url = f"{SANDBOX_URL}/cfdi/{doc}/issuedLite/{id_factura}"
     response = requests.get(url, auth=(USERNAME, PASSWORD))
     return response
  
 def cancelar_factura_api(factura_id, motive, uuid_replacement):
-    url = f"https://apisandbox.facturama.mx/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
+    url = f"{SANDBOX_URL}/api-lite/cfdis/{factura_id}?motive={motive}&uuidReplacement={uuid_replacement}"
     
     # Realiza la llamada a la API (usa el método que necesites, por ejemplo POST)
     try:
-        username = "AranzaInade"  # nombre de usuario
-        password = "Puebla4990"
         # Solicitud al API de Facturama
-        response = requests.delete(url, auth=(username, password))
+        response = requests.delete(url, auth=(USERNAME, PASSWORD))
         if response.status_code == 200:
             # La solicitud fue exitosa
             factura = get_object_or_404(Factura, cfdi_id=factura_id)
@@ -793,5 +943,3 @@ def search_cfdi_return(id):
     url = f"{SANDBOX_URL}/api-lite/cfdis/{id}"   
     response = requests.get(url, auth=(USERNAME, PASSWORD))
     return response
-
-

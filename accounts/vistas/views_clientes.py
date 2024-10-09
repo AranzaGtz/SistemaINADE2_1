@@ -34,9 +34,6 @@ def obtener_titulos(request):
 
 # VISTA PARA DIRIGIR A INTERFAZ DE CLIENTES
 def lista_clientes(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
 
     # Parámetro de ordenamiento desde la URL
     # Ordena por 'id' como predeterminado
@@ -64,8 +61,6 @@ def lista_clientes(request):
 
     # Contexto que se pasa a la plantilla
     context = {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'personas_page': personas_page,
         'titulos': titulos,
         'empresas': empresas,

@@ -6,9 +6,6 @@ from django.core.paginator import Paginator
 
 # VISTA MOSTRAR EMPRESAS
 def empresa_cont_list(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
 
     # Parámetro de ordenamiento desde la URL
     order_by = request.GET.get('order_by', 'nombre_empresa')  # Orden por defecto
@@ -27,8 +24,6 @@ def empresa_cont_list(request):
     empresa_form = EmpresaForm()
 
     context = {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'empresas_page': empresas_page,  # Usar solo empresas_page para la tabla
         'empresa_form': empresa_form
     }

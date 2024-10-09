@@ -17,9 +17,6 @@ from weasyprint import HTML  # type: ignore
 #   VISTA PARA LA INTERFAZ DE FORMATOS
 @login_required
 def config_org(request):
-    # Notificaciones del usuario
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     organizacion = request.user.organizacion
     org_direccion = organizacion.direccion
@@ -103,8 +100,6 @@ def config_org(request):
         'formato_orden_form': formato_orden_form,
         'form': organizacion_form,
         'forms': forms,
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'formato_cotizacion': formato_cotizacion,
         'formato_orden': formato_orden,
         'organizacion': organizacion,
@@ -114,9 +109,6 @@ def config_org(request):
 
 #   VISTA PARA QUEJAS
 def enviar_queja(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     if request.method == 'POST':
         form = QuejaForm(request.POST, request.FILES)
@@ -137,8 +129,6 @@ def enviar_queja(request):
         form = QuejaForm()
         
     context = {
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'form': form
     }
     return render(request, 'accounts/organizacion/enviar_queja.html', context)

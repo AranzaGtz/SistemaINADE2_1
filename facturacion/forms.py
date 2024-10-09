@@ -39,6 +39,43 @@ METODOS_PAGO_CHOICES = [
     ("99", "99 - Por definir"),
 ]
 
+from django import forms
+
+#   FORMULARIO PARA ENVIAR CORREO CON FACTURA Y/O COMPROBANTE DE PAGO
+class EmailForm(forms.Form):
+    cfdi_id = forms.CharField(widget=forms.HiddenInput())  # Agrega este campo para el cfdi_id
+    emails = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={'placeholder': 'correo1@example.com, correo2@example.com', 'class': 'form-control form-control-sm'}),
+        label='Correos destinatarios (separados por comas):'
+    )
+    bcc_emails = forms.CharField(
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'correo3@example.com, correo4@example.com','class': 'form-control form-control-sm'}),
+        label='Correos CCO (separados por comas, opcional):'
+    )
+    need_factura = forms.BooleanField(
+        required=False,
+        label='Necesito Factura',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input', 'type':'checkbox'})  # Añadiendo una clase CSS
+    )
+    need_comprobante = forms.BooleanField(
+        required=False,
+        label='Necesito Comprobante',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input', 'type':'checkbox'})  # Añadiendo una clase CSS
+    )
+    mensaje = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'placeholder': 'Escribe tu mensaje aquí...',
+            'class': 'form-control',
+            'rows': 4  # Puedes ajustar la cantidad de filas según sea necesario
+        }),
+        label='Mensaje',
+        required=False  # Este campo es opcional
+    )
+
+
 #   FORMULARIO PARA GENERAR COMPROBANTE DE PAGO
 class ComprobantePagoForm(forms.Form):
     Date = forms.DateTimeField(label='Fecha de Pago',widget=forms.DateTimeInput(attrs={'type': 'datetime-local','class': 'form-control', 'id': 'Date'}), required=False)

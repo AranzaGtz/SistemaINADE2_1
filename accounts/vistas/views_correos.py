@@ -99,6 +99,7 @@ def confirmacion_recepcion(request):
 #   FORMULARIO PARA ORDEN DE PEDIDOS DE LOS USUARIO
 def formulario_descarga_subida(request, pk, usuario):
     cotizacion = get_object_or_404(Cotizacion, id=pk)
+
     # Intentar obtener el usuario
     try:
         usuario_obj = CustomUser.objects.get(username=usuario)
@@ -109,13 +110,13 @@ def formulario_descarga_subida(request, pk, usuario):
     if request.method == 'POST':
         form = OrdenPedidoForm(request.POST, request.FILES)
         if form.is_valid():
-            archivo = form.cleaned_data['archivo']
-            cotizacion.orden_pedido_pdf.save(archivo.name, archivo)  # Guardar el archivo correctamente
+            # Guardar el archivo directamente desde el formulario
+            cotizacion.orden_cmpra_pdf = form.cleaned_data['orden_cmpra_pdf']
             cotizacion.save()
 
             # Crear la notificación con el usuario objeto
             Notificacion.objects.create(
-                usuario=usuario_obj,  # Utiliza el objeto de usuario
+                usuario=usuario_obj,
                 tipo='orden_trabajo_subida',
                 mensaje=f'Se ha subido la orden de trabajo para la cotización {cotizacion.id}',
                 enlace=reverse('cotizacion_detalle', args=[cotizacion.id])
@@ -124,7 +125,8 @@ def formulario_descarga_subida(request, pk, usuario):
             return redirect('confirmacion_recepcion')
     else:
         form = OrdenPedidoForm()
-    return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})    
+
+    return render(request, 'accounts/correos/formulario_descarga_subida.html', {'cotizacion': cotizacion, 'form': form})   
 
 #   VISTA PARA  ENVIAR CORREO A MUESTREADOR
 def enviar_orden(request, pk, receptor):

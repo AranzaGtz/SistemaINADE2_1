@@ -27,9 +27,6 @@ ROL_DESCRIPCION = {
 # VISTA PARA DIRIGIR A INTERFAZ DE USUARIO
 @login_required
 def usuario_list(request):
-    # Notificación
-    notificaciones = request.user.notificacion_set.all()
-    notificaciones_no_leidas = notificaciones.filter(leido=False).count()
     
     # Obtener el filtro de rol de la solicitud GET, si existe
     rol = request.GET.get('rol', 'todos')
@@ -53,8 +50,6 @@ def usuario_list(request):
     context = {
         'usuarios': Lista_usuarios,
         'form': form,
-        'notificaciones': notificaciones,
-        'notificaciones_no_leidas': notificaciones_no_leidas,
         'rol_seleccionado': rol,
         'rol_descriptions': json.dumps(ROL_DESCRIPCION),  # Enviar descripciones al template
     }

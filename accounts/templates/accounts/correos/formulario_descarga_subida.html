@@ -5,47 +5,51 @@
 <head>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Descargar Cotización y Subir Orden de Trabajo | INADE</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
      {% load static %}
-     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+     <!-- Favicon -->
+     <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
+     <title>Orden de Compra | INADE</title>
+
 </head>
 
 <body>
-     <header class="navbar navbar-expand-lg navbar-light">
-          <div class="container">
-               <a class="navbar-brand" href="#">INADE Laboratorio Ambiental</a>
-          </div>
-     </header>
-     <div class="container d-flex justify-content-center align-items-center ">
-          <div class="card p-4 mt-5" style="max-width: 500px;">
-               <h1 class="text-center mb-4">Descargar Cotización y Subir Orden de Pedido</h1>
-               <p class="text-center mb-4">Por favor, descargue la cotización y suba su orden de pedido utilizando el formulario a continuación.</p>
 
-               
-               <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="text-center m-3">
-                         <input type="file" name="archivo" id="archivo" onchange="actualizarNombreArchivo(this)">
+     <header class="">
+          <nav class="navbar bg-body-tertiary fixed-top">
+               <div class="container-fluid d-flex justify-content-between align-items-center">
+                    <div class="container">
+                         <a class="navbar-brand" href="#">INADE Laboratorio Ambiental</a>
                     </div>
-                    <div class="text-center">
-                         <button type="submit" class="btn btn-success">Subir Orden de Pedido</button>
-                    </div>
-               </form>
-               <div class="text-center">
-                    <h2><strong><a class="link-primary" href="{% url 'cotizacion_pdf' cotizacion.id %}">Descargar Cotización</a></strong></h2>
                </div>
-          </div>
+          </nav>
+     </header>
+     <div class="container mt-5" style="margin-top: 200pt;">
+          <h1 class="mb-4">Descargar Cotización y Subir Orden de Pedido</h1>
+          <h5 class="mb-4">Por favor, descargue la cotización y suba su orden de pedido utilizando el formulario a
+               continuación. Para descargar la cotización puede hacer clic en el siguiente link: <strong><a
+                         class="link-primary" href="{% url 'cotizacion_pdf' cotizacion.id %}">Descargar
+                         Cotización</a></strong>
+          </h5>
+
+          {% if messages %}
+          <ul class="messages mb-4">
+               {% for message in messages %}
+               <li{% if message.tags %} class="{{ message.tags }} mb-2" {% endif %}>{{ message }}</li>
+                    {% endfor %}
+          </ul>
+          {% endif %}
+
+
+          <form method="post" enctype="multipart/form-data" id="form" >
+               {% csrf_token %}
+               {{ form.as_p }}
+               <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-primary">Cargar Orden de Compra</button>
+               </div>
+          </form>
      </div>
 
-     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-     <script>
-          function actualizarNombreArchivo(input) {
-               var nombreArchivo = input.files[0].name;
-               document.getElementById('nombre-archivo').textContent = nombreArchivo;
-          }
-     </script>
 </body>
 
 </html>

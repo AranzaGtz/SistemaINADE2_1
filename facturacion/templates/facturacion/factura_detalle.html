@@ -3,7 +3,10 @@
 {% block title %}Facturas{% endblock %}
 {% block header %}Facturas{% endblock %}
 {% block content %}
-<div class="container">
+<div class="container-xxl">
+
+
+
      <!-- SECCION DE TITULO ENCABEZANDO -->
      <div class="row">
           <div class="col">
@@ -15,56 +18,58 @@
      <div class="dropdown text-end dropleft m-3">
           <!-- Botón para activar el dropdown -->
           <button class="btn btn-success dropdown-toggle mt-3" type="button" id="dropdownMenuButton"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              Acciones para factura
+               data-bs-toggle="dropdown" aria-expanded="false">
+               Acciones para factura
           </button>
           <!-- Elementos del dropdown -->
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               <!-- {% if factura.pdf_file and factura.xml_file %}
+
+               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img src="{% static 'img/envelope.svg' %}" > Enviar por correo</button>
           
+               {% endif %} -->
+
+               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img
+                         src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
+
                {% if factura.estado == 'active' %}
-               
-                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI">Cancelar factura</button>
-                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI">Generar comprobante de pago</button>
-                    <li>
-                         <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
-                              {% if factura.pdf_file %}
-                                   Descargar PDF
-                              {% else %}
-                                   Generar PDF
-                              {% endif %}
-                         </a>
-                    </li>
-                    <li>
-                         <a class="dropdown-item" href="{% url 'generar_factura_xml' factura.cfdi_id %}">
-                              {% if factura.xml_file %}
-                                   Descargar XML
-                              {% else %}
-                                   Generar XML
-                              {% endif %}
-                         </a>
-                    </li>
+
+               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI"><img
+                         src="{% static 'img/x-circle.svg' %}"> Cancelar factura</button>
+               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI"><img
+                         src="{% static 'img/plus-circle.svg' %}"> Generar comprobante de pago</button>
+               <li>
+                    <a class="dropdown-item"
+                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}" target="_blank">
+                         <img src="{% static 'img/download.svg' %}">
+                         Descargar PDF
+                    </a>
+               </li>
+               <li>
+                    <a class="dropdown-item"
+                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='xml' %}">
+                         <img src="{% static 'img/download.svg' %}">
+                         Descargar XML
+                    </a>
+               </li>
                {% else %}
-                    <li>
-                         <a class="dropdown-item" href="{% url 'generar_factura_pdf' factura.cfdi_id %}" target="_blank">
-                              {% if factura.pdf_file %}
-                                   Descargar PDF
-                              {% else %}
-                                   Generar PDF
-                              {% endif %}
-                         </a>
-                    </li>
-                    <li>
-                         <a class="dropdown-item" href="{% url 'generar_factura_xml' factura.cfdi_id %}">
-                              {% if factura.xml_file %}
-                                   Descargar XML
-                              {% else %}
-                                   Generar XML
-                              {% endif %}
-                         </a>
-                    </li>
+               <li>
+                    <a class="dropdown-item"
+                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}" target="_blank">
+                         <img src="{% static 'img/download.svg' %}">
+                         Descargar PDF
+                    </a>
+               </li>
+               <li>
+                    <a class="dropdown-item"
+                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='xml' %}">
+                         <img src="{% static 'img/download.svg' %}">
+                         Descargar XML
+                    </a>
+               </li>
                {% endif %}
           </ul>
-      </div>
+     </div>
      <table class="table table-bordered">
           <thead>
                <tr>
@@ -146,20 +151,38 @@
 
      <div id="comprobantes-container" class="mt-4">
           {% for comprobante in comprobantes %}
-              <div class="card mb-3">
-                  <div class="card-body">
-                      <h5 class="card-title">Comprobante - Folio: {{ comprobante.folio }}</h5>
-                      <p class="card-text"><strong>Monto Pagado:</strong> ${{ comprobante.monto_pagado }}</p>
-                      <p class="card-text"><strong>Fecha de Pago:</strong> {{ comprobante.fecha_pago }}</p>
-                      <p class="card-text"><strong>Método de Pago:</strong> {{ comprobante.metodo_pago }}</p>
-                  </div>
-              </div>
+          <div class="card mb-3">
+               <div class="card-body">
+                    <div class="row">
+                         <div class="col">
+                              <h5 class="card-title">Comprobante - Folio: {{ comprobante.folio }}</h5>
+                              <p class="card-text"><strong>CFDI id:</strong> {{ comprobante.cfdi_id }}</p>
+                              <p class="card-text"><strong>Monto Pagado:</strong> ${{ comprobante.monto_pagado }}</p>
+                              <p class="card-text"><strong>Fecha de Pago:</strong> {{ comprobante.fecha_pago }}</p>
+                              <p class="card-text"><strong>Método de Pago:</strong> {{ comprobante.metodo_pago }}</p>
+                         </div>
+                         <div class="col col-3">
+                              <a href="{% url 'download_comprobante' id_factura=comprobante.cfdi_id file_type='xml' %}"
+                                   class="btn btn-primary m-1">
+                                   <img src="{% static 'img/download.svg' %}" style="filter: invert(1);">
+                                   Descarga XML
+                              </a>
+                              <a href="{% url 'download_comprobante' id_factura=comprobante.cfdi_id file_type='pdf' %}"
+                                   class="btn btn-primary m-1">
+                                   <img src="{% static 'img/download.svg' %}" style="filter: invert(1);">
+                                   Descarga PDF
+                              </a>
+                         </div>
+                    </div>
+
+               </div>
+          </div>
           {% empty %}
-              <div class="alert alert-warning" role="alert">
-                  No hay comprobantes disponibles para esta factura.
-              </div>
+          <div class="alert alert-warning" role="alert">
+               No hay comprobantes disponibles para esta factura.
+          </div>
           {% endfor %}
-      </div>
+     </div>
 
 </div>
 
@@ -188,6 +211,13 @@
                               <input type="hidden" name="factura_id" value="{{ factura.cfdi_id }}">
                          </div>
                     </form>
+                    <!-- Spinner -->
+                    <div id="loading2" style="display: none;" class="text-center">
+                         <div class="spinner-border" role="status">
+                              <span class="visually-hidden">Cargando...</span>
+                         </div>
+                         <p>Por favor, espera...</p>
+                    </div>
                </div>
 
                <div class="modal-footer">
@@ -263,6 +293,13 @@
                          </div>
 
                     </form>
+                    <!-- Spinner -->
+                    <div id="loading1" style="display: none;" class="text-center">
+                         <div class="spinner-border" role="status">
+                              <span class="visually-hidden">Cargando...</span>
+                         </div>
+                         <p>Por favor, espera...</p>
+                    </div>
                </div>
                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -272,7 +309,100 @@
      </div>
 </div>
 
+<!-- Modal para enviar correo -->
+<div class="modal fade" id="EnviarCFDI" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+          <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Eviando Factura</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               
+               <div class="modal-body">
+                    
+                    <form action="{% url 'send_email_view' %}" method="POST" id="EmailForm">
+                         {% csrf_token %}
+                         <!-- Campo oculto para cfdi_id -->
+                         <input type="hidden" name="cfdi_id" id="cfdi_id" value="{{ factura.cfdi_id }}">
+                         <div class="form-group">
+                              {{ form_email.emails.label }}
+                              {{ form_email.emails }} <!-- Campo para correos destinatarios -->
+                              <small class="form-text text-muted">Ingrese los correos separados por comas.</small>
+                         </div>
+                         <div class="form-group">
+                              {{ form_email.bcc_emails.label }}
+                              {{ form_email.bcc_emails }} <!-- Campo para correos CCO -->
+                              <small class="form-text text-muted">Ingrese los correos CCO separados por comas (opcional).</small>
+                         </div>
+                         <div class="form-check">
+                              {{ form_email.need_factura }} <!-- Checkbox de factura -->
+                              <label class="form-check-label" for="{{ form.need_factura.id_for_label }}">
+                                   {{ form_email.need_factura.label }}
+                              </label>
+                         </div>
+                         <div class="form-check">
+                              {{ form_email.need_comprobante }} <!-- Checkbox de comprobante -->
+                              <label class="form-check-label" for="{{ form.need_comprobante.id_for_label }}">
+                                   {{ form_email.need_comprobante.label }}
+                              </label>
+                         </div>
+                         <div class="form-group">
+                              {{ form_email.mensaje.label }}
+                              {{ form_email.mensaje }} <!-- Campo para el mensaje -->
+                              <small class="form-text text-muted">Este mensaje se incluirá en el correo.</small>
+                         </div>
+                    </form>
+                    <!-- Spinner -->
+                    <div id="loading" style="display: none;" class="text-center">
+                         <div class="spinner-border" role="status">
+                              <span class="visually-hidden">Cargando...</span>
+                         </div>
+                         <p>Por favor, espera...</p>
+                    </div>
+               </div>
+
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" form="EmailForm">Enviar</button>
+               </div>
+          </div>
+     </div>
+</div>
+
+{% if not comprobantes %}
 <script>
+     document.getElementById("{{ form_email.need_comprobante.id_for_label }}").disabled = true;  // Deshabilitar checkbox
+</script>
+{% endif %}
+
+<script>
+
+     document.addEventListener('DOMContentLoaded', function () {
+          const form = document.getElementById('cancelarCFDIForm'); // Reemplaza con el ID de tu formulario
+
+          form.addEventListener('submit', function () {
+               // Muestra el spinner
+               document.getElementById('loading2').style.display = 'block';
+          });
+     });
+
+     document.addEventListener('DOMContentLoaded', function () {
+          const form = document.getElementById('ComprobantePagoForm'); // Reemplaza con el ID de tu formulario
+
+          form.addEventListener('submit', function () {
+               // Muestra el spinner
+               document.getElementById('loading1').style.display = 'block';
+          });
+     });
+
+     document.addEventListener('DOMContentLoaded', function () {
+          const form = document.getElementById('EmailForm'); // Reemplaza con el ID de tu formulario
+
+          form.addEventListener('submit', function () {
+               // Muestra el spinner
+               document.getElementById('loading').style.display = 'block';
+          });
+     });
 
      document.addEventListener("DOMContentLoaded", function() {
           const paymentSelect = document.getElementById("PaymentForm");

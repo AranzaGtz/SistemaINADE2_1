@@ -287,9 +287,17 @@ class OrganizacionForm(forms.ModelForm):
     optional = ['nombre','slogan', 'telefono', 'pagina_web', 'logo']
 
 #   FORMULARIO PARA QUE USUARIO SUBA ORDEN DE TRABAJO
-class OrdenPedidoForm(forms.Form):
-    archivo = forms.FileField(
-        widget=forms.FileInput(attrs={'class': 'custom-file-input','id': 'archivo', 'onchange': 'actualizarNombreArchivo(this)'}),label='')
+class OrdenPedidoForm(forms.ModelForm):
+    class Meta:
+        model = Cotizacion
+        fields = ['orden_cmpra_pdf']
+        widgets = {
+            'orden_cmpra_pdf' : forms.ClearableFileInput(attrs={'class': 'form-control','id': 'archivo'}),
+        }
+        labels = {
+            'orden_cmpra_pdf' : 'Archivo Orden de compra'
+        }
+        
 
 #   FORMULARIO PARA ORDEN DE TRABAJO
 class OrdenTrabajoForm(forms.ModelForm):
