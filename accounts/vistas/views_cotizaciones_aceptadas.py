@@ -45,7 +45,7 @@ def cotizaciones_aceptadas_list(request):
     cotizaciones = Cotizacion.objects.filter(estado=True).prefetch_related('orden_trabajo').order_by(order_by)
     
     # Paginación
-    paginator = Paginator(cotizaciones, 50) # Mostrar 50 cotizaciones aceptadas por página
+    paginator = Paginator(cotizaciones, 10) # Mostrar 12 cotizaciones aceptadas por página
     page_number = request.GET.get('page')
     cotizaciones_page = paginator.get_page(page_number)
     

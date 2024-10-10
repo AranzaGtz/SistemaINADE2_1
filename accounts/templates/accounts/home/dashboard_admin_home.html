@@ -17,7 +17,33 @@
 </style>
 
 <div class="container-xxl">
-    <h1 class="mb-5">Bienvenidos a SistemaINADE2</h1>
+
+    <div class="container mt-4 mb-4">
+        <h4 class="mb-4">Cotizaciones</h4>
+
+        <div class="progress mb-3" style="height: 30px;">
+            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%;"
+                id="progressBar">
+                0%
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total de Cotizaciones:
+                        <span class="badge bg-primary rounded-pill">{{ total_cotizaciones }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Cotizaciones Aceptadas:
+                        <span class="badge bg-success rounded-pill">{{ cotizaciones_aceptadas }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
     <div class="d-flex flex-wrap justify-content-center">
         <!-- BOTON PARA CREAR CLIENTES -->
         <a href="{% url 'lista_clientes' %}" class="text-decoration-none">
@@ -128,34 +154,7 @@
             </div>
         </a>
     </div>
-    <div class="container mt-4 mb-4">
-        <h4 class="mb-4">Cotizaciones</h4>
-
-        <div class="progress mb-3" style="height: 30px;">
-            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%;"
-                id="progressBar">
-                0%
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-body">
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Total de Cotizaciones:
-                        <span class="badge bg-primary rounded-pill">{{ total_cotizaciones }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        Cotizaciones Aceptadas:
-                        <span class="badge bg-success rounded-pill">{{ cotizaciones_aceptadas }}</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-
-
-    </div>
+    
 </div>
 
 <script>

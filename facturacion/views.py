@@ -196,17 +196,37 @@ def factura_detalle(request, cfdi_id):
             'RfcReceiverBeneficiaryAccount': factura.cliente.empresa.rfc
         })
     form_send_email = EmailForm()
-    
-    context = {
-        'factura' : factura,
-        'id': f'{factura.id:04}',
-        'comprobantes': comprobantes,
-        'form_cancel': form_cancel,
-        'form' : form,
-        'form_email': form_send_email,
-    }
-    
-    return render(request, 'facturacion/factura_detalle.html', context)
+ 
+    response = search_cfdi_return(factura.cfdi_id)
+    # Convertir la respuesta JSON a un diccionario de Python
+    data = response.json()
+    # Verificar si la solicitud fue exitosa
+    if response.status_code == 200:
+        
+        # Acceder a información específica
+        Receiver = data.get('Receiver',{})
+        items = data.get('Items', [])  # Lista de items
+        Taxes = data.get('Taxes',[])
+
+        context = {
+            'factura' : factura,
+            'id': f'{factura.id:04}',
+            'comprobantes': comprobantes,
+            'form_cancel': form_cancel,
+            'form' : form,
+            'form_email': form_send_email,
+            'items': items,
+            'Receiver':Receiver,
+            'data': data,
+            'Taxes': Taxes,
+        }
+        
+        return render(request, 'facturacion/factura_detalle.html', context)
+    else:
+        print(f"Error en la solicitud: Código de estado {response.status_code}")
+        return JsonResponse({'success': False, 'status': response.status_code, 'data':data})
+
+
 
 def create_and_save_fac (cfdi, file_type, id_factura):
     

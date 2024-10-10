@@ -3,7 +3,7 @@
 {% block title %}Facturas{% endblock %}
 {% block header %}Facturas{% endblock %}
 {% block content %}
-<div class="container">
+<div class="container-xxl">
      <!-- SECCION DE TITULO ENCABEZANDO -->
      <div class="row">
           <div class="col">
@@ -25,44 +25,9 @@
      </div>
      <div class="row mb-3 justify-content-end">
           <div class="col-auto">
-               <a href="/" class="btn btn-primary mx-1">Nueva Factura</a>
+               <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#NewFac">Nueva Factura</button>
           </div>
      </div>
-     <table border="1">
-          <thead>
-              <tr>
-                  <th>ID</th>
-                  <th>Tipo</th>
-                  <th>Folio</th>
-                  <th>Serie</th>
-                  <th>Nombre Fiscal</th>
-                  <th>RFC</th>
-                  <th>RFC Emisor</th>
-                  <th>Fecha</th>
-                  <th>Subtotal</th>
-                  <th>Total</th>
-                  <th>Estatus</th>
-              </tr>
-          </thead>
-          <tbody>
-              {% for factura in cdfis %}
-                  <tr>
-                      <td>{{ factura.Id }}</td>
-                      <td>{{ factura.Type }}</td>
-                      <td>{{ factura.Folio }}</td>
-                      <td>{{ factura.Serie }}</td>
-                      <td>{{ factura.TaxName }}</td>
-                      <td>{{ factura.Rfc }}</td>
-                      <td>{{ factura.RfcIssuer }}</td>
-                      <td>{{ factura.Date }}</td>
-                      <td>{{ factura.Subtotal }}</td>
-                      <td>{{ factura.Total }}</td>
-                      <td>{{ factura.Status }}</td>
-                  </tr>
-              {% endfor %}
-          </tbody>
-      </table>
-
 
      <!-- TABLA -->
     <div class="row">
@@ -73,9 +38,9 @@
                          <thead class="thead-light">
                               <tr>
                                    
-                                   <th colspan="2" ><a href="" class="link-secondary">Factura</a></th>
+                                   <th colspan="1"><a href="" class="link-secondary">Factura</a></th>
                                    <th><a href="" class="link-secondary">Fecha</a></th>
-                                   <th><a href="" class="link-secondary">Emisor</a></th>
+                                   <th><a href="" class="link-secondary">Cliente</a></th>
                                    <th><a href="" class="link-secondary">Importe</a></th>
                                    <th><a href="" class="link-secondary">Estado</a></th>
                                    <th></th>
@@ -85,13 +50,19 @@
                          <tbody>
                               {% for factura in facturas %}
                               <tr>
-                                   <td><a href="">{{ factura.id }}</a></td>
-                                   <td>{{ factura.cfdi_id}}</td>
-                                   <td>{{ factura.fecha_creacion}}</td>
-                                   <td>{{ factura.emisor}}</td>
+                                   <td>
+                                        <div class="row">
+                                             <a href="">{{ factura.id }}</a><br>
+                                             <div class="col small">
+                                                  {{ factura.cfdi_id}}
+                                             </div>
+                                        </div>
+                                   </td>
+                                   <td>{{ factura.fecha_creacion|date:"d/m/y H:i" }}</td>
+                                   <td>{{ factura.cliente.empresa.nombre_empresa}}</td>
                                    <td>$ {{ factura.total}}</td>
                                    <td>{{ factura.estado}}</td>
-                                   <th><a href="{% url 'factura_detalle' factura.cfdi_id %}" class="btn btn-primary btn-sm">Detalles</a></th>
+                                   <td><a href="{% url 'factura_detalle' factura.cfdi_id %}" class="btn btn-primary btn-sm">Detalles</a></td>
                               </tr>
                               {% endfor %}
                          </tbody>
@@ -99,5 +70,38 @@
                </div>
           </div> 
     </div>
+</div>
+
+
+<!-- Modal para Crear nueva factura cfdi -->
+<div class="modal fade" id="NewFac" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+     <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+               <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Ordenes de trabajo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+
+               <div class="modal-body">
+
+                    <form action="{% url 'cancelar_factura' %}" method="POST" id="cancelarCFDIForm">
+                         
+                    
+                    </form>
+                    <!-- Spinner -->
+                    <div id="loading2" style="display: none;" class="text-center">
+                         <div class="spinner-border text-secondary" role="status">
+                              <span class="visually-hidden">Cargando...</span>
+                         </div>
+                         <p>Por favor, espera...</p>
+                    </div>
+               </div>
+
+               <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" form="cancelarCFDIForm">Facturar</button>
+               </div>
+          </div>
+     </div>
 </div>
 {% endblock %}

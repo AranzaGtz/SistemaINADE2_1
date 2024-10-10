@@ -5,12 +5,7 @@
 {% block header %}Clientes{% endblock %}
 {% block content %}
 
-<div class="container">
-    {% if personas == 0 %}
-    <div class="alert alert-warning" role="alert">
-        <strong>¡Atención!</strong> No tienes ningún cliente agregado, por favor agrega uno.
-    </div>
-    {% endif %}
+<div class="container-xxl">
 
     <div class="row">
         <div class="col">
@@ -51,8 +46,9 @@
                         <th><a class="link-secondary" href="?order_by=id">#</a></th>
                         <th colspan="3"><a class="link-secondary" href="?order_by=nombre">Cliente</a></th>
                         <th><a class="link-secondary" href="?order_by=empresa__nombre_empresa">Empresa</a></th>
-                        <th><a class="link-secondary" href="?order_by=informacion_contacto__correo_electronico">Correo</a></th>
-                        <th colspan="4"></th>
+                        <th><a class="link-secondary" href="?order_by=informacion_contacto__correo_electronico">Correo</a>
+                        </th>
+                        <th colspan="1"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,9 +60,13 @@
                         <td>{{ persona.apellidos }}</td>
                         <td>{{ persona.empresa.nombre_empresa }}</td>
                         <td>{{ persona.informacion_contacto.correo_electronico }}</td>
-                        <td><a href="{% url 'cotizacion_form' persona.id %}" class="btn btn-success btn-sm">Cotizar</a></td>
-                        <td><a href="{% url 'cliente_edit' persona.id %}" class="btn btn-primary btn-sm">Editar</a></td>
-                        <td><a href="#" onclick="eliminarCliente({{ persona.id }})" class="btn btn-danger btn-sm">Eliminar</a></td>
+                        <td>
+                            <a href="{% url 'cotizacion_form' persona.id %}" class="btn btn-success btn-sm">Cotizar</a>
+                            <a href="{% url 'cliente_edit' persona.id %}" class="btn btn-primary btn-sm"><img
+                                    src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);"></a>
+                            <a href="#" onclick="eliminarCliente({{ persona.id }})" class="btn btn-danger btn-sm"><img
+                                    src="{% static 'img/x-square.svg' %}" style="filter: invert(1);"></a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -74,19 +74,39 @@
         </div>
     </div>
 
-    <p>Número de clientes: {{ personas }}</p>
-
-    <div class="pagination">
-        {% if personas_page.has_previous %}
-        <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-        <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
-        {% endif %}
-        <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.</div>
-        {% if personas_page.has_next %}
-        <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
-        <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
-        {% endif %}
+    <div class="container-xxl">
+        <div class="alert alert-info" role="alert">
+            <strong>Número de cotizaciones:</strong> {{ personas }}
+        </div>
+        <nav aria-label="Paginación de cotizaciones">
+            <ul class="pagination justify-content-center">
+                {% if personas_page.has_previous %}
+                <li class="page-item">
+                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Anterior</a>
+                </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.</div>
+                </li>
+                {% if personas_page.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+    
+        </nav>
     </div>
+</div>
 
     <!-- Modal para crear un nuevo cliente -->
     <div class="modal fade" id="createClienteModal" tabindex="-1" aria-labelledby="createClienteLabel" aria-hidden="true">
@@ -199,6 +219,7 @@
             </div>
         </div>
     </div>
+    
     <!-- Mostrar errores del formulario -->
     {% if persona_form.errors %}
         <div class="alert alert-danger">
@@ -210,7 +231,7 @@
             </ul>
         </div>
     {% endif %}
-</div>
+
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

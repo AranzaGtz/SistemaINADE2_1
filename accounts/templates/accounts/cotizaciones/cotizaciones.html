@@ -4,7 +4,7 @@
 {% block header %}Cotizaciones{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="container-xxl">
     <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
     <div class="row">
         <div class="col">
@@ -36,57 +36,72 @@
             <a href="{% url 'cotizaciones_aceptadas_list' %}" class="btn btn-info mb-3">Ver Proyectos</a>
         </div>
     </div>
-    <!-- TABLA -->
-    <div class="row">
-        <div class="col">
-            <div class="table-responsive" style="min-height: 75vh; overflow-y: auto;">
-                <table id="cotizacionesTable" class="table table-hover">
-                    <!-- ENCABEZADO DE TABLA -->
-                    <thead class="thead-light">
-                        <tr>
-                            <th><a href="?order_by=id_personalizado" class="link-secondary">Cotización</a></th>
-                            <th><a href="?order_by=persona__empresa__nombre_empresa" class="link-secondary">Empresa</a></th>
-                            <th colspan="3">Contacto</th>
-                            <th><a href="?order_by=fecha_solicitud" class="link-secondary">Solicitud</a></th>
-                            <th><a href="?order_by=fecha_caducidad" class="link-secondary">Expiración</a></th>
-                            <th><a href="?order_by=metodo_pago" class="link-secondary">Moneda</a></th>
-                            <th><a href="?order_by=estado" class="link-secondary">Estado</a></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <!-- CUERPO DE TABLA -->
-                    <tbody>
-                        {% for c in cotizaciones_page %}
-                        <tr>
-                            <td><a href="{% url 'cotizacion_detalle' c.id %}" class="link-success">{{ c.id_personalizado }}</a></td>
-                            <td>{{ c.persona.empresa.nombre_empresa }}</td>
-                            <td>{{ c.persona.titulo.abreviatura }} </td>
-                            <td>{{ c.persona.nombre }} </td>
-                            <td>{{ c.persona.apellidos }}</td>
-                            <td>{{ c.fecha_solicitud|date:"d/m/Y" }}</td>
-                            <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
-                            <td>{{ c.metodo_pago }}</td>
-                            <td>{% if c.estado %} Aceptado {% else %} No aceptado {% endif %}</td>
-                            <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
 
-            <p>Número de cotizaciones: {{cotizaciones.count}}</p>
-            <div class="pagination">
-                {% if cotizaciones_page.has_previous %}
-                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm mr-2">Primera</a>
-                    <a href="?page={{ cotizaciones_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm mr-2">Anterior</a>
-                {% endif %}
-                <div class="m-1 mr-2">Página {{ cotizaciones_page.number }} de {{ cotizaciones_page.paginator.num_pages }}.</div> 
-                {% if cotizaciones_page.has_next %}
-                    <a href="?page={{ cotizaciones_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm mr-2">Siguiente</a>
-                    <a href="?page={{ cotizaciones_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
-                {% endif %}
-            </div>
+
+    <!-- TABLA -->
+    <div class="table-responsive">
+        <table id="cotizacionesTable" class="table table-hover">
+            <!-- ENCABEZADO DE TABLA -->
+            <thead class="thead-light">
+                <tr>
+                    <th><a href="?order_by=id_personalizado" class="link-secondary">Cotización</a></th>
+                    <th><a href="?order_by=persona__empresa__nombre_empresa" class="link-secondary">Empresa</a></th>
+                    <th colspan="3">Contacto</th>
+                    <th><a href="?order_by=fecha_solicitud" class="link-secondary">Solicitud</a></th>
+                    <th><a href="?order_by=fecha_caducidad" class="link-secondary">Expiración</a></th>
+                    <th><a href="?order_by=metodo_pago" class="link-secondary">Moneda</a></th>
+                    <th><a href="?order_by=estado" class="link-secondary">Estado</a></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <!-- CUERPO DE TABLA -->
+            <tbody>
+                {% for c in cotizaciones_page %}
+                <tr>
+                    <td><a href="{% url 'cotizacion_detalle' c.id %}" class="link-success">{{ c.id_personalizado }}</a></td>
+                    <td>{{ c.persona.empresa.nombre_empresa }}</td>
+                    <td>{{ c.persona.titulo.abreviatura }} </td>
+                    <td>{{ c.persona.nombre }} </td>
+                    <td>{{ c.persona.apellidos }}</td>
+                    <td>{{ c.fecha_solicitud|date:"d/m/Y" }}</td>
+                    <td>{{ c.fecha_caducidad|date:"d/m/Y" }}</td>
+                    <td>{{ c.metodo_pago }}</td>
+                    <td>{% if c.estado %} Aceptado {% else %} No aceptado {% endif %}</td>
+                    <td><a href="{% url 'cotizacion_detalle' c.id %}" class="btn btn-primary btn-sm">Detalles</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-xxl">
+        <div class="alert alert-info" role="alert">
+            <strong>Número de cotizaciones:</strong> {{ cotizaciones.count }}
         </div>
+        
+        <nav aria-label="Paginación de cotizaciones">
+            <ul class="pagination justify-content-center">
+                {% if cotizaciones_page.has_previous %}
+                    <li class="page-item">
+                        <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a href="?page={{ cotizaciones_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
+                    </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <div class="page-link">Página {{ cotizaciones_page.number }} de {{ cotizaciones_page.paginator.num_pages }}.</div>
+                </li>
+                {% if cotizaciones_page.has_next %}
+                    <li class="page-item">
+                        <a href="?page={{ cotizaciones_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
+                    </li>
+                    <li class="page-item">
+                        <a href="?page={{ cotizaciones_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}

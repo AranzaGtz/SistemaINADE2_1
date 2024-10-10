@@ -5,183 +5,233 @@
 {% block content %}
 <div class="container-xxl">
 
-
-
      <!-- SECCION DE TITULO ENCABEZANDO -->
      <div class="row">
           <div class="col">
-               <h1 class="text-center">Factura {{ id }} </h1>
-               <hr />
+               <h1 class="text-start">Factura {{ id }} </h1>
           </div>
-     </div>
-     <!-- BOTONES DE ACCIÓN -->
-     <div class="dropdown text-end dropleft m-3">
-          <!-- Botón para activar el dropdown -->
-          <button class="btn btn-success dropdown-toggle mt-3" type="button" id="dropdownMenuButton"
-               data-bs-toggle="dropdown" aria-expanded="false">
-               Acciones para factura
-          </button>
-          <!-- Elementos del dropdown -->
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-               <!-- {% if factura.pdf_file and factura.xml_file %}
+          <div class="col">
+               <!-- BOTONES DE ACCIÓN -->
+               <div class="dropdown text-end dropleft ">
+                    <!-- Botón para activar el dropdown -->
+                    <button class="btn btn-success dropdown-toggle " type="button" id="dropdownMenuButton"
+                         data-bs-toggle="dropdown" aria-expanded="false">
+                         Acciones para factura
+                    </button>
+                    <!-- Elementos del dropdown -->
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                         
 
-               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img src="{% static 'img/envelope.svg' %}" > Enviar por correo</button>
-          
-               {% endif %} -->
+                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img
+                                   src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
 
-               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img
-                         src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
+                         {% if factura.estado == 'active' %}
 
-               {% if factura.estado == 'active' %}
-
-               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI"><img
-                         src="{% static 'img/x-circle.svg' %}"> Cancelar factura</button>
-               <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI"><img
-                         src="{% static 'img/plus-circle.svg' %}"> Generar comprobante de pago</button>
-               <li>
-                    <a class="dropdown-item"
-                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}" target="_blank">
-                         <img src="{% static 'img/download.svg' %}">
-                         Descargar PDF
-                    </a>
-               </li>
-               <li>
-                    <a class="dropdown-item"
-                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='xml' %}">
-                         <img src="{% static 'img/download.svg' %}">
-                         Descargar XML
-                    </a>
-               </li>
-               {% else %}
-               <li>
-                    <a class="dropdown-item"
-                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}" target="_blank">
-                         <img src="{% static 'img/download.svg' %}">
-                         Descargar PDF
-                    </a>
-               </li>
-               <li>
-                    <a class="dropdown-item"
-                         href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='xml' %}">
-                         <img src="{% static 'img/download.svg' %}">
-                         Descargar XML
-                    </a>
-               </li>
-               {% endif %}
-          </ul>
-     </div>
-     <table class="table table-bordered">
-          <thead>
-               <tr>
-                    <th colspan="2" class="text-center">FACTURA</th>
-               </tr>
-          </thead>
-          <tbody>
-               <tr>
-                    <th scope="row">ID</th>
-                    <td>factura {{ id }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">CFDI ID</th>
-                    <td> {{ factura.cfdi_id }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Orden de Trabajo</th>
-                    <td> {{ factura.orden }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Receptor / Cliente</th>
-                    <td> {{ factura.cliente.empresa.nombre_empresa }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Tipo Moneda</th>
-                    <td> {{ factura.tipo_moneda }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Uso CFDI</th>
-                    <td> {{ factura.uso_cfdi }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Forma de Pago</th>
-                    <td> {{ factura.forma_pago }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Metodo de Pago</th>
-                    <td> {{ factura.metodo_pago }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">ExchangeRate</th>
-                    <td> {{ factura.ExchangeRate }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Descuento</th>
-                    <td> {{ factura.Discount }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Subtotal</th>
-                    <td> {{ factura.subtotal }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Tasa IVA</th>
-                    <td> {{ factura.tasa_iva }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">IVA</th>
-                    <td> {{ factura.iva }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Total</th>
-                    <td> {{ factura.total }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Fecha</th>
-                    <td> {{ factura.fecha_creacion }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">Estado</th>
-                    <td> {{ factura.estado }}</td>
-               </tr>
-               <tr>
-                    <th scope="row">ExpeditionPlace</th>
-                    <td> {{ factura.ExpeditionPlace }}</td>
-               </tr>
-
-          </tbody>
-     </table>
-
-     <div id="comprobantes-container" class="mt-4">
-          {% for comprobante in comprobantes %}
-          <div class="card mb-3">
-               <div class="card-body">
-                    <div class="row">
-                         <div class="col">
-                              <h5 class="card-title">Comprobante - Folio: {{ comprobante.folio }}</h5>
-                              <p class="card-text"><strong>CFDI id:</strong> {{ comprobante.cfdi_id }}</p>
-                              <p class="card-text"><strong>Monto Pagado:</strong> ${{ comprobante.monto_pagado }}</p>
-                              <p class="card-text"><strong>Fecha de Pago:</strong> {{ comprobante.fecha_pago }}</p>
-                              <p class="card-text"><strong>Método de Pago:</strong> {{ comprobante.metodo_pago }}</p>
-                         </div>
-                         <div class="col col-3">
-                              <a href="{% url 'download_comprobante' id_factura=comprobante.cfdi_id file_type='xml' %}"
-                                   class="btn btn-primary m-1">
-                                   <img src="{% static 'img/download.svg' %}" style="filter: invert(1);">
-                                   Descarga XML
+                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI"><img
+                                   src="{% static 'img/x-circle.svg' %}"> Cancelar factura</button>
+                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI"><img
+                                   src="{% static 'img/plus-circle.svg' %}"> Generar comprobante de pago</button>
+                         <li>
+                              <a class="dropdown-item"
+                                   href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}"
+                                   target="_blank">
+                                   <img src="{% static 'img/download.svg' %}">
+                                   Descargar PDF
                               </a>
-                              <a href="{% url 'download_comprobante' id_factura=comprobante.cfdi_id file_type='pdf' %}"
-                                   class="btn btn-primary m-1">
-                                   <img src="{% static 'img/download.svg' %}" style="filter: invert(1);">
-                                   Descarga PDF
+                         </li>
+                         <li>
+                              <a class="dropdown-item"
+                                   href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='xml' %}">
+                                   <img src="{% static 'img/download.svg' %}">
+                                   Descargar XML
                               </a>
-                         </div>
-                    </div>
-
+                         </li>
+                         {% else %}
+                         <li>
+                              <a class="dropdown-item"
+                                   href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}"
+                                   target="_blank">
+                                   <img src="{% static 'img/download.svg' %}">
+                                   Descargar PDF
+                              </a>
+                         </li>
+                         <li>
+                              <a class="dropdown-item"
+                                   href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='xml' %}">
+                                   <img src="{% static 'img/download.svg' %}">
+                                   Descargar XML
+                              </a>
+                         </li>
+                         {% endif %}
+                    </ul>
                </div>
           </div>
-          {% empty %}
-          <div class="alert alert-warning" role="alert">
-               No hay comprobantes disponibles para esta factura.
+     </div>
+     <hr />
+
+     <ul class="nav nav-tabs">
+          <li class="nav-item">
+               <a class="nav-link active" href="#info" data-bs-toggle="tab">Información</a>
+          </li>
+          <li class="nav-item">
+               <a class="nav-link " href="#cop" data-bs-toggle="tab">Pagos</a>
+          </li>
+          <li class="nav-item">
+               <a class="nav-link" href="#docs" data-bs-toggle="tab">Archivos</a>
+          </li>
+     </ul>
+
+     <div class="tab-content">
+
+          <!-- Pestaña información -->
+          <div class="tab-pane fade show active" id="info">
+
+               <div class="row">
+                    <div class="col col-lg-9">
+
+                         <!-- Card de información con estilos mejorados de Bootstrap -->
+                         <div class="card border-light mb-3 mt-4">
+                              <div class="card-header">Información</div>
+                              <div class="card-body">
+
+                                   <div class="row card-text">
+                                        <div class="col-md-6 mb-3">
+                                             <strong>Factura</strong> <br>
+                                             <p class="mb-2"><i class="bi bi-calendar-date"></i> Fecha: {{ data.Date }}
+                                             </p>
+                                             <p class="mb-2"><i class="bi bi-info-circle"></i> Estatus:
+                                                  {{ data.Status }}
+                                             </p>
+                                             <p class="mb-2"><i class="bi bi-credit-card"></i> Forma de pago:
+                                                  {{ data.PaymentTerms }}
+                                             </p>
+                                             <p class="mb-2"><i class="bi bi-wallet2"></i> Método de pago:
+                                                  {{ data.PaymentMethod }}
+                                             </p>
+                                             <p class="mb-2"><i class="bi bi-currency-exchange"></i> Moneda:
+                                                  {{ data.Currency }}
+                                             </p>
+                                             <p class="mb-2"><i class="bi bi-arrow-repeat"></i> Tipo de cambio:
+                                                  {{ data.ExchangeRate }}
+                                             </p>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                             <strong>Cliente</strong> <br>
+                                             <p class="mb-2"><i class="bi bi-building"></i> Empresa: {{ Receiver.Name }}
+                                             </p>
+                                             <p class="mb-2"><i class="bi bi-file-earmark-person"></i> RFC:
+                                                  {{ Receiver.Rfc }}
+                                             </p>
+                                        </div>
+                                   </div>
+                                   <div>
+                                        <p class="mb-0"><strong>Comentarios:</strong> {{ data.Observations }}</p>
+                                   </div>
+
+                                   <h5 class="card-title mt-5">Conceptos</h5>
+                                   <table class="table">
+                                        <thead class="table-light">
+                                             <tr>
+                                                  <th>Código</th>
+                                                  <th class="col-6">Descripcion</th>
+                                                  <th>Cantidad</th>
+                                                  <th>Precio U.</th>
+                                                  <th>Total</th>
+                                             </tr>
+                                        </thead>
+                                        <tbody>
+                                             {% for item in items %}
+                                             <tr>
+                                                  <td></td>
+                                                  <td>{{ item.Description }}</td>
+                                                  <td>{{ item.Quantity }}</td>
+                                                  <td>${{ item.UnitValue }}</td>
+                                                  <td>${{ item.Total }}</td>
+                                             </tr>
+                                             {% endfor %}
+                                        </tbody>
+                                   </table>
+                              </div>
+                         </div>
+                    </div>
+                    <div class="col">
+                         <!-- Card de cuentas -->
+                         <div class="card border-light mb-3 mt-4" style="max-width: 18rem;">
+                              <div class="card-header">Cuenta</div>
+                              <div class=" row card-body">
+                                   <div class="col card-text">
+                                        <p class="text-start">Subtotal</p>
+                                        <p class="text-start">{% for tax in Taxes %}{{tax.Name}}{% endfor %}( {% for tax in Taxes %}{{tax.Rate}}{% endfor %} % )</p>
+                                   </div>
+                                   <div class="col card-text">
+                                        <p class="text-end">$ {{data.Subtotal}} </p>
+                                        <p class="text-end">{% for tax in Taxes %}{{tax.Total}}{% endfor %}</p>
+                                   </div>
+                              </div>
+
+                              <div class="card-footer bg-transparent">
+                                   <div class="row card-text">
+                                        <div class="col text-start">Importe</div>
+                                        <div class="col text-end">{{data.Total}}</div>
+                                   </div>
+                              </div>
+                         </div>
+
+                    </div>
+               </div>
           </div>
-          {% endfor %}
+
+          <!-- Pestaña Comprobantes -->
+          <div class="tab-pane fade show " id="cop">
+               <h3 class="text-center">Pagos</h3>
+               <div id="comprobantes-container" class="mt-4">
+                    {% for comprobante in comprobantes %}
+                    <div class="card mb-3">
+                         <div class="card-body bg-body-tertiary">
+                              <div class="row">
+                                   <div class="col">
+
+                                        <h5 class="card-title text-primary "><strong>Comprobante - Folio: {{ comprobante.folio }}</strong></h5>
+                                        <div class="row">
+                                             <div class="col">
+                                                  <p class="card-text"><strong>CFDI id:</strong> {{ comprobante.cfdi_id }} <br>
+                                                       <strong>Fecha de Pago:</strong>{{ comprobante.fecha_pago }}</p>
+                                             </div>
+                                             <div class="col text-end">
+                                                  <strong>Monto Pagado:</strong> ${{ comprobante.monto_pagado}} <br>
+                                                  <strong>Método de Pago:</strong> {{ comprobante.metodo_pago }}
+                                             </div>
+                                        </div>
+                                        
+                                   </div>
+                                   <div class="col col-3 text-end">
+                                        <a href="{% url 'download_comprobante' id_factura=comprobante.cfdi_id file_type='xml' %}"
+                                             class="btn btn-primary m-1">
+                                             <img src="{% static 'img/download.svg' %}" style="filter: invert(1);">
+                                             Descarga XML
+                                        </a>
+                                        <a href="{% url 'download_comprobante' id_factura=comprobante.cfdi_id file_type='pdf' %}"
+                                             class="btn btn-primary m-1">
+                                             <img src="{% static 'img/download.svg' %}" style="filter: invert(1);">
+                                             Descarga PDF
+                                        </a>
+                                   </div>
+                              </div>
+
+                         </div>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-warning" role="alert">
+                         No hay comprobantes disponibles para esta factura.
+                    </div>
+                    {% endfor %}
+               </div>
+          </div>
+
+          <!-- Pestaña Archivos -->
+          <div class="tab-pane fade show " id="docs">
+               <h3 class="text-center">Documentos</h3>
+          </div>
      </div>
 
 </div>
@@ -194,9 +244,9 @@
                     <h5 class="modal-title" id="modalLabel">Cancelando Factura</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
-               
+
                <div class="modal-body">
-                    
+
                     <form action="{% url 'cancelar_factura' %}" method="POST" id="cancelarCFDIForm">
                          {% csrf_token %}
                          <div class="mb-3">
@@ -213,7 +263,7 @@
                     </form>
                     <!-- Spinner -->
                     <div id="loading2" style="display: none;" class="text-center">
-                         <div class="spinner-border" role="status">
+                         <div class="spinner-border text-secondary" role="status">
                               <span class="visually-hidden">Cargando...</span>
                          </div>
                          <p>Por favor, espera...</p>
@@ -237,59 +287,60 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
                <div class="modal-body">
-                    <form action="{% url 'comprobante_factura' factura.cfdi_id  %}" method="post" id="ComprobantePagoForm">
-                         
+                    <form action="{% url 'comprobante_factura' factura.cfdi_id  %}" method="post"
+                         id="ComprobantePagoForm">
+
                          {% csrf_token %}
                          {{ form.non_field_errors }}
-                     
+
                          <div class="mb-3">
-                             {{ form.Date.label_tag }}
-                             {{ form.Date }}
-                             {{ form.Date.errors }}
+                              {{ form.Date.label_tag }}
+                              {{ form.Date }}
+                              {{ form.Date.errors }}
                          </div>
-                         
+
                          <div class="mb-3">
-                             {{ form.PaymentForm.label_tag }}
-                             {{ form.PaymentForm }}
-                             {{ form.PaymentForm.errors }}
+                              {{ form.PaymentForm.label_tag }}
+                              {{ form.PaymentForm }}
+                              {{ form.PaymentForm.errors }}
                          </div>
-                         
+
                          <div class="mb-3">
-                             {{ form.Amount.label_tag }}
-                             {{ form.Amount }}
-                             {{ form.Amount.errors }}
+                              {{ form.Amount.label_tag }}
+                              {{ form.Amount }}
+                              {{ form.Amount.errors }}
                          </div>
-                     
+
                          <div class="mb-3">
-                             {{ form.OperationNumber.label_tag }}
-                             {{ form.OperationNumber }}
-                             {{ form.OperationNumber.errors }}
+                              {{ form.OperationNumber.label_tag }}
+                              {{ form.OperationNumber }}
+                              {{ form.OperationNumber.errors }}
                          </div>
-                         
+
                          <div id="extra-fields">
-                             <div class="mb-3">
-                                 {{ form.ForeignAccountNamePayer.label_tag }}
-                                 {{ form.ForeignAccountNamePayer }}
-                                 {{ form.ForeignAccountNamePayer.errors }}
-                             </div>
-                     
-                             <div class="mb-3">
-                                 {{ form.PayerAccount.label_tag }}
-                                 {{ form.PayerAccount }}
-                                 {{ form.PayerAccount.errors }}
-                             </div>
-                     
-                             <div class="mb-3">
-                                 {{ form.RfcReceiverBeneficiaryAccount.label_tag }}
-                                 {{ form.RfcReceiverBeneficiaryAccount }}
-                                 {{ form.RfcReceiverBeneficiaryAccount.errors }}
-                             </div>
-                     
-                             <div class="mb-3">
-                                 {{ form.BeneficiaryAccount.label_tag }}
-                                 {{ form.BeneficiaryAccount }}
-                                 {{ form.BeneficiaryAccount.errors }}
-                             </div>
+                              <div class="mb-3">
+                                   {{ form.ForeignAccountNamePayer.label_tag }}
+                                   {{ form.ForeignAccountNamePayer }}
+                                   {{ form.ForeignAccountNamePayer.errors }}
+                              </div>
+
+                              <div class="mb-3">
+                                   {{ form.PayerAccount.label_tag }}
+                                   {{ form.PayerAccount }}
+                                   {{ form.PayerAccount.errors }}
+                              </div>
+
+                              <div class="mb-3">
+                                   {{ form.RfcReceiverBeneficiaryAccount.label_tag }}
+                                   {{ form.RfcReceiverBeneficiaryAccount }}
+                                   {{ form.RfcReceiverBeneficiaryAccount.errors }}
+                              </div>
+
+                              <div class="mb-3">
+                                   {{ form.BeneficiaryAccount.label_tag }}
+                                   {{ form.BeneficiaryAccount }}
+                                   {{ form.BeneficiaryAccount.errors }}
+                              </div>
                          </div>
 
                     </form>
@@ -303,7 +354,8 @@
                </div>
                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" form="ComprobantePagoForm">Generar Comprobante</button>
+                    <button type="submit" class="btn btn-primary" form="ComprobantePagoForm">Generar
+                         Comprobante</button>
                </div>
           </div>
      </div>
@@ -317,9 +369,9 @@
                     <h5 class="modal-title" id="modalLabel">Eviando Factura</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                </div>
-               
+
                <div class="modal-body">
-                    
+
                     <form action="{% url 'send_email_view' %}" method="POST" id="EmailForm">
                          {% csrf_token %}
                          <!-- Campo oculto para cfdi_id -->
@@ -332,7 +384,8 @@
                          <div class="form-group">
                               {{ form_email.bcc_emails.label }}
                               {{ form_email.bcc_emails }} <!-- Campo para correos CCO -->
-                              <small class="form-text text-muted">Ingrese los correos CCO separados por comas (opcional).</small>
+                              <small class="form-text text-muted">Ingrese los correos CCO separados por comas
+                                   (opcional).</small>
                          </div>
                          <div class="form-check">
                               {{ form_email.need_factura }} <!-- Checkbox de factura -->
@@ -404,47 +457,47 @@
           });
      });
 
-     document.addEventListener("DOMContentLoaded", function() {
+     document.addEventListener("DOMContentLoaded", function () {
           const paymentSelect = document.getElementById("PaymentForm");
           const extraFields = document.getElementById("extra-fields");
-     
+
           // Función para manejar la visibilidad de los campos extra
           function toggleExtraFields() {
-          if (paymentSelect.value === "01"||paymentSelect.value === "02") {
-               extraFields.style.display = "none"; // Ocultar campos si es efectivo
-          } else {
-               extraFields.style.display = "block"; // Mostrar campos en cualquier otro caso
+               if (paymentSelect.value === "01" || paymentSelect.value === "02") {
+                    extraFields.style.display = "none"; // Ocultar campos si es efectivo
+               } else {
+                    extraFields.style.display = "block"; // Mostrar campos en cualquier otro caso
+               }
           }
-          }
-     
+
           // Llamamos a la función al cargar la página para asegurarnos de que los campos tengan el estado correcto
           toggleExtraFields();
-     
+
           // Agregamos un event listener para que cambie la visibilidad cada vez que se selecciona un método de pago
           paymentSelect.addEventListener("change", toggleExtraFields);
      });
 
      document.addEventListener('DOMContentLoaded', function () {
-     const selectOpciones = document.getElementById('select_opciones'); // Asegúrate de que este ID coincida
-     const uuidFieldContainer = document.getElementById('uuidFieldContainer');
-     const uuidReplacementField = document.getElementById('uuid_replacement');
+          const selectOpciones = document.getElementById('select_opciones'); // Asegúrate de que este ID coincida
+          const uuidFieldContainer = document.getElementById('uuidFieldContainer');
+          const uuidReplacementField = document.getElementById('uuid_replacement');
 
-     function toggleUUIDField() {
-          if (selectOpciones.value === '01') {
-               uuidFieldContainer.style.display = 'block'; // Mostrar el campo
-          } else {
-               uuidFieldContainer.style.display = 'none'; // Ocultar el campo
-               uuidReplacementField.value = ''; // Limpiar el campo si se oculta
+          function toggleUUIDField() {
+               if (selectOpciones.value === '01') {
+                    uuidFieldContainer.style.display = 'block'; // Mostrar el campo
+               } else {
+                    uuidFieldContainer.style.display = 'none'; // Ocultar el campo
+                    uuidReplacementField.value = ''; // Limpiar el campo si se oculta
+               }
           }
-     }
 
-     // Inicialmente ocultamos el campo
-     toggleUUIDField();
+          // Inicialmente ocultamos el campo
+          toggleUUIDField();
 
-     // Escuchar cambios en el select
-     selectOpciones.addEventListener('change', toggleUUIDField);
+          // Escuchar cambios en el select
+          selectOpciones.addEventListener('change', toggleUUIDField);
      });
 
 </script>
- 
+
 {% endblock %}

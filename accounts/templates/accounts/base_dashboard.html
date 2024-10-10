@@ -21,7 +21,7 @@
     <!-- Script para filtrar tablas -->
     <script>
         function filterTable(inputId, tableId) {
-            var input, filter, table, tr, td, i, j, txtValue;
+            var input, filter, table, tr, td, i, j, txtValue;   
             input = document.getElementById(inputId);
             filter = input.value.toUpperCase();
             table = document.getElementById(tableId);
@@ -190,33 +190,7 @@
     </div>
 
     <!-- PIE DE PAGINA -->
-    <footer class="bg-light text-dark py-4 mt-auto">
-        <div class="container">
-            <hr class="border-dark">
-            <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
-                    <p class="mb-0">
-                        <a href="https://www.inade.mx/" class="text-dark">&copy; 2024 INADE Servicios Ambientales</a>
-                        <br>
-                        Ingeniería y Administración Estratégica, S.A. de C.V.
-                    </p>
-                </div>
-                <div class="col-md-6 text-center text-md-right">
-                    <!-- Enlaces a redes sociales y contacto -->
-                    <a href="https://wa.me/your-whatsapp-number" class="text-dark mx-2">
-                        <img src="{% static 'img/whatsapp.svg' %}" alt="WhatsApp" style="width: 30px; height: 30px;">
-                    </a>
-                    <a href="https://www.facebook.com/p/Ingenier%C3%ADa-y-Administraci%C3%B3n-Estrat%C3%A9gica-SA-de-CV-100067820710003/"
-                        class="text-dark mx-2">
-                        <img src="{% static 'img/facebook.svg' %}" alt="Facebook" style="width: 30px; height: 30px;">
-                    </a>
-                    <a href="mailto:inade@inade.mx" class="text-dark mx-2">
-                        <img src="{% static 'img/gmail.svg' %}" alt="Gmail" style="width: 30px; height: 30px;">
-                    </a>
-                </div>
-            </div>
-        </div>
-    </footer>
+
 
     <!-- Bloque para JavaScript adicional, definido en plantillas hijas -->
     {% block extra_js %}{% endblock %}
