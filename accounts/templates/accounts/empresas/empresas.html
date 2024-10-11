@@ -1,18 +1,15 @@
 {% extends 'accounts/base_dashboard.html' %}
-
 {% load static %}
-
 {% block title %}Empresas{% endblock %}
 {% block header %}Empresas{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container-xxl">
 
     <!-- SECCION DE TITULO ENCABEZANDO DIV -->
     <div class="row">
         <div class="col">
             <h1 class="text-center">Empresas</h1>
-            <hr class="featurette-divider">
         </div>
     </div>
 
@@ -45,9 +42,7 @@
                         <th><a class="link-secondary" href="?order_by=nombre_empresa">Empresa</a></th>
                         <th><a class="link-secondary" href="?order_by=rfc">RFC</a></th>
                         <th><a class="link-secondary" href="?order_by=direccion">Direccion</a></th>
-                        <th><a class="link-secondary" href="?order_by=moneda">Moneda</a></th>
-                        <th><a class="link-secondary" href="?order_by=condiciones_pago">Condiciones</a></th>
-                        <th colspan="2"></th>
+                        <th colspan="1"></th>
                     </tr>
                 </thead>
 
@@ -59,50 +54,139 @@
                         <td>{{ e.nombre_empresa }}</td>
                         <td>{{ e.rfc }}</td>
                         <td>{{ e.direccion }}</td>
-                        <td>{{ e.moneda }}</td>
-                        <td>{{ e.condiciones_pago }}</td>
-                        <td><a href="{% url 'empresa_edit' e.id %}" class="btn btn-primary btn-sm">Editar</a></td>
-                        <td><a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">Eliminar</a></td>
+                        <td>
+                            <a href="{% url 'empresa_edit' e.id %}" class="btn btn-primary btn-sm">
+                                <img src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);">
+                            </a>
+                            <a href="{% url 'empresa_delete' e.id %}" class="btn btn-danger btn-sm">
+                                <img src="{% static 'img/x-square.svg' %}" style="filter: invert(1);">
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        <p>Número de empresas: {{ empresas_page.paginator.count }}</p>
-        <!-- CONTROLES DE PAGINACIÓN -->
-        <div class="pagination">
-            {% if empresas_page.has_previous %}
-                <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-                <a href="?page={{ empresas_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
-            {% endif %}
-            Página {{ empresas_page.number }} de {{ empresas_page.paginator.num_pages }}.
-            {% if empresas_page.has_next %}
-                <a href="?page={{ empresas_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
-                <a href="?page={{ empresas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
-            {% endif %}
-        </div>
-        <hr class="featurette-divider">
+
     </div>
+
+    <div class="container-xxl">
+        <div class="alert alert-info" role="alert">
+            <strong>Número de empresas:</strong> {{ empresas_page.paginator.count }}
+        </div>
+        <nav aria-label="Paginación de empresas">
+            <ul class="pagination justify-content-center">
+                {% if empresas_page.has_previous %}
+                <li class="page-item">
+                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page={{ empresas_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Anterior</a>
+                </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <div class="m-1">Página {{ empresas_page.number }} de {{ empresas_page.paginator.num_pages }}.</div>
+                </li>
+                {% if empresas_page.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ empresas_page.next_page_number }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page={{ empresas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    
 </div>
 
 <!-- Modal para crear una nueva empresa -->
 <div class="modal fade" id="createEmpresaModal" tabindex="-1" aria-labelledby="createEmpresaLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="createEmpresaLabel">Crear Nueva Empresa</h5>
+                <h5 class="modal-title" id="createEmpresaLabel">Registrar Empresa</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="{% url 'empresa_create' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    {{ empresa_form.as_p }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Crear Empresa</button>
-                </div>
-            </form>
+
+            <div class="modal-body">
+                <form method="post" action="{% url 'empresa_create' %}" id="newEmpresa">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="text-start col">
+                            <h6 class="text-center text-primary">Registro</h6>
+                            <p>
+                                {{ empresa_form.nombre_empresa.label_tag }} <code>*</code>
+                                {{ empresa_form.nombre_empresa }}
+                                {{ empresa_form.nombre_empresa.errors }}
+                                <small class="form-text text-muted">Ingrese el nombre registrado legalmente de la empresa.</small>
+                            </p>
+                            <p>
+                                {{ empresa_form.regimen_fiscal.label_tag }}
+                                {{ empresa_form.regimen_fiscal }}
+                                {{ empresa_form.regimen_fiscal.errors }}
+                                <small class="form-text text-muted">Ingrese regimen fiscal.</small>
+                            </p>
+                            <p>
+                                {{ empresa_form.moneda.label_tag }}
+                                {{ empresa_form.moneda }}
+                                {{ empresa_form.moneda.errors }}
+                                <small class="form-text text-muted">Elije un tipo de moneda.</small>
+                            </p>
+                            <p>
+                                {{ empresa_form.condiciones_pago.label_tag }}
+                                {{ empresa_form.condiciones_pago }}
+                                {{ empresa_form.condiciones_pago.errors }}
+                                <small class="form-text text-muted">Ingrese los días condicionados para plasis de pago.</small>
+                            </p>
+                        </div>
+                        <div class="col">
+                            <h6 class="text-center text-primary">Dirección</h6>
+                            <p>
+                                {{ empresa_form.calle.label_tag }}<code>*</code>
+                                {{ empresa_form.calle }}
+                                {{ empresa_form.calle.errors }}
+                            </p>
+                            <p>
+                                {{ empresa_form.numero.label_tag }}<code>*</code>
+                                {{ empresa_form.numero }}
+                                {{ empresa_form.numero.errors }}
+                            </p>
+                            <p>
+                                {{ empresa_form.colonia.label_tag }}<code>*</code>
+                                {{ empresa_form.colonia }}
+                                {{ empresa_form.colonia.errors }}
+                            </p>
+                            <p>
+                                {{ empresa_form.ciudad.label_tag }}<code>*</code>
+                                {{ empresa_form.ciudad }}
+                                {{ empresa_form.ciudad.errors }}
+                            </p>
+                            <p>
+                                {{ empresa_form.codigo.label_tag }}<code>*</code>
+                                {{ empresa_form.codigo }}
+                                {{ empresa_form.codigo.errors }}
+                            </p>
+                            <p>
+                                {{ empresa_form.estado.label_tag }}<code>*</code>
+                                {{ empresa_form.estado }}
+                                {{ empresa_form.estado.errors }}
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success" form="newEmpresa">Crear Empresa</button>
+            </div>
         </div>
     </div>
 </div>

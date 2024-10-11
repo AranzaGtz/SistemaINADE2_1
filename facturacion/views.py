@@ -25,10 +25,11 @@ from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Serv
 from facturacion.models import CSD, Comprobante, Factura
 from .forms import (CSDForm, CancelarCFDI, ComprobantePagoForm, EmailForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm)
 
-
+# Obtener la zona horaria UTC
 utc_timezone = pytz.UTC
-naive_datetime = datetime(2024, 10, 8, 8, 15, 0)  # Fecha y hora naive
-aware_datetime = utc_timezone.localize(naive_datetime)  # Ajusta la fecha y hora a la zona horaria UTC
+
+# Obtener la fecha y hora actual en UTC
+aware_datetime = datetime.now(utc_timezone)  # Ahora ya es un datetime "aware"
 
 # ------------------------------- #
 #   FUNCIONES
@@ -129,7 +130,8 @@ def get_new_cfdi_id(): # FUNCION PARA BUSCAR EL SIGUIENTE NUEVO FOLIO DE LA BD
         next_id = int(last_factura.id) + 1
     else:
         next_id = 1
-    print (f"{next_id:04d}")
+    
+    return next_id
 
 def get_new_cfdi_comp_id(): # FUNCION PARA BUSCAR EL SIGUIENTE NUEVO FOLIO DE UN COMPROBANTE DE PAGO DE LA BD
     # Lógica para obtener el siguiente ID en la base de datos
@@ -226,8 +228,6 @@ def factura_detalle(request, cfdi_id):
         print(f"Error en la solicitud: Código de estado {response.status_code}")
         return JsonResponse({'success': False, 'status': response.status_code, 'data':data})
 
-
-
 def create_and_save_fac (cfdi, file_type, id_factura):
     
     response = get_cfdi_doc(file_type, id_factura)  # Llama a la función que obtiene el documento
@@ -297,7 +297,7 @@ def cargar_csd(request):
 
             # Obtener la organización seleccionada en el formulario
             # El formulario incluiría un campo para seleccionar la organización
-            organizacion = get_unica_organizacion()
+            organizacion =request.user.organizacion
 
             # Asignar la única organización automáticamente
             csd.organizacion = organizacion
@@ -321,10 +321,8 @@ def cargar_csd(request):
             }
             
             # URL de la API de Facturama
-            url = "https://apisandbox.facturama.mx/api-lite/csds"
-            username = "AranzaInade"  # nombre de usuario
-            password = "Puebla4990"
-            response = requests.post(url, json=csd_data, auth=(username, password))
+            url = f"{SANDBOX_URL}/api-lite/csds"
+            response = requests.post(url, json=csd_data, auth=(USERNAME, PASSWORD))
 
             # Manejar la respuesta de la API
             if response.status_code == 200:
@@ -359,6 +357,21 @@ def cargar_csd(request):
     else:
         form = CSDForm()
     return render(request, 'facturacion/cargar_csd.html', {'form': form})
+
+@login_required
+@transaction.atomic
+def eliminar_csd(request):
+    if request.method == 'POST':
+        # Verificamos que la petición es de tipo AJAX
+        if request.headers.get('Content-Type') == 'application/json':
+            try:
+                organizacion = request.user.organizacion
+                # Eliminar los CSD asociados a la organización del usuario
+                CSD.objects.filter(organizacion=organizacion).delete()
+                return JsonResponse({'success': True})
+            except Exception as e:
+                return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
 @login_required
 @transaction.atomic
@@ -430,6 +443,7 @@ def crear_factura(request, id_personalizado):
                         # Si el servicio no existe, podrías lanzar una excepción o manejar el error de otra forma
                         raise ValueError(f"El servicio con el código {codigo_servicio} no existe.")
 
+            print(aware_datetime.isoformat())
             cfdi_data = {
                 "NameId": "1",
                 "Currency": "MXN",
@@ -488,7 +502,7 @@ def crear_factura(request, id_personalizado):
                     for concepto in conceptos_data
                 ]
             }
-       
+            print(get_new_cfdi_id())
             response = crear_cfdi_api(cfdi_data)
 
             if response.status_code == 201:

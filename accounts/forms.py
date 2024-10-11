@@ -78,13 +78,12 @@ class EmpresaForm(forms.ModelForm):
 
     class Meta:
         model = Empresa
-        fields = ['nombre_empresa', 'rfc','regimen_fiscal', 'moneda', 'condiciones_pago',
+        fields = ['nombre_empresa','regimen_fiscal', 'moneda', 'condiciones_pago',
                   'calle', 'numero', 'colonia', 'ciudad', 'codigo', 'estado']
         widgets = {
             'nombre_empresa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa el Nombre de la Empresa ', 'required': 'True'}),
-            'rfc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa RFC ', 'required': 'False', 'pattern': r"[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}"}),
-            'regimen_fiscal': forms.Select(attrs={'class':'form-control'}),
-            'moneda': forms.Select(attrs={'class': 'form-control'}),
+            'regimen_fiscal': forms.Select(attrs={'class':'form-select'}),
+            'moneda': forms.Select(attrs={'class': 'form-select'}),
             'condiciones_pago': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Días de pago '}),
         }
 
