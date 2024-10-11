@@ -4,28 +4,64 @@
 {% block title %}Estadísticas de Cotizaciones{% endblock %}
 {% block header %}Estadísticas de Cotizaciones{% endblock %}
 {% block content %}
-<div class="container mt-5">
-    <h1 class="display-4 text-center mb-4">Estadísticas de Cotizaciones</h1>
-    
+<div class="container-xxl">
+    <!-- SECCION DE TITULO ENCABEZANDO SERVICIOS -->
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center">Estadísticas de Cotizaciones</h1>
+            <hr />
+        </div>
+    </div>
+
     <div class="row mb-5">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Resumen General</h5>
-                    <p class="card-text"><strong>Número Total de Cotizaciones Emitidas:</strong> {{ total_cotizaciones }}</p>
-                    <p class="card-text"><strong>Valor Total de las Cotizaciones Emitidas:</strong> {{ valor_total_cotizaciones }}</p>
-                    <p class="card-text"><strong>Promedio de Valor por Cotización:</strong> {{ promedio_valor_cotizacion }}</p>
-                    <p class="card-text"><strong>Tiempo Promedio de Respuesta a una Cotización:</strong> {{ promedio_tiempo_respuesta }}</p>
+        <!-- Card Resumen General -->
+        <div class="row mb-5">
+            <!-- Card Resumen General -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-lg h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Resumen General</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon text-primary">
+                                <i class="bi bi-clipboard-data" style="font-size: 2rem;"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="card-text mb-1"><strong>Número Total de Cotizaciones Emitidas:</strong></p>
+                                <h4 class="mb-0">{{ total_cotizaciones }}</h4>
+                            </div>
+                        </div>
+                        <p class="card-text"><strong>Valor Total de las Cotizaciones Emitidas:</strong>
+                            {{ valor_total_cotizaciones }}</p>
+                        <p class="card-text"><strong>Promedio de Valor por Cotización:</strong>
+                            {{ promedio_valor_cotizacion }}</p>
+                        <p class="card-text"><strong>Tiempo Promedio de Respuesta a una Cotización:</strong>
+                            {{ promedio_tiempo_respuesta }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Estadísticas de Éxito</h5>
-                    <p class="card-text"><strong>Tasa de Aceptación de Cotizaciones:</strong> {{ tasa_aceptacion }}%</p>
-                    <p class="card-text"><strong>Tasa de Rechazo de Cotizaciones:</strong> {{ tasa_rechazo }}%</p>
-                    <p class="card-text"><strong>Tiempo Promedio para Cerrar una Cotización:</strong> {{ tiempo_promedio_cierre }}</p>
+
+            <!-- Card Estadísticas de Éxito -->
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0 rounded-lg h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">Estadísticas de Éxito</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon text-success">
+                                <i class="bi bi-bar-chart-line" style="font-size: 2rem;"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="card-text mb-1"><strong>Tasa de Aceptación de Cotizaciones:</strong></p>
+                                <h4 class="mb-0">{{ tasa_aceptacion }}%</h4>
+                            </div>
+                        </div>
+                        <p class="card-text"><strong>Tasa de Rechazo de Cotizaciones:</strong> {{ tasa_rechazo }}%</p>
+                        <p class="card-text"><strong>Tiempo Promedio para Cerrar una Cotización:</strong>
+                            {{ tiempo_promedio_cierre }}</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -34,8 +70,8 @@
     <div class="mb-5">
         <h2 class="text-center mb-4">Estadísticas por Cliente</h2>
         <div class="table-responsive">
-            <table class="table table-hover table-bordered">
-                <thead class="thead-dark">
+            <table class="table table-hover table-striped table-bordered align-middle">
+                <thead class="bg-primary text-white">
                     <tr>
                         <th>Cliente</th>
                         <th>Valor Total de Cotizaciones</th>
@@ -46,7 +82,7 @@
                     {% for cliente in estadisticas_cliente %}
                     <tr>
                         <td>{{ cliente.persona__nombre }}</td>
-                        <td>{{ cliente.valor_total }}</td>
+                        <td>${{ cliente.valor_total|floatformat:2 }}</td> <!-- Formato a 2 decimales -->
                         <td>{{ cliente.numero_cotizaciones }}</td>
                     </tr>
                     {% endfor %}
@@ -54,12 +90,12 @@
             </table>
         </div>
     </div>
-
+    
     <div class="mb-5">
         <h2 class="text-center mb-4">Estadísticas Temporales</h2>
         <div class="table-responsive">
-            <table class="table table-hover table-bordered">
-                <thead class="thead-dark">
+            <table class="table table-hover table-striped table-bordered align-middle">
+                <thead class="bg-success text-white">
                     <tr>
                         <th>Mes/Año</th>
                         <th>Número de Cotizaciones Emitidas</th>
@@ -76,5 +112,6 @@
             </table>
         </div>
     </div>
+
 </div>
 {% endblock %}
