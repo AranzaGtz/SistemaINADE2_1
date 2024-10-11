@@ -3,152 +3,253 @@
 {% block title %}Servicios{% endblock %}
 {% block header %}Servicios{% endblock %}
 {% block content %}
-<style>
-    .modal-dialog.custom-size {
-        max-width: 50%; /* Ajusta el valor según sea necesario */
-    }
-</style>
+
 <div class="container-xxl">
-    <!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
 
-    <div class="row">
-        <div class="col">
-            <h1 class="text-center">Servicios</h1>
-        </div>
-    </div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#servi" data-bs-toggle="tab">Servicios</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link " href="#met" data-bs-toggle="tab">Metodos</a>
+        </li>
+    </ul>
 
-    <!-- BUSCADOR -->
-    <div class="row mb-3 justify-content-center">
-        <div class="col-md-6">
-            <div class="input-group mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar servicios..." onkeyup="filterTable('searchInput', 'serviciosTable')">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'serviciosTable')">Buscar</button>
+    <div class="tab-content">
+
+        <!-- SECCIÓN DE TÍTULO ENCABEZANDO SERVICIOS -->
+        <div class="tab-pane fade show active" id="servi">
+            <div class="row">
+                <div class="col">
+                    <h1 class="text-center">Servicios</h1>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="row mb-3 justify-content-end">
-        <div class="col-auto">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createServicioModal">Añadir Servicio</button>
-        </div>
-    </div>
-
-    <!-- TABLA DE SERVICIOS -->
-    <div class="row">
-        <div class="col">
-            <div class="table-responsive" style="max-height: 90vh; overflow-y: auto;">
-                <table id="serviciosTable" class="table table-hover">
-                    <!-- ENCABEZADO DE TABLA -->
-                    <thead class="thead-light">
-                        <tr>
-                            <th><a class="link-secondary" href="?order_by=codigo">Codigo</a></th>
-                            <th><a class="link-secondary" href="?order_by=nombre_servicio">Nombre</a></th>
-                            <th><a class="link-secondary" href="?order_by=metodo__metodo">Método</a></th>
-                            <th><a class="link-secondary" href="?order_by=descripcion">Descripción</a></th>
-                            <th><a class="link-secondary" href="?order_by=precio_unitario">Precio sugerido</a></th>
-                            <th><a class="link-secondary" href="?order_by=acreditado">Acreditado</a></th>
-                            <th colspan="2" class="col-md-1"></th>
-                        </tr>
-                    </thead>
-                    <!-- CUERPO DE TABLA -->
-                    <tbody>
-                        {% for s in servicios_page %}
-                        <tr>
-                            <td>{{ s.codigo }}</td>
-                            <td>{{ s.nombre_servicio }}</td>
-                            <td>{{ s.metodo.metodo }}</td>
-                            <td>{{ s.descripcion }}</td>
-                            <td>{{ s.precio_unitario }}</td>
-                            <td>{% if s.acreditado %}Acreditado{% else %}No Acreditado{% endif %}</td>
-                            <td>
-                                <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">Editar</a>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                    data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">Eliminar</button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="pagination">
-                    {% if servicios_page.has_previous %}
-                        <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-                        <a href="?page={{ servicios_page.previous_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Anterior</a>
-                    {% endif %}
-                    <div class="m-1">Página {{ servicios_page.number }} de {{ servicios_page.paginator.num_pages }}.</div>
-                    {% if servicios_page.has_next %}
-                        <a href="?page={{ servicios_page.next_page_number }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Siguiente</a>
-                        <a href="?page={{ servicios_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Última</a>
-                    {% endif %}
+        
+            <!-- BUSCADOR -->
+            <div class="row mb-3 justify-content-center">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar servicios..." onkeyup="filterTable('searchInput', 'serviciosTable')">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'serviciosTable')">Buscar</button>
+                        </div>
+                    </div>
                 </div>
-                
             </div>
-        </div>
-    </div>
-
-    <!-- SECCIÓN DE MÉTODOS -->
-    <div class="row">
-        <div class="col">
-            <h1 class="text-center">Métodos</h1>
-        </div>
-    </div>
-
-    <div class="row mb-3 justify-content-end">
-        <div class="col-auto">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMetodoModal">Añadir
-                Metodo</button>
-        </div>
-    </div>
-
-    <!-- TABLA DE MÉTODOS -->
-    <div class="row">
-        <div class="col">
-            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-                <table id="metodoTable" class="table table-hover">
-                    <thead class="thead-light">
-                        <tr>
-                            <th class="col-md-1">#</th>
-                            <th>Métodos</th>
-                            <th class="col-md-1"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for m in metodos %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ m.metodo }}</td>
-                            <td>
-                                <a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        
+            <div class="row mb-3 justify-content-end">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createServicioModal">Añadir Servicio</button>
+                </div>
             </div>
+        
+            <!-- TABLA DE SERVICIOS -->
+            <table id="serviciosTable" class="table table-hover table-sm">
+                <!-- ENCABEZADO DE TABLA -->
+                <thead class="thead-light">
+                    <tr class="fs-6">
+                        <th ><a class="link-secondary" href="?order_by=codigo">Codigo</a></th>
+                        <th class="col-2"><a class="link-secondary" href="?order_by=nombre_servicio">Nombre</a></th>
+                        <th class="col-2"><a class="link-secondary" href="?order_by=metodo__metodo">Método</a></th>
+                        <th class="col-23"><a class="link-secondary " href="?order_by=descripcion">Descripción</a></th>
+                        <th ><a class="link-secondary" href="?order_by=precio_unitario">Precio</a></th>
+                        <th ><a class="link-secondary" href="?order_by=acreditado">Acreditado</a></th>
+                        <th  colspan="1" class="col-md-1"></th>
+                    </tr>
+                </thead>
+                <!-- CUERPO DE TABLA -->
+                <tbody class="fs-6">
+                    {% for s in servicios_page %}
+                    <tr>
+                        <td>{{ s.codigo }}</td>
+                        <td>{{ s.nombre_servicio }}</td>
+                        <td>{{ s.metodo.metodo }}</td>
+                        <td>{{ s.descripcion }}</td>
+                        <td>{{ s.precio_unitario }}</td>
+                        <td>{% if s.acreditado %}Acreditado{% else %}No Acreditado{% endif %}</td>
+                        <td>
+                            <a href="{% url 'servicio_edit' s.id %}" class="btn btn-primary btn-sm">
+                                <img src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);">
+                            </a>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteServicioModal" data-servicio-id="{{ s.id }}">
+                                <img src="{% static 'img/x-square.svg' %}" style="filter: invert(1);">
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="container-xxl">
+                <div class="alert alert-info" role="alert">
+                    <strong>Número de servicios:</strong> {{ servicios_page.paginator.count }}
+                </div>
+                <nav aria-label="Paginación de servicios">
+                    <ul class="pagination justify-content-center">
+                        {% if servicios_page.has_previous %}
+                        <li class="page-item">
+                            <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ servicios_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Anterior</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item disabled">
+                            <div class="m-1">Página {{ servicios_page.number }} de {{ servicios_page.paginator.num_pages }}.</div>
+                        </li>
+                        {% if servicios_page.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ servicios_page.next_page_number }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ servicios_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Última</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            
+
         </div>
+
+        <!-- SECCIÓN DE MÉTODOS -->
+        <div class="tab-pane fade show " id="met">
+            <div class="row">
+                <div class="col">
+                    <h1 class="text-center">Métodos</h1>
+                </div>
+            </div>
+        
+            <div class="row mb-3 justify-content-end">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMetodoModal">Añadir
+                        Metodo</button>
+                </div>
+            </div>
+        
+            <!-- TABLA DE MÉTODOS -->
+            <table id="metodoTable" class="table table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="col-md-1">#</th>
+                        <th>Métodos</th>
+                        <th class="col-md-1"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in metodos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ m.metodo }}</td>
+                        <td>
+                            <a href="{% url 'metodo_delete' m.id %}" class="btn btn-danger btn-sm">
+                                <img src="{% static 'img/x-square.svg' %}" style="filter: invert(1);">
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
+
 </div>
+
 <!-- Modal para crear un nuevo servicio -->
 <div class="modal fade" id="createServicioModal" tabindex="-1" aria-labelledby="createServicioLabel" aria-hidden="true">
-    <div class="modal-dialog custom-size">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="createServicioLabel">Crear Nuevo Servicio</h5>
+                <h5 class="modal-title" id="createServicioLabel">Registrar Servicio</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'servicio_create' %}" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
+
+            <div class="modal-body">
+                <form action="{% url 'servicio_create' %}" method="post" id="formservicio">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        
+                        <div class="col">
+                            <p>
+                                {{ servicio_form.codigo.label_tag }}<code>*</code>
+                                {{ servicio_form.codigo }}
+                                {{ servicio_form.codigo.errors }}
+                            </p>
+                            
+                            <p>
+                                {{ servicio_form.nombre_servicio.label_tag }}<code>*</code>
+                                {{ servicio_form.nombre_servicio }}
+                                {{ servicio_form.nombre_servicio.errors }}
+                            </p>
+                            <p>
+                                {{ servicio_form.descripcion.label_tag }}<code>*</code>
+                                {{ servicio_form.descripcion }}
+                                {{ servicio_form.descripcion.errors }}
+                            </p>
+                            
+                            <p>
+                                {{ servicio_form.precio_unitario.label_tag }}<code>*</code>
+                                {{ servicio_form.precio_unitario }}
+                                {{ servicio_form.precio_unitario.errors }}
+                            </p>
+                            <p>
+                                {{ servicio_form.subcontrato.label_tag }}
+                                {{ servicio_form.subcontrato }}
+                                {{ servicio_form.subcontrato.errors }}
+                            </p>
+                            
+                            <p>
+                                {{ servicio_form.acreditado.label_tag }}
+                                {{ servicio_form.acreditado }}
+                                {{ servicio_form.acreditado.errors }}
+                            </p>
+                        </div>
+                        <div class="col">
+                            <p>
+                                {{ servicio_form.unidad.label_tag }}<code>*</code>
+                                {{ servicio_form.unidad }}
+                                {{ servicio_form.unidad.errors }}
+                            </p>
+                            
+                            <p>
+                                {{ servicio_form.unidad_cfdi.label_tag }}<code>*</code>
+                                {{ servicio_form.unidad_cfdi }}
+                                {{ servicio_form.unidad_cfdi.errors }}
+                            </p>
+                            
+                            <p>
+                                {{ servicio_form.clave_cfdi.label_tag }}<code>*</code>
+                                {{ servicio_form.clave_cfdi }}
+                                {{ servicio_form.clave_cfdi.errors }}
+                            </p>
+                            <p>
+                                {{ servicio_form.objeto_impuesto.label_tag }}<code>*</code>
+                                {{ servicio_form.objeto_impuesto }}
+                                {{ servicio_form.objeto_impuesto.errors }}
+                            </p>
+                            
+                            <p>
+                                {{ servicio_form.descuento.label_tag }}
+                                {{ servicio_form.descuento }}
+                                {{ servicio_form.descuento.errors }}
+                            </p>
+                        </div>
+                    </div>
+
                     <p>
-                        Crear servicio:
+                        Crear servicio: 
                         <input type="checkbox" id="crear_metodo_checkbox" name="crear_metodo_checkbox" placeholder="Crear metodo">
+                        <small class="form-text text-muted">Selecciona si crearas uno nuevo.</small>
                     </p>
 
                     <div class="mb-3" id="select_metodo_div">
-                        <label for="metodoSelect" class="form-label">Metodo:</label>
+                        <label for="metodoSelect" class="form-label">Metodo:</label><code>*</code>
                         <select class="form-select" id="metodoSelect" name="metodo">
                             <option value="">Selecciona un metodo</option>
                             {% for metodo in metodos %}
@@ -159,21 +260,22 @@
                             <span class="text-info">Por favor, selecciona una norma o segu¡miento de calidad.</span>
                         </div>
                     </div>
+
                     <div id="form_metodo_div" style="display: none;">
                         {{ metodo_form.as_p }}
                         <div class="mt-2 text-end" style="text-align: right;">
                             <span class="text-info">Por favor, ingresa la norma o segu¡miento de calidad.</span>
                         </div>
                     </div>
-                    <h2>Servicio</h2>
-                    {{ servicio_form.as_p }}
-                </div>
-                <!-- BOTONES ACEPTAR CANDELAR-->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Añadir Servicio</button>
-                </div>
-            </form>
+                    
+                </form>
+            </div>
+            <!-- BOTONES ACEPTAR CANDELAR-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success" form="formservicio">Crear</button>
+            </div>
+            
         </div>
     </div>
 </div>
@@ -198,8 +300,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Añadir Metodo</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Crear</button>
                 </div>
             </form>
         </div>
