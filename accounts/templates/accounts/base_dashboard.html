@@ -21,7 +21,7 @@
     <!-- Script para filtrar tablas -->
     <script>
         function filterTable(inputId, tableId) {
-            var input, filter, table, tr, td, i, j, txtValue;   
+            var input, filter, table, tr, td, i, j, txtValue;
             input = document.getElementById(inputId);
             filter = input.value.toUpperCase();
             table = document.getElementById(tableId);
@@ -46,7 +46,7 @@
 
 </head>
 
-<body>
+<body class="bg-body">
 
     <!-- BARRA DE ENCABEZADO -->
     <header class="">
@@ -83,7 +83,8 @@
                     <button class="navbar-toggler ms-2" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar"
                         aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;" alt=""></span>
+                        <span class="navbar-toggler-icon"><img src="{% static 'img/list.svg' %}" style="width: 20pt;"
+                                alt=""></span>
                     </button>
                 </div>
             </div>
@@ -92,19 +93,38 @@
 
     <!-- Contenido del offcanvas -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Hola! 🖐️
                 {{ user.first_name|default:'Guest' }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
+
         <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+
                 <!--#   LINK HOME   -->
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}"><img
-                            src="{% static 'img/house-fill.svg' %}" alt=""> Home</a>
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">
+                        <img src="{% static 'img/house-fill.svg' %}" alt=""> Home
+                    </a>
                 </li>
+                
+                <!--#   LINK EMPRESAS   -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'empresas_cont_list' %}">
+                        <img src="{% static 'img/building.svg' %}"> Empresas
+                    </a>
+                </li>
+
+                <!--#   LINK CLIENTES   -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'lista_clientes' %}">
+                        <img src="{% static 'img/people-fill.svg' %}"> Clientes
+                    </a>
+                </li>
+
                 <!--#   LINK COTIZACIONES   -->
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'cotizaciones_list' %}"><img src="{% static 'img/pencil.svg' %}"
@@ -120,21 +140,13 @@
                     <a class="nav-link" href="{% url 'ordenes_list' %}"><img src="{% static 'img/clipboard-data.svg' %}"
                             alt=""> Ordenes de Trabajo</a>
                 </li>
-                <!--#   LINK CLIENTES   -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'lista_clientes' %}"><img src="{% static 'img/people-fill.svg' %}">
-                        Clientes</a>
-                </li>
+
                 <!--#   LINK PROSPECTOS     -->
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'prospecto_list' %}"><img src="{% static 'img/people.svg' %}">
                         Prospectos</a>
                 </li>
-                <!--#   LINK EMPRESAS   -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'empresas_cont_list' %}"><img
-                            src="{% static 'img/building.svg' %}"> Empresas</a>
-                </li>
+
 
                 <!--#   LINK SERVICIOS Y METODOS    -->
                 <li class="nav-item">
@@ -144,8 +156,8 @@
 
                 <!--#   LINK FACTURAS   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'facturas_list' %}"><img src="{% static 'img/cash.svg' %}"
-                            alt=""> Facturas</a>
+                    <a class="nav-link" href="{% url 'facturas_list' %}"><img src="{% static 'img/cash.svg' %}" alt="">
+                        Facturas</a>
                 </li>
 
                 <hr style="border-color:darkgrey">
@@ -156,7 +168,8 @@
                 </li>
                 <!--#   LINK CONFIGURACION   -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'config_org' %}"><img src="{% static 'img/gear-wide-connected.svg' %}"> Configuracion</a>
+                    <a class="nav-link" href="{% url 'config_org' %}"><img
+                            src="{% static 'img/gear-wide-connected.svg' %}"> Configuracion</a>
                 </li>
                 <!--#   LINK QUEJAS Y SEUGERENCIAS  -->
                 <li class="nav-item">

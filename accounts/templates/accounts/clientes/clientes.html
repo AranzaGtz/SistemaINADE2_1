@@ -114,80 +114,90 @@
 
 <!-- Modal para crear un nuevo cliente -->
 <div class="modal fade" id="createClienteModal" tabindex="-1" aria-labelledby="createClienteLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="createClienteLabel">Crear Nuevo Cliente</h5>
+                <h5 class="modal-title" id="createClienteLabel">Registrar Cliente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="{% url 'cliente_create' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <!-- Formulario de persona -->
-                    <!-- Campo Nombre -->
-                    <div class="form-group">
-                        <label for="{{ persona_form.nombre.id_for_label }}">Nombre: <code>*</code></label>
-                        <input type="text" name="{{ persona_form.nombre.name }}" id="{{ persona_form.nombre.id_for_label }}" class="form-control" placeholder="Ingresa Nombre del cliente" >
-                        {{ persona_form.nombre.errors }}
-                    </div>
 
-                    <!-- Campo Apellidos -->
-                    <div class="form-group">
-                        <label for="{{ persona_form.apellidos.id_for_label }}">Apellidos: <code>*</code></label>
-                        <input type="text" name="{{ persona_form.apellidos.name }}" id="{{ persona_form.apellidos.id_for_label }}" class="form-control" placeholder="Ingresa Ambos apellidos del cliente">
-                        {{ persona_form.apellidos.errors }}
-                    </div>
+            <div class="modal-body">
 
-                    <!-- Campo Título -->
-                    <label for="{{ persona_form.titulo.id_for_label }}">Título:</label>
+                <form method="post" action="{% url 'cliente_create' %}" id="newCliente">
+                    {% csrf_token %}
+
                     <div class="row">
+
                         <div class="col">
                             <div class="form-group">
+                                <label for="{{ persona_form.nombre.id_for_label }}">Nombre: <code>*</code></label>
+                                <input type="text" name="{{ persona_form.nombre.name }}" id="{{ persona_form.nombre.id_for_label }}" class="form-control" placeholder="Ingresa Nombre del cliente" >
+                                {{ persona_form.nombre.errors }}
+                            </div>
+        
+                            <!-- Campo Apellidos -->
+                            <div class="form-group">
+                                <label for="{{ persona_form.apellidos.id_for_label }}">Apellidos: <code>*</code></label>
+                                <input type="text" name="{{ persona_form.apellidos.name }}" id="{{ persona_form.apellidos.id_for_label }}" class="form-control" placeholder="Ingresa Ambos apellidos del cliente">
+                                {{ persona_form.apellidos.errors }}
+                            </div>
+        
+                            <!-- Campo Título -->
+                            <label for="{{ persona_form.titulo.id_for_label }}">Título:</label>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        
+                                        <select name="{{ persona_form.titulo.name }}" id="{{ persona_form.titulo.id_for_label }}" class="form-control">
+                                            {% for option in titulos %}
+                                            <option value="{{ option.id }}" {% if persona_form.titulo.value == option.id %}selected{% endif %}>
+                                                {{ option.titulo }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                        {{ persona_form.titulo.errors }}
+                                    </div>
+                                </div>
+                                <div class="col col-2">
+                                    <button class="btn btn-success" type="button" onclick="abrirVentana()">
+                                        <img src="{% static 'img/person-plus-fill.svg' %}" width="20" height="20" style="filter: invert(1);">
+                                    </button>
+                                </div>
                                 
-                                <select name="{{ persona_form.titulo.name }}" id="{{ persona_form.titulo.id_for_label }}" class="form-control">
-                                    {% for option in titulos %}
-                                    <option value="{{ option.id }}" {% if persona_form.titulo.value == option.id %}selected{% endif %}>
-                                        {{ option.titulo }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                {{ persona_form.titulo.errors }}
                             </div>
                         </div>
-                        <div class="col col-2">
-                            <button class="btn btn-success" type="button" onclick="abrirVentana()">
-                                <img src="{% static 'img/person-plus-fill.svg' %}" width="20" height="20" style="filter: invert(1);">
-                            </button>
+
+                        <div class="col">
+                            <!-- Campo Correo Electrónico -->
+                            <div class="form-group">
+                                <label for="{{ persona_form.correo_electronico.id_for_label }}">Correo Electrónico: <code>*</code></label>
+                                <input type="email" name="{{ persona_form.correo_electronico.name }}" id="{{ persona_form.correo_electronico.id_for_label }}" class="form-control" placeholder="Correo electrónico" >
+                                {{ persona_form.correo_electronico.errors }}
+                            </div>
+
+                            <!-- Campo Teléfono -->
+                            <div class="form-group">
+                                <label for="{{ persona_form.telefono.id_for_label }}">Teléfono:</label>
+                                <input type="text" name="{{ persona_form.telefono.name }}" id="{{ persona_form.telefono.id_for_label }}" class="form-control" placeholder="Teléfono">
+                                {{ persona_form.telefono.errors }}
+                            </div>
+
+                            <!-- Campo Celular -->
+                            <div class="form-group">
+                                <label for="{{ persona_form.celular.id_for_label }}">Celular: <code>*</code></label>
+                                <input type="text" name="{{ persona_form.celular.name }}" id="{{ persona_form.celular.id_for_label }}" class="form-control" placeholder="Celular">
+                                {{ persona_form.celular.errors }}
+                            </div>
+
+                            <!-- Campo Fax -->
+                            <div class="form-group">
+                                <label for="{{ persona_form.fax.id_for_label }}">Fax: </label>
+                                <input type="text" name="{{ persona_form.fax.name }}" id="{{ persona_form.fax.id_for_label }}" class="form-control" placeholder="Fax">
+                                {{ persona_form.fax.errors }}
+                            </div>
                         </div>
-                        
-                    </div>
 
-                    <!-- Campo Correo Electrónico -->
-                    <div class="form-group">
-                        <label for="{{ persona_form.correo_electronico.id_for_label }}">Correo Electrónico: <code>*</code></label>
-                        <input type="email" name="{{ persona_form.correo_electronico.name }}" id="{{ persona_form.correo_electronico.id_for_label }}" class="form-control" placeholder="Correo electrónico" >
-                        {{ persona_form.correo_electronico.errors }}
-                    </div>
-
-                    <!-- Campo Teléfono -->
-                    <div class="form-group">
-                        <label for="{{ persona_form.telefono.id_for_label }}">Teléfono:</label>
-                        <input type="text" name="{{ persona_form.telefono.name }}" id="{{ persona_form.telefono.id_for_label }}" class="form-control" placeholder="Teléfono">
-                        {{ persona_form.telefono.errors }}
-                    </div>
-
-                    <!-- Campo Celular -->
-                    <div class="form-group">
-                        <label for="{{ persona_form.celular.id_for_label }}">Celular: <code>*</code></label>
-                        <input type="text" name="{{ persona_form.celular.name }}" id="{{ persona_form.celular.id_for_label }}" class="form-control" placeholder="Celular">
-                        {{ persona_form.celular.errors }}
-                    </div>
-
-                    <!-- Campo Fax -->
-                    <div class="form-group">
-                        <label for="{{ persona_form.fax.id_for_label }}">Fax: </label>
-                        <input type="text" name="{{ persona_form.fax.name }}" id="{{ persona_form.fax.id_for_label }}" class="form-control" placeholder="Fax">
-                        {{ persona_form.fax.errors }}
                     </div>
 
                     <!-- Checkbox para crear empresa -->
@@ -208,18 +218,80 @@
                     </div>
 
                     <!-- Formulario para nueva empresa, oculto por defecto -->
-                    <div class="mb-3" id="form_empresa_div" style="display: none;">
-                        {{ empresa_form.as_p }}
-                        {{ direccion_form.as_p }}
+                    <div class="row" id="form_empresa_div" style="display: none;">
+                        <div class="row">
+                            <div class="text-start col">
+                                <h6 class="text-center text-primary">Registro</h6>
+                                <p>
+                                    {{ empresa_form.nombre_empresa.label_tag }} <code>*</code>
+                                    {{ empresa_form.nombre_empresa }}
+                                    {{ empresa_form.nombre_empresa.errors }}
+                                    <small class="form-text text-muted">Ingrese el nombre registrado legalmente de la empresa.</small>
+                                </p>
+                                <p>
+                                    {{ empresa_form.regimen_fiscal.label_tag }}
+                                    {{ empresa_form.regimen_fiscal }}
+                                    {{ empresa_form.regimen_fiscal.errors }}
+                                    <small class="form-text text-muted">Ingrese regimen fiscal.</small>
+                                </p>
+                                <p>
+                                    {{ empresa_form.moneda.label_tag }}
+                                    {{ empresa_form.moneda }}
+                                    {{ empresa_form.moneda.errors }}
+                                    <small class="form-text text-muted">Elije un tipo de moneda.</small>
+                                </p>
+                                <p>
+                                    {{ empresa_form.condiciones_pago.label_tag }}
+                                    {{ empresa_form.condiciones_pago }}
+                                    {{ empresa_form.condiciones_pago.errors }}
+                                    <small class="form-text text-muted">Ingrese los días condicionados para plasis de pago.</small>
+                                </p>
+                            </div>
+                            <div class="col">
+                                <h6 class="text-center text-primary">Dirección</h6>
+                                <p>
+                                    {{ empresa_form.calle.label_tag }}<code>*</code>
+                                    {{ empresa_form.calle }}
+                                    {{ empresa_form.calle.errors }}
+                                </p>
+                                <p>
+                                    {{ empresa_form.numero.label_tag }}<code>*</code>
+                                    {{ empresa_form.numero }}
+                                    {{ empresa_form.numero.errors }}
+                                </p>
+                                <p>
+                                    {{ empresa_form.colonia.label_tag }}<code>*</code>
+                                    {{ empresa_form.colonia }}
+                                    {{ empresa_form.colonia.errors }}
+                                </p>
+                                <p>
+                                    {{ empresa_form.ciudad.label_tag }}<code>*</code>
+                                    {{ empresa_form.ciudad }}
+                                    {{ empresa_form.ciudad.errors }}
+                                </p>
+                                <p>
+                                    {{ empresa_form.codigo.label_tag }}<code>*</code>
+                                    {{ empresa_form.codigo }}
+                                    {{ empresa_form.codigo.errors }}
+                                </p>
+                                <p>
+                                    {{ empresa_form.estado.label_tag }}<code>*</code>
+                                    {{ empresa_form.estado }}
+                                    {{ empresa_form.estado.errors }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" name="action" value="create" class="btn btn-success">Crear Cliente</button>
-                    <button type="submit" name="action" value="create_and_quote" class="btn btn-primary">Crear y Cotizar</button>
-                </div>
-            </form>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" name="action" value="create" class="btn btn-success" form="newCliente">Crear Cliente</button>
+                <button type="submit" name="action" value="create_and_quote" class="btn btn-primary" form="newCliente">Crear y Cotizar</button>
+            </div>
+
         </div>
     </div>
 </div>

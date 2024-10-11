@@ -18,7 +18,7 @@
 
 <div class="container-xxl">
 
-    <div class="container mt-4 mb-4">
+    <div class=" mt-4 mb-4">
         <h4 class="mb-4">Cotizaciones</h4>
 
         <div class="progress mb-3" style="height: 30px;">
@@ -45,6 +45,21 @@
     </div>
     
     <div class="d-flex flex-wrap justify-content-center">
+
+            <!-- BOTON PARA EMPRESAS -->
+            <a href="{% url 'empresas_cont_list' %}" class="text-decoration-none">
+                <div class="card m-2 card-custom">
+                    <div class="card-img-top p-1 text-center">
+                        <i class="bi bi-buildings card-icon"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Empresas</h5>
+                        <p class="card-text">"Consulta la información de las empresas que han sido parte de nuestros
+                            procesos y gestiona la información"</p>
+                    </div>
+                </div>
+            </a>
+
         <!-- BOTON PARA CREAR CLIENTES -->
         <a href="{% url 'lista_clientes' %}" class="text-decoration-none">
             <div class="card m-2 card-custom">
@@ -101,19 +116,7 @@
             </div>
         </a>
 
-        <!-- BOTON PARA EMPRESAS -->
-        <a href="{% url 'empresas_cont_list' %}" class="text-decoration-none">
-            <div class="card m-2 card-custom">
-                <div class="card-img-top p-1 text-center">
-                    <i class="bi bi-buildings card-icon"></i>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Empresas</h5>
-                    <p class="card-text">"Consulta la información de las empresas que han sido parte de nuestros
-                        procesos y gestiona la información"</p>
-                </div>
-            </div>
-        </a>
+
 
         <!-- BOTON PARA CREAR USUARIOS DEL SISTEMA -->
         <a href="{% url 'usuario_list' %}" class="text-decoration-none">
