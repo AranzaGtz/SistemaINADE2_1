@@ -5,8 +5,23 @@
 {% block header %}Queja{% endblock %}
 {% block content %}
     <div class="container mt-4">
-        <h1>Enviar Solicitud de Queja</h1>
-        <form method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col">
+                <h1>Enviar Solicitud de Queja</h1>
+            </div>
+            <div class="col col3">
+                <!-- Spinner -->
+                <div id="loading" style="display: none;" class="text-center text-primary">
+                    <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Por favor, espera...</p>
+                </div>
+            </div>
+        </div>
+        
+        
+        <form method="post" enctype="multipart/form-data" id="quejita">
             {% csrf_token %}
             <div class="mb-3">
                 <label for="id_asunto" class="form-label">Asunto</label>
@@ -24,7 +39,21 @@
                 <label for="id_archivo_adjunto" class="form-label">Archivo Adjunto (opcional)</label>
                 {{ form.archivo_adjunto }}
             </div>
-            <button type="submit" class="btn btn-success">Enviar Solicitud de Queja</button>
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Enviar Solicitud de Queja</button>
+            </div>
+            
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('quejita'); // Reemplaza con el ID de tu formulario
+  
+            form.addEventListener('submit', function () {
+                 // Muestra el spinner
+                 document.getElementById('loading').style.display = 'block';
+            });
+       });
+    </script>
 {% endblock %}

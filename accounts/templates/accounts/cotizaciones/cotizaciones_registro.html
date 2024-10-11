@@ -15,10 +15,12 @@
         border-left: 5px solid dodgerblue;
     }
 </style>
+
 <script type="text/javascript">
     var servicios = {{ servicios_json | safe }};
 </script>
-<div class="container">
+
+<div class="container-xxl">
     <h1 class="text-center">Registro de cotización</h1>
     <hr />
 
@@ -165,8 +167,9 @@
         </div>
 
         <div class="form-group text-right mt-4">
-            <input type="submit" class="btn btn-success" value="{% if cotizacion %}Actualizar Cotización{% else %}Crear Cotización{% endif %}" />
-            <a href="{% url 'cotizaciones_list' %}" class="btn btn-secondary">Cancelar</a>
+            <a href="{% url 'cotizaciones_list' %}" class="btn btn-danger">Cancelar</a>
+            <input type="submit" class="btn btn-success" value="Crear" />
+            
         </div>
     </form>
 

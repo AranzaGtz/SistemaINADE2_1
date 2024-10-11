@@ -4,7 +4,7 @@
 {% block header %}Ordenes de Trabajo{% endblock %}
 {% block content %}
 
-<div class="container">
+<div class="container-xxl">
     <!-- SECCION DE TITULO ENCABEZANDO -->
     <div class="row">
         <div class="col">
@@ -30,53 +30,67 @@
         </div>
     </div>
     <!-- TABLA -->
-    <div class="row">
-        <div class="col">
-            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-                <table id="ordenesTable" class="table table-hover">
-                    <!-- ENCABEZADO DE TABLA -->
-                    <thead class="thead-light">
-                        <tr>
-                            <th><a href="?order_by=id_personalizado">ID</a></th>
-                            <th><a href="?order_by=cotizacion">Cotización</a></th>
-                            <th><a href="?order_by=cotizacion__persona__nombre">Cliente</a></th>
-                            <th><a href="?order_by=receptor__last_name">Recibe</a></th>
-                            <th><a href="?order_by=estado">Estado</a></th>
-                            <th><a href="?order_by=cotizacion__fecha_caducidad">Vigencia</a></th>
-                            <th colspan="1">Opciones</th>
-                        </tr>
-                    </thead>
-                    <!-- CUERPO DE TABLA -->
-                    <tbody>
-                        {% for orden in ordenes_page %}
-                        <tr>
-                            <td>{{ orden.id_personalizado }}</td>
-                            <td>{{ orden.cotizacion }}</td>
-                            <td>{{ orden.cotizacion.persona }} </td>
-                            <td>{{ orden.receptor.first_name }} {{ orden.receptor.last_name }}</td>
-                            <td>{% if orden.estado %}Terminado{% else %}Pendiente{% endif %}</td>
-                            <td>{{ orden.cotizacion.fecha_caducidad}}</td>
-                            <td><a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}" class="btn btn-primary btn-sm">Detalles</a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <p>Numero de ordenes de trabajo: {{ordenes.count}}</p>
-
-            <div class="pagination">
-                {% if ordenes_page.has_previous %}
-                    <a class="btn btn-light btn-sm" href="?page=1&order_by={{ request.GET.order_by }}">Primera</a>
-                    <a class="btn btn-light btn-sm" href="?page={{ ordenes_page.previous_page_number }}&order_by={{ request.GET.order_by }}">Anterior</a>
-                {% endif %}
-                Página {{ ordenes_page.number }} de {{ ordenes_page.paginator.num_pages }}.
-                {% if ordenes_page.has_next %}
-                    <a class="btn btn-light btn-sm" href="?page={{ ordenes_page.next_page_number }}&order_by={{ request.GET.order_by }}">Siguiente</a>
-                    <a class="btn btn-light btn-sm" href="?page={{ ordenes_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}">Última</a>
-                {% endif %}
-            </div>
+    <table id="ordenesTable" class="table table-hover">
+        <!-- ENCABEZADO DE TABLA -->
+        <thead class="thead-light">
+            <tr>
+                <th><a href="?order_by=id_personalizado">ID</a></th>
+                <th><a href="?order_by=cotizacion">Cotización</a></th>
+                <th><a href="?order_by=cotizacion__persona__nombre">Cliente</a></th>
+                <th><a href="?order_by=receptor__last_name">Recibe</a></th>
+                <th><a href="?order_by=estado">Estado</a></th>
+                <th><a href="?order_by=cotizacion__fecha_caducidad">Vigencia</a></th>
+                <th colspan="1">Opciones</th>
+            </tr>
+        </thead>
+        <!-- CUERPO DE TABLA -->
+        <tbody>
+            {% for orden in ordenes_page %}
+            <tr>
+                <td>{{ orden.id_personalizado }}</td>
+                <td>{{ orden.cotizacion }}</td>
+                <td>{{ orden.cotizacion.persona.empresa }} </td>
+                <td>{{ orden.receptor.first_name }} {{ orden.receptor.last_name }}</td>
+                <td>{% if orden.estado %}Terminado{% else %}Pendiente{% endif %}</td>
+                <td>{{ orden.cotizacion.fecha_caducidad}}</td>
+                <td><a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}" class="btn btn-primary btn-sm">Detalles</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="container-xxl">
+        <div class="alert alert-info" role="alert">
+            <strong>Número de órdenes de trabajo:</strong> {{ ordenes.count }}
         </div>
+        <nav aria-label="Paginación de órdenes de trabajo">
+            <ul class="pagination justify-content-center">
+                {% if ordenes_page.has_previous %}
+                <li class="page-item">
+                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page={{ ordenes_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Anterior</a>
+                </li>
+                {% endif %}
+                <li class="page-item disabled">
+                    <div class="m-1">Página {{ ordenes_page.number }} de {{ ordenes_page.paginator.num_pages }}.</div>
+                </li>
+                {% if ordenes_page.has_next %}
+                <li class="page-item">
+                    <a href="?page={{ ordenes_page.next_page_number }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a href="?page={{ ordenes_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
+                        class="btn btn-light btn-sm">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
+    
 </div>
 
 {% endblock %}

@@ -18,7 +18,7 @@ class CustomUserCreationForm(UserCreationForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos', 'required': 'False'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}),
             'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
-            'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
+            'rol': forms.Select(attrs={'class': 'form-select', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
         }
         
 class CustomUserCreationForm1(UserCreationForm):
@@ -31,7 +31,7 @@ class CustomUserCreationForm1(UserCreationForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos', 'required': 'False'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico', 'required': 'True'}),
             'celular': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Celular', 'required': 'False'}),
-            'rol': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
+            'rol': forms.Select(attrs={'class': 'form-select', 'placeholder': 'Selecciona Tipo de Rol', 'required': 'True'}),
         }
 
 #   FORMULARIO PARA CAMBIAR USUARIO

@@ -5,8 +5,8 @@
 {% block header %}Usuarios{% endblock %}
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<div class="container">
-<!-- TITULO -->
+<div class="container-xxl">
+    <!-- TITULO -->
     <h1 class="text-center">Usuarios del Sistema</h1>
     <hr class="featurette-divider">
 
@@ -58,26 +58,34 @@
             <table id="usuariosTable" class="table table-hover">
                 <thead class="thead-light">
                     <tr>
+                        <th>Id</th>
                         <th>Username</th>
                         <th>Correo</th>
                         <th>Nombre</th>
                         <th>Apellidos</th>
                         <th>Celular</th>
                         <th>Rol</th>
-                        <th colspan="2">Opciones</th>
+                        <th colspan="1">Opciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for c in usuarios %}
                     <tr>
+                        <td> {{c.id}} </td>
                         <td>{{ c.username }}</td>
                         <td>{{ c.email }}</td>
                         <td>{{ c.first_name }}</td>
                         <td>{{ c.last_name }}</td>
                         <td>{{ c.celular }}</td>
                         <td>{{ c.rol }}</td>
-                        <td><a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">Editar</a></td>
-                        <td><a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">Eliminar</a></td>
+                        <td>
+                            <a href="{% url 'usuario_edit' c.username %}" class="btn btn-primary btn-sm">
+                                <img src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);">
+                            </a>
+                            <a href="#" onclick="eliminarUsuario({{ c.id }})" class="btn btn-danger btn-sm">
+                                <img src="{% static 'img/x-square.svg' %}" style="filter: invert(1);">
+                            </a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -87,7 +95,7 @@
 </div>
 <!-- Modal para crear un nuevo usuario -->
 <div class="modal fade" id="createUsuarioModal" tabindex="-1" aria-labelledby="createUsuarioLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <!-- Título del modal -->
