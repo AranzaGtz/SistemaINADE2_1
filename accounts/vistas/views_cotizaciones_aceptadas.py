@@ -111,7 +111,7 @@ def generar_orden_trabajo(request, pk):
                     # Filtrar los conceptos seleccionados
                     conceptos_orden_trabajo = []
                     for concepto in Concepto.objects.filter(cotizacion=cotizacion):
-                        if f'usar_concepto_{concepto.id}' in request.POST:
+                        if f'usare_concepto_{concepto.id}' in request.POST:
                             
                             OrdenTrabajoConcepto.objects.create(
                                 orden_de_trabajo=orden_trabajo,

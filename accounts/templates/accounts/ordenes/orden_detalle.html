@@ -24,7 +24,7 @@
     }
 </style>
 
-<div class="container mt-4">
+<div class="container-xxl mt-4 mb-5">
     <h1 class="text-center">Detalles de la Orden de Trabajo: {{ orden_trabajo.id_personalizado }}</h1>
     <hr />
     <!-- BOTONES DE ACCIÓN -->
@@ -36,23 +36,47 @@
         </button>
         <!-- Elementos del dropdown -->
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion.id %}">Ir a cotización</a></li>
-            <li><a class="dropdown-item" href="{% url 'crear_factura' orden_trabajo.id_personalizado %}">Facturar</a></li>
-            <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" target="_blank">Ver PDF</a></li>
-            <li><a href="{% url 'enviar_orden' orden_trabajo.id_personalizado orden_trabajo.receptor.email %}" class="dropdown-item">Enviar Orden de Trabajo</a></li>
+            <li><a class="dropdown-item" href="{% url 'cotizacion_detalle' orden_trabajo.cotizacion.id %}"><img src="{% static 'img/box-arrow-up-right.svg' %}"> Ir a cotización</a></li>
+            <li><a class="dropdown-item" href="{% url 'crear_factura' orden_trabajo.id_personalizado %}"><img src="{% static 'img/calculator-fill.svg' %}">  Facturar</a></li>
+            <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" target="_blank"><img src="{% static 'img/filetype-pdf.svg' %}">Ver PDF</a></li>
+            <li><a href="{% url 'enviar_orden' orden_trabajo.id_personalizado orden_trabajo.receptor.email %}" class="dropdown-item"><img src="{% static 'img/envelope.svg' %}"> Enviar Orden de Trabajo</a></li>
+            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCOT"><img src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
         </ul>
     </div>
-
-    <!-- DATOS DE COTIZACION -->
-    <p class="text-center">
+    
+    
+    <!-- Card de información con estilos mejorados de Bootstrap -->
+    <div class="card border-light mb-3 mt-4">
+        <div class="card-header">Información</div>
         {% if orden_trabajo.gestion %}
-        <strong class="gestion-alert">¡Atención! Esta orden de trabajo requiere gestión.</strong>
+        <div class="card-header bg-danger bg-gradient text-white text-center">
+            <strong>
+                
+                ¡Atención! Esta orden de trabajo requiere gestión.
+                
+            </strong>
+        </div>
         {% endif %}
-    </p>
-    <p><strong>Cliente:</strong> {{ orden_trabajo.cotizacion.persona.empresa.nombre_empresa }}</p>
-    <p><strong>Receptor:</strong> {{ orden_trabajo.receptor }}</p>
-    <p><strong>Dirección:</strong> {{ orden_trabajo.direccion }}</p>
-    <p><strong>Estado:</strong>{% if orden_trabajo.estado %} Terminado {% else %} Pendiente {% endif %}</p>
+        <div class="card-body">
+
+            <div class="row card-text">
+    
+                <p><strong>Cliente:</strong> {{ orden_trabajo.cotizacion.persona.empresa.nombre_empresa }}</p>
+                <p><strong>Receptor:</strong> {{ orden_trabajo.receptor }}</p>
+                <p><strong>Dirección:</strong> {{ orden_trabajo.direccion }}</p>
+                <p><strong>Estado:</strong>{% if orden_trabajo.estado %} Terminado {% else %} Pendiente {% endif %}</p>
+            </div>
+            <div>
+                <p class="mb-0"><strong>Comentarios:</strong> {{ data.Observations }}</p>
+            </div>
+    
+        </div>
+    </div>
+
+
+
+
+    
 
     <h2>Conceptos Asociados</h2>
     <!-- DETALLES DE CONCEPTOS -->

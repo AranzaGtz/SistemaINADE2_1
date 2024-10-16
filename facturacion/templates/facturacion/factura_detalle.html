@@ -1,15 +1,17 @@
 {% extends 'accounts/base_dashboard.html' %}
 {% load static %}
-{% block title %}Facturas{% endblock %}
-{% block header %}Facturas{% endblock %}
+{% block title %}Factura{% endblock %}
+{% block header %}Factura{% endblock %}
 {% block content %}
 <div class="container-xxl">
 
      <!-- SECCION DE TITULO ENCABEZANDO -->
      <div class="row">
+
           <div class="col">
-               <h1 class="text-start">Factura {{ id }} </h1>
+               <h1 class="text-start ">Factura {{ id }} </h1>
           </div>
+
           <div class="col">
                <!-- BOTONES DE ACCIÓN -->
                <div class="dropdown text-end dropleft ">
@@ -22,15 +24,12 @@
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                          
 
-                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img
-                                   src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
+                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCFDI"><img src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
 
                          {% if factura.estado == 'active' %}
 
-                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI"><img
-                                   src="{% static 'img/x-circle.svg' %}"> Cancelar factura</button>
-                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI"><img
-                                   src="{% static 'img/plus-circle.svg' %}"> Generar comprobante de pago</button>
+                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#CancelarCFDI"><img src="{% static 'img/x-circle.svg' %}"> Cancelar factura</button>
+                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ComprobanteCFDI"><img src="{% static 'img/plus-circle.svg' %}"> Generar comprobante de pago</button>
                          <li>
                               <a class="dropdown-item"
                                    href="{% url 'download_factura' id_factura=factura.cfdi_id file_type='pdf' %}"
@@ -67,6 +66,7 @@
                </div>
           </div>
      </div>
+     
      <hr />
 
      <ul class="nav nav-tabs">
@@ -76,9 +76,9 @@
           <li class="nav-item">
                <a class="nav-link " href="#cop" data-bs-toggle="tab">Pagos</a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
                <a class="nav-link" href="#docs" data-bs-toggle="tab">Archivos</a>
-          </li>
+          </li> -->
      </ul>
 
      <div class="tab-content">
@@ -128,33 +128,10 @@
                                         <p class="mb-0"><strong>Comentarios:</strong> {{ data.Observations }}</p>
                                    </div>
 
-                                   <h5 class="card-title mt-5">Conceptos</h5>
-                                   <table class="table">
-                                        <thead class="table-light">
-                                             <tr>
-                                                  <th>Código</th>
-                                                  <th class="col-6">Descripcion</th>
-                                                  <th>Cantidad</th>
-                                                  <th>Precio U.</th>
-                                                  <th>Total</th>
-                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                             {% for item in items %}
-                                             <tr>
-                                                  <td></td>
-                                                  <td>{{ item.Description }}</td>
-                                                  <td>{{ item.Quantity }}</td>
-                                                  <td>${{ item.UnitValue }}</td>
-                                                  <td>${{ item.Total }}</td>
-                                             </tr>
-                                             {% endfor %}
-                                        </tbody>
-                                   </table>
                               </div>
                          </div>
                     </div>
-                    <div class="col">
+                    <div class="col ">
                          <!-- Card de cuentas -->
                          <div class="card border-light mb-3 mt-4" style="max-width: 18rem;">
                               <div class="card-header">Cuenta</div>
@@ -178,6 +155,32 @@
                          </div>
 
                     </div>
+               </div>
+
+               <div class="row m-2">
+                    <h5 class="">Conceptos</h5>
+                    <table class="table ">
+                         <thead class="table-light">
+                              <tr>
+                                   <th>Código</th>
+                                   <th class="col-6">Descripcion</th>
+                                   <th>Cantidad</th>
+                                   <th>Precio U.</th>
+                                   <th>Total</th>
+                              </tr>
+                         </thead>
+                         <tbody>
+                              {% for item in items %}
+                              <tr>
+                                   <td></td>
+                                   <td>{{ item.Description }}</td>
+                                   <td>{{ item.Quantity }}</td>
+                                   <td>${{ item.UnitValue }}</td>
+                                   <td>${{ item.Total }}</td>
+                              </tr>
+                              {% endfor %}
+                         </tbody>
+                    </table>
                </div>
           </div>
 
@@ -228,10 +231,10 @@
                </div>
           </div>
 
-          <!-- Pestaña Archivos -->
+          <!-- Pestaña Archivos
           <div class="tab-pane fade show " id="docs">
                <h3 class="text-center">Documentos</h3>
-          </div>
+          </div> -->
      </div>
 
 </div>

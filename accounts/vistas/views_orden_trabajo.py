@@ -6,27 +6,31 @@ from django.core.paginator import Paginator
 
 #    VISTA PARA ORDENES DE TRABAJO
 def ordenes_list(request):
-     
-     # Parámetro de ordenamiento desde la URL
-     order_by = request.GET.get('order_by', 'id_personalizado')  # Default order by id
-     
-     if not order_by:  # Asegura que siempre haya un valor válido para order_by
-        order_by = 'id_personalizado'
-     
-     # Filtrar órdenes de trabajo que no están terminadas y ordenarlas
-     ordenes = OrdenTrabajo.objects.filter(estado=False).order_by(order_by)
-     
-     # Paginación
-     paginator = Paginator(ordenes, 10)  # Mostrar 50 órdenes por página
-     page_number = request.GET.get('page')
-     ordenes_page = paginator.get_page(page_number)
+    # Parámetro de ordenamiento desde la URL
+    order_by = request.GET.get('order_by', 'id_personalizado')  # Default order by id_personalizado
+    order_direction = request.GET.get('order_direction', 'desc')  # Dirección ascendente o descendente, por defecto ascendente
 
-     ordenes = OrdenTrabajo.objects.filter(estado=False)
-     context={
-          'ordenes':ordenes,
-          'ordenes_page': ordenes_page, # Usar ordenes_page en lugar de ordenes
-     }
-     return render(request, 'accounts/ordenes/ordenes.html', context)
+    if not order_by:  # Asegura que siempre haya un valor válido para order_by
+        order_by = 'id_personalizado'
+
+    # Si la dirección es descendente, se agrega el prefijo '-'
+    if order_direction == 'desc':
+        order_by = f'-{order_by}'
+
+    # Filtrar órdenes de trabajo que no están terminadas y ordenarlas
+    ordenes = OrdenTrabajo.objects.filter(estado=False).order_by(order_by)
+
+    # Paginación
+    paginator = Paginator(ordenes, 10)  # Mostrar 10 órdenes por página
+    page_number = request.GET.get('page')
+    ordenes_page = paginator.get_page(page_number)
+
+    context = {
+        'ordenes': ordenes,
+        'ordenes_page': ordenes_page,  # Usar ordenes_page en lugar de ordenes
+    }
+    return render(request, 'accounts/ordenes/ordenes.html', context)
+
 
 #    VISTA PARA DETALLES DE UNA ORDEN DE TRABAJO
 def detalle_orden_trabajo(request, id_personalizado):

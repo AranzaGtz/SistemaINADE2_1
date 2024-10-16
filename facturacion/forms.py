@@ -156,8 +156,8 @@ class FacturaEncabezadoForm(forms.ModelForm):
         model = Factura
         fields = ['tipo_moneda','OrderNumber', 'uso_cfdi', 'forma_pago','metodo_pago']
         widgets = {
-            'tipo_moneda': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione tipo moneda'}),
-            'OrderNumber': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ID de orden de compra'}),
+            'tipo_moneda': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione tipo moneda','disabled': 'true'}),
+            'OrderNumber': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ID de orden de compra','readonly': 'true'}),
             'uso_cfdi': forms.Select(attrs={'class': 'form-control'}),
             'forma_pago': forms.Select(attrs={'class': 'form-control'}),
             'metodo_pago': forms.Select(attrs={'class': 'form-control'}),
@@ -173,35 +173,27 @@ class FacturaEncabezadoForm(forms.ModelForm):
 class FacturaPieForm(forms.ModelForm):
     direccion = forms.CharField(
         widget=forms.TextInput(
-            attrs={'class': 'form-control', 'aria-describedby': 'passwordHelpBlock'}),
+            attrs={'class': 'form-control', 'aria-describedby': 'passwordHelpBlock','readonly': 'true'}),
         label="Dirección Fiscal"
-    )
-    notificacion = forms.BooleanField(
-        widget=forms.CheckboxInput(attrs={'class': 'fomr-control'}),
-        label="Notificación ",
-        required=False  # Opcional: Si quieres que sea obligatorio, cambia esto a True o elimina esta línea
     )
 
     class Meta:
         model = Factura
-        fields = ['direccion', 'comentarios', 'notificacion', 'correos']
+        fields = ['direccion', 'comentarios',]
         widgets = {
             'comentarios': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'correos': forms.TextInput(attrs={'class': 'form-control'})
         }
-        optional = ['comentarios', 'correos']
+        optional = ['comentarios']
 
 #    FORMULARIO PARA DATOS DE UNA FACTURAR Totales
 class FacturaTotalesForm(forms.ModelForm):
     subtotal = forms.DecimalField(
         max_digits=10, decimal_places=2,
-        widget=forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control',
-                                 'placeholder': 'Ingrese un número decimal', 'inputmode': 'decimal'})
+        widget=forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control', 'placeholder': 'Ingrese un número decimal', 'inputmode': 'decimal'})
     )
     iva = forms.DecimalField(
         max_digits=10, decimal_places=2,
-        widget=forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control',
-                                 'placeholder': 'Ingrese un número decimal', 'inputmode': 'decimal'})
+        widget=forms.NumberInput(attrs={'step': '0.01', 'class': 'form-control', 'placeholder': 'Ingrese un número decimal', 'inputmode': 'decimal'})
     )
 
     class Meta:
@@ -214,7 +206,7 @@ class FacturaTotalesForm(forms.ModelForm):
                 'placeholder': 'Ingrese un número decimal',
                 'inputmode': 'decimal',  # Este atributo sugiere la entrada de números sin flechas
             }),
-            'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
+            'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA','readonly': 'true'}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -5,7 +5,7 @@ from django.db import IntegrityError
 from django.forms import modelformset_factory, inlineformset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from accounts.helpers import  get_unica_organizacion
-from accounts.models import ConfiguracionSistema, Cotizacion, Concepto, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
+from accounts.models import ConfiguracionSistema, Cotizacion, Concepto, CustomUser, Empresa, InformacionContacto, Metodo, OrdenTrabajo, Persona, Prospecto, Servicio, Titulo
 from accounts.forms import ConceptoForm, CotizacionForm, CotizacionChangeForm, ConceptoFormSet, DireccionForm, EmpresaForm, MetodoForm, PersonaForm, ProspectoForm, ServicioForm, ServicioForm2
 from django.contrib import messages
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
@@ -179,6 +179,21 @@ def cotizacion_detalle(request, pk):
     
     cotizacion = get_object_or_404(Cotizacion, id=pk)
     conceptos = cotizacion.conceptos.all()
+    
+    cotizacion = get_object_or_404(Cotizacion, id=pk)
+    cliente = get_object_or_404(Persona, id=cotizacion.persona.id)
+    cliente_info = cliente.informacion_contacto
+    cliente_correo = cliente_info.correo_electronico if cliente_info else None
+    usuario = get_object_or_404(CustomUser, username=request.user.username)
+    usuario_correo = usuario.email
+    correos_adicionales = cotizacion.correos_adicionales.split(",") if cotizacion.correos_adicionales else []
+    
+    cotizacion_form = CotizacionChangeForm(instance=cotizacion)
+    concepto_formset = ConceptoFormSet(instance=cotizacion)
+    
+    servicios = list(Servicio.objects.all().values('id', 'nombre_servicio'))  # Asegúrate de ajustar los campos según tu modelo
+    servicios_json = json.dumps(servicios)  # Convertir la lista de diccionarios a JSON
+    
     for concepto in conceptos:
         concepto.subtotal = concepto.cantidad_servicios * concepto.precio
     
@@ -191,6 +206,17 @@ def cotizacion_detalle(request, pk):
         'conceptos': conceptos,
         'tasa_iva': tasa_iva,
         'ordenes_trabajo': ordenes_trabajo,
+        'cliente_correo': cliente_correo,
+        'usuario_correo': usuario_correo,
+        'correos_adicionales': correos_adicionales,
+        'cotizacion_form': cotizacion_form,
+        'concepto_formset': concepto_formset,
+        'cliente': cotizacion.persona,
+        'servicios_json': servicios_json,
+        'servicio_form': ServicioForm(),
+        'metodos': Metodo.objects.all(),
+        'metodo_form': MetodoForm(),
+        'edit': True  # Esta bandera se puede usar para ajustar la interfaz según si es edición o creación
     })
 
 # VISTA DE ESTADISTICAS DE COTIZACIONES
@@ -327,12 +353,10 @@ def cotizacion_duplicar(request, pk):
                 tasa_iva=cotizacion_original.tasa_iva,
                 notas=cotizacion_original.notas,
                 correos_adicionales=cotizacion_original.correos_adicionales,
-                subtotal=cotizacion_original.subtotal,
-                iva=cotizacion_original.iva,
-                total=cotizacion_original.total,
-                estado=False  # Estado inicial como "No Aceptado"
+                estado=False,  # Estado inicial como "No Aceptado"
+                usuario=request.user,
             )
-            
+
             # Generar el nuevo id_personalizado secuencialmente
             configuracion = ConfiguracionSistema.objects.first()
             if configuracion:
@@ -340,15 +364,21 @@ def cotizacion_duplicar(request, pk):
             else:
                 cotizacion_nueva.id_personalizado = cotizacion_nueva.generate_new_id_personalizado("{year}-{seq}")
 
-            cotizacion_nueva.save()
+            cotizacion_nueva.save()  # Guarda la nueva cotización antes de duplicar conceptos
 
             # Duplicar los conceptos asociados
             for concepto in cotizacion_original.conceptos.all():
                 concepto.pk = None  # Esto asegurará que se cree una nueva instancia
-                concepto.cotizacion = cotizacion_nueva
-                concepto.save()
+                concepto.cotizacion = cotizacion_nueva  # Asignar la nueva cotización al concepto
+                concepto.save()  # Guarda el concepto duplicado
 
-        messages.success(request, f'Cotización {cotizacion_original.id_personalizado} duplicada con éxito. Se creo la cotrización {cotizacion_nueva.id_personalizado}.')
+            # Calcular y guardar los valores derivados en la nueva cotización
+            cotizacion_nueva.subtotal = cotizacion_nueva.calculate_subtotal()
+            cotizacion_nueva.iva = cotizacion_nueva.calculate_iva()
+            cotizacion_nueva.total = cotizacion_nueva.calculate_total()
+            cotizacion_nueva.save()  # Guarda nuevamente para actualizar los totales
+
+        messages.success(request, f'Cotización {cotizacion_original.id_personalizado} duplicada con éxito. Se creó la cotización {cotizacion_nueva.id_personalizado}.')
         return redirect('cotizacion_detalle', pk=cotizacion_nueva.id)
 
     except Exception as e:
@@ -363,7 +393,12 @@ def cotizacion_pdf(request, pk):
         # Retornar el archivo PDF guardado
         return FileResponse(cotizacion.cotizacion_pdf.open(), content_type='application/pdf')
     else:
-        raise Http404("El archivo PDF no se encuentra.")
+        # Generar PDF y guardar en el modelo
+        pdf_data = generar_pdf_cotizacion(request, cotizacion)
+        cotizacion.cotizacion_pdf.save(f"cotizacion_{cotizacion.id_personalizado}.pdf", ContentFile(pdf_data))
+        cotizacion.save()
+        return FileResponse(cotizacion.cotizacion_pdf.open(), content_type='application/pdf')
+        
 
 # VISTA PARA VER ARCHIVO PDF ORDEN PEDIDO
 def ver_orden_pedido(request, pk):

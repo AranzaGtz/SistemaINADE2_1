@@ -209,7 +209,7 @@ class ConceptoForm(forms.ModelForm):
             
             'servicio': forms.Select(attrs={'class': 'form-control', 'list': 'servicios-list', 'autocomplete': 'off'}),
             'cantidad_servicios': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Cantidad', 'min': 1}),
-            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido', 'min': 1, 'step': 1.00}), # subir peso a peso
+            'precio': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas adicionales', 'rows': 3}),
         }
 
@@ -244,11 +244,14 @@ class CotizacionChangeForm(forms.ModelForm):
         model = Cotizacion
         fields = ['metodo_pago', 'tasa_iva', 'notas', 'correos_adicionales']
         widgets = {
-            'metodo_pago': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecciona Tipo de Moneda', 'required': 'True'}),
-            'tasa_iva': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingresa la tasa de IVA'}),
+            'metodo_pago': forms.Select(attrs={'class': 'form-select', 'placeholder': 'Selecciona Tipo de Moneda', 'required': 'True'}),
+            'tasa_iva': forms.Select(choices=[('0.08', '8%'), ('0.16', '16%')], attrs={'class': 'form-select', 'placeholder': 'Selecciona la tasa de IVA'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Notas que aparecerán al final de la cotización (Opcional).', 'rows': 3}),
             'correos_adicionales': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Ingresa correos adicionales, separados por comas (Opcional)', 'rows': 3}),
         }
+
+ConceptoChangeFormSet = inlineformset_factory(
+    Cotizacion, Concepto, form=ConceptoForm, extra=1, can_delete=True)
 
 # ---      ORGANIZACIÓN     ---
 
@@ -360,10 +363,11 @@ class QuejaForm(forms.ModelForm):
 class ConfiguracionSistemaForm(forms.ModelForm):
     class Meta:
         model = ConfiguracionSistema
-        fields = ['moneda_predeterminada', 'tasa_iva_default', 'formato_numero_cotizacion']
+        fields = ['moneda_predeterminada', 'tasa_iva_default', 'formato_numero_cotizacion','tipo_de_cambio_dolar']
         widgets = {
             'moneda_predeterminada': forms.Select(attrs={'class': 'form-select'}),
             'tasa_iva_default': forms.Select(attrs={'class': 'form-select'}),
             'formato_numero_cotizacion': forms.Select(attrs={'class': 'form-select'}),
+            'tipo_de_cambio_dolar': forms.TextInput(attrs={'class':'form-control'})
         }
         

@@ -5,10 +5,9 @@
 {% block content %}
 
 <!-- CONTENEDOR DETALLES DE COTIZACION -->
-<div class="container mt-4">
+<div class="container-xxl mt-4 mb-5">
 
-    <h1 class="text-center"> Detalles de la Cotización {{ cotizacion.id_personalizado }}{% if cotizacion.estado %}
-        Proyecto {% endif %}</h1>
+    <h1 class="text-center"> Detalles de la Cotización {{ cotizacion.id_personalizado }}{% if cotizacion.estado %} Proyecto {% endif %}</h1>
     <hr />
 
 
@@ -39,54 +38,121 @@
                 <!-- Elementos del dropdown -->
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 
-                    <li><a class="dropdown-item" href="{% url 'cotizacion_duplicar' cotizacion.id %}">Duplicar</a></li>
-                    <li><a class="dropdown-item" href="{% url 'cotizaciones_editar' cotizacion.id %}">Editar</a></li>
-                    <li><a class="dropdown-item" href="{% url 'cotizacion_delete' cotizacion.id %}">Borrar</a></li>
-                    <li><a class="dropdown-item" href="{% url 'seleccionar_correos' cotizacion.id %}">Enviar cotización</a></li>
-                    <li><a class="dropdown-item" href="{% url 'actualizar_estado' cotizacion.id %}">Actualizar estado</a></li>
-                    <li><a class="dropdown-item" href="{% url 'cotizacion_pdf' cotizacion.id %}" target="_blank">Ver PDF</a>
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCOT"><img src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
+                    <li><a class="dropdown-item" href="{% url 'cotizacion_duplicar' cotizacion.id %}"><img src="{% static 'img/copy.svg' %}"> Duplicar</a></li>
+                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EditCOT"><img src="{% static 'img/pencil-square.svg' %}"> Editar</a></button>
+                    {% if cotizacion.estado == 0 %}
+                    
+                    <li><a class="dropdown-item" href="{% url 'actualizar_estado' cotizacion.id %}"><img src="{% static 'img/check2-square.svg' %}"> Actualizar estado</a></li>
+                    {% endif %}
+                    <li>
+                        <a class="dropdown-item" href="{% url 'cotizacion_pdf' cotizacion.id %}" target="_blank"><img src="{% static 'img/filetype-pdf.svg' %}"> Ver PDF</a>
                     </li>
                 </ul>
             </div>
             <br>
-            <div class="row col-md-10 mx-auto">
-                <div class="col border-info p-4 mb-3 rounded shadow-sm">
-                    <h4 class="text-info mb-4">Información de la Cotización</h4>
-                    <p class="mb-2"><strong>Atención a:</strong> {{ cotizacion.persona.nombre }}
-                        {{ cotizacion.persona.apellidos }}
-                    </p>
-                    <p class="mb-2"><strong>Empresa:</strong> {{ cotizacion.persona.empresa.nombre_empresa }}</p>
-                    <p class="mb-2"><strong>Dirección:</strong> {{ cotizacion.persona.empresa.direccion }}</p>
-                    <p class="mb-2"><strong>Fecha solicitada:</strong> {{ cotizacion.fecha_solicitud | date:"d M Y" }}
-                    </p>
-                    <p class="mb-2"><strong>Fecha de caducidad:</strong> {{ cotizacion.fecha_caducidad | date:"d M Y" }}
-                    </p>
-                    <p class="mb-2"><strong>Denominación:</strong> {{ cotizacion.metodo_pago }}</p>
-                    <p class="mb-2"><strong>Tasa IVA:</strong> {{ cotizacion.tasa_iva }}%</p>
-                    <p class="mb-2"><strong>Notas:</strong> {{ cotizacion.notas }}</p>
-                    <p><strong>Correos adicionales:</strong> {{ cotizacion.correos_adicionales }}</p>
-                </div>
-                {% if cotizacion.estado %}
-                {% if ordenes_trabajo %}
-                <div class="col col-md-3 border-info p-4 mb-3 rounded shadow-sm">
-                    <h4 class="text-info mb-4">Ordenes de trabajo</h4>
-                    {% for orden in ordenes_trabajo %}
-                    <li><a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}"
-                            class="link-success">{{ orden.id_personalizado }}
-                            {{ orden.estado|yesno:"Terminado,No Terminado" }}</a></li>
-                    {% endfor %}
-                    <br>
-                    <a href="{% url 'generar_orden_trabajo' cotizacion.id %}" class="btn btn-success btn-sm mt-2">Crea
-                        nueva orden de trabajo</a>
-                </div>
-                {% else %}
-                <div class="col col-md-3 border-info p-4 mb-3 rounded shadow-sm">
-                    <a href="{% url 'generar_orden_trabajo' cotizacion.id %}" class="btn btn-success btn-sm mt-2">Crea
-                        nueva orden de trabajo</a>
+
+            <div class="row">
+                <div class="col col-lg-9">
+                    
+                    <div class="card border-light mb-3 mt-4"><!-- Card de información con estilos mejorados de Bootstrap -->
+
+                        <div class="card-header">Información de la Cotización</div>
+
+                        <div class="card-body">
+            
+                            <div class="row card-text">
+                            
+                                <div class="col-md-6 mb-3">
+                            
+                                    <p class="mb-2"><strong>Atención:</strong> {{ cotizacion.persona.nombre }}
+                                        {{ cotizacion.persona.apellidos }}
+                                    </p>
+                                    <p class="mb-2"><strong>Empresa:</strong> {{ cotizacion.persona.empresa.nombre_empresa }}</p>
+                                    <p class="mb-2"><strong>Dirección:</strong> {{ cotizacion.persona.empresa.direccion }}</p>
+                                    <p class="mb-2"><strong>Fecha solicitada:</strong> {{ cotizacion.fecha_solicitud | date:"d M Y" }}
+                                    </p>
+                                    <p class="mb-2"><strong>Fecha de caducidad:</strong> {{ cotizacion.fecha_caducidad | date:"d M Y" }}
+                                    </p>
+                                    <p class="mb-2"><strong>Denominación:</strong> {{ cotizacion.metodo_pago }}</p>
+                                    <p class="mb-2"><strong>Tasa IVA:</strong> {{ cotizacion.tasa_iva }}%</p>
+                                    <p class="mb-2"><strong>Notas:</strong> {{ cotizacion.notas }}</p>
+                                    <p><strong>Correos adicionales:</strong> {{ cotizacion.correos_adicionales }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {% endif %}
-                {% endif %}
+
+                <div class="col">
+
+                    {% if cotizacion.estado %}
+                    {% if ordenes_trabajo %}
+    
+                    <div class="col">
+                        <!-- Card de ordenesd -->
+                        <div class="card border-light mb-3 mt-4" style="max-width: 18rem;">
+                            <div class="card-header">Ordenes de trabajo</div>
+                            <div class=" row card-body">
+                                {% for orden in ordenes_trabajo %}
+                                <li>
+                                    <a href="{% url 'detalle_orden_trabajo' orden.id_personalizado %}" class="link-primary">
+                                        {{ orden.id_personalizado }}{{ orden.estado|yesno:"Terminado,No Terminado" }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                                <br>
+                                <a href="{% url 'generar_orden_trabajo' cotizacion.id %}" class="btn btn-primary ">Nueva Orden de trabajo</a>
+                            </div>
+                        </div>
+                    
+                    </div>
+    
+                    {% else %}
+    
+                    <div class="col">
+                        <!-- Card de ordenesd -->
+                        <div class="card border-light mb-3 mt-4" style="max-width: 18rem;">
+                            <div class="card-header">Ordenes de trabajo</div>
+                            <div class=" row card-body">
+                                <br>
+                                <a href="{% url 'generar_orden_trabajo' cotizacion.id %}" class="btn btn-primary ">Nueva Orden de trabajo</a>
+                            </div>
+                        </div>
+                    
+                    </div>
+    
+                    {% endif %}
+                    {% endif %}
+    
+                    <div class="col">
+                        <!-- Card de cuentas -->
+                        <div class="card border-light mb-3 mt-4" style="max-width: 18rem;">
+                            <div class="card-header">Cuenta</div>
+                            <div class=" row card-body">
+                                <div class="col card-text">
+                                    <p class="text-start">Subtotal</p>
+                                    <p class="text-start">IVA ({{ cotizacion.tasa_iva }}%):</strong> </p>
+                                </div>
+                                <div class="col card-text">
+                                    <p class="text-end">$ {{ cotizacion.subtotal }} </p>
+                                    <p class="text-end">$ {{ cotizacion.iva }} </p>
+                                </div>
+                            </div>
+                    
+                            <div class="card-footer bg-transparent">
+                                <div class="row card-text">
+                                    <div class="col text-start">Importe</div>
+                                    <div class="col text-end">$ {{ cotizacion.total }} {{ cotizacion.metodo_pago }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+
+                </div>
+                
             </div>
 
             <!-- DETALLES DE CONCEPTOS -->
@@ -116,15 +182,6 @@
                 </table>
             </div>
 
-            <!-- RESUMEN -->
-            <div class="d-flex justify-content-end mt-4">
-                <div class="p-2">
-                    <h4>Resumen</h4>
-                    <p><strong>Subtotal:</strong> ${{ cotizacion.subtotal }}</p>
-                    <p><strong>IVA ({{ cotizacion.tasa_iva }}%):</strong> ${{ cotizacion.iva }}</p>
-                    <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
-                </div>
-            </div>
         </div>
         
         <!-- DETALLES -->
@@ -165,6 +222,126 @@
             </div>
         </div>
     </div>
-
 </div>
+
+<!-- Modal para editar cotización -->
+<div class="modal fade" id="EditCOT" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Editar Cotización</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'cotizaciones_editar' cotizacion.id %}" method="post" id="fEditCOT">
+                    <!-- Token de protección CSRF -->
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col">
+                            <!-- Formulario de la cotización con campos renderizados automáticamente -->
+                            <div class="form-group">
+                                {{ cotizacion_form.metodo_pago.label }} <!-- Etiqueta para el campo método de pago -->
+                                {{ cotizacion_form.metodo_pago }} <!-- Campo para método de pago -->
+                                <small class="form-text text-muted">Selecciona el tipo de moneda.</small>
+                            </div>
+                    
+                            <div class="form-group">
+                                {{ cotizacion_form.tasa_iva.label }} <!-- Etiqueta para el campo tasa de IVA -->
+                                {{ cotizacion_form.tasa_iva }} <!-- Campo para la tasa de IVA -->
+                                <small class="form-text text-muted">Ingresa la tasa de IVA en porcentaje.</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                {{ cotizacion_form.notas.label }} <!-- Etiqueta para el campo notas -->
+                                {{ cotizacion_form.notas }} <!-- Campo para las notas -->
+                                <small class="form-text text-muted">Notas que aparecerán al final de la cotización (Opcional).</small>
+                            </div>
+                    
+                            <div class="form-group">
+                                {{ cotizacion_form.correos_adicionales.label }} <!-- Etiqueta para el campo correos adicionales -->
+                                {{ cotizacion_form.correos_adicionales }} <!-- Campo para correos adicionales -->
+                                <small class="form-text text-muted">Ingresa correos adicionales, separados por comas (Opcional).</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <!-- Formset de conceptos -->
+                    {{ concepto_formset.management_form }}
+                    {% for form in concepto_formset %}
+                        <div class="formset-row">
+                            {{ form.as_p }}
+                        </div>
+                    {% endfor %}
+                </form>
+                <!-- Spinner -->
+                <div id="loading" style="display: none;" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Por favor, espera...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary" form="fEditCOT">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('fEditCOT'); // Reemplaza con el ID de tu formulario
+
+        form.addEventListener('submit', function () {
+            // Muestra el spinner
+            document.getElementById('loading').style.display = 'block';
+        });
+    });
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('fEnviarCOT');
+        const enviarBtn = document.getElementById('enviarBtn');
+        const loading = document.getElementById('loading');
+    
+        form.addEventListener('submit', function (event) {
+            // Mostrar el spinner
+            loading.style.display = 'block';
+    
+            // Deshabilitar el botón de enviar para evitar múltiples envíos
+            enviarBtn.disabled = true;
+        });
+    });
+    // Espera a que el contenido del documento esté completamente cargado antes de ejecutar el script
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtiene la referencia al modal de eliminación de cotización por su ID
+        var deleteCotizacionModal = document.getElementById('deleteCotizacionModal');
+
+        // Agrega un evento cuando el modal de eliminación se muestra
+        deleteCotizacionModal.addEventListener('show.bs.modal', function (event) {
+            // Obtiene el botón que activó el modal (el botón relacionado)
+            var button = event.relatedTarget;
+
+            // Obtiene el ID de la cotización desde el atributo data-cotizacion-id del botón
+            var cotizacionId = button.getAttribute('data-cotizacion-id');
+
+            // Obtiene el formulario de eliminación de cotización por su ID
+            var form = document.getElementById('deleteCotizacionForm');
+
+            // Obtiene la acción actual del formulario y reemplaza '0' con el cotizacionId obtenido
+            var action = form.getAttribute('action').replace('0', cotizacionId);
+
+            // Actualiza la acción del formulario con la nueva URL que incluye el cotizacionId
+            form.setAttribute('action', action);
+        });
+    });
+
+
+</script>
+
 {% endblock %}

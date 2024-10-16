@@ -3,16 +3,17 @@ from django.views.generic.list import ListView
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect, render
 from accounts.forms import ConfiguracionSistemaForm
-from accounts.models import  ConfiguracionSistema, Notificacion
+from accounts.models import  ConfiguracionSistema, Notificacion, Organizacion
 from .utils import obtener_configuracion
 from django.contrib import messages
 
 
 #   VISTA PARA IR A LA CONFIGURACIÓN DEL SISTEMA
 def editar_configuracion_sistema(request):
-    # Obtén la primera instancia de ConfiguracionSistema o crea una si no existe
-    configuracion, created = ConfiguracionSistema.objects.get_or_create(id=1)
-    
+    # Obtén la organización del usuario logueado
+    organizacion = get_object_or_404(Organizacion, id=request.user.organizacion.id)  # Suponiendo que tienes una relación en el usuario
+    configuracion = organizacion.configuracion_sistema
+
     if request.method == 'POST':
         form = ConfiguracionSistemaForm(request.POST, instance=configuracion)
         if form.is_valid():
@@ -50,3 +51,4 @@ def borrar_notificacion(request, pk):
     notificacion = get_object_or_404(Notificacion, pk=pk)
     notificacion.delete()
     return JsonResponse({'success': True})
+

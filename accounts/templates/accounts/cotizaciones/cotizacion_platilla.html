@@ -174,21 +174,21 @@
 </head>
 
 <body>
-     <div class="row sb">
-          <img class="logo" src="{{ org.logo.url }}" alt="Logo de {{ organizacion.nombre }}" style="width: 60pt; height: 60pt; object-fit: contain;display: block;margin-left: auto;margin-right: auto;">
-          <h4 class="text-center">{{ org }}</h4>
-          <p class="text-end">
-               <strong>{{ org_form.nombre_formato }}</strong><br>
-               Versión {{ org_form.version }}<br>
-               Emisión: {{ org_form.emision|date:"d/m/Y" }}
-          </p>
+     <div class="row sb d-flex align-items-center">
+          <div class="col-auto"><img class="logo" src="{{ org.logo.url }}" alt="Logo de {{ organizacion.nombre }}" ></div>
+          <div class="col text-center"><h4 class="">{{ org }}</h4></div>
+          <div class="col ">
+               <div class="row end"><strong>{{ org_form.nombre_formato }}</strong></div>
+               <div class="row end">Versión {{ org_form.version }}</div>
+               <div class="row end">Emisión: {{ org_form.emision|date:"d/m/Y" }}</div>
+          </div>
      </div>
 
-     <h3 class="text-center">COTIZACIÓN / CONTRATO</h3><br>
+     <h3 class="text-center m-0">COTIZACIÓN / CONTRATO</h3>
 
      <div class="row sb">
           <div class="w-m">
-               <p class="m-1"><strong>Atención a: {{ cotizacion.persona.titulo.abreviatura }}
+               <p class="m-1"><strong>Atención : {{ cotizacion.persona.titulo.abreviatura }}
                          {{cotizacion.persona.nombre }} {{cotizacion.persona.apellidos }}</strong></p>
                <p class="m-1">{{ cotizacion.persona.empresa.nombre_empresa }}</p>
                <p class="m-1">{{ cotizacion.persona.empresa.direccion }}</p>

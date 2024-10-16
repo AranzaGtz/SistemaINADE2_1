@@ -28,30 +28,27 @@
         {% csrf_token %}
 
         <div class="form-group mt-4">
-            <div class="alert alert-primary mb-4">
+
+            <div class="alert alert-primary ">
                 <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
                 Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
             </div>
 
-            <div class="container mt-3">
+            <div class="container-xxl mt-3">
                 <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div class="card border-primary">
-                            <div class="card-header bg-primary text-white text-center">
-                                <h5>Cliente <strong>{{ cliente.empresa.nombre_empresa }}</strong></h5>
-                            </div>
-                            <div class="card-body bg-light">
-                                <p class="card-text">
-                                    <strong>RFC:</strong> <span class="text-monospace">{{ cliente.empresa.rfc }}</span>
-                                </p>
-                                <p class="card-text">
-                                    <strong>Representante:</strong> {{ cliente }}
-                                </p>
-                                <p class="card-text">
-                                    <strong>Información de contacto:</strong> {{ cliente.informacion_contacto }}
-                                </p>
-                            </div>
-                        </div>
+                    <div class="card-header bg-primary bg-gradient text-white text-center">
+                        <h5>Cliente <strong>{{ cliente.empresa.nombre_empresa }}</strong></h5>
+                    </div>
+                    <div class="card-body bg-light mb-4">
+                        <p class="card-text ml-5">
+                            <strong>RFC:</strong> <span class="text-monospace">{{ cliente.empresa.rfc }}</span>
+                        </p>
+                        <p class="card-text ml-5">
+                            <strong>Representante:</strong> {{ cliente }}
+                        </p>
+                        <p class="card-text ml-5">
+                            <strong>Información de contacto:</strong> {{ cliente.informacion_contacto }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -78,6 +75,12 @@
                         <option value="MXN" {% if cotizacion_form.metodo_pago.value == 'MXN' %}selected{% endif %}>MXN</option>
                         <option value="USD" {% if cotizacion_form.metodo_pago.value == 'USD' %}selected{% endif %}>USD</option>
                     </select>
+
+                    <!-- Alerta de tipo de cambio -->
+                    <div id="alert-tipo-cambio" class="alert alert-warning alert-dismissible fade show mt-1" role="alert" style="display: none;">
+                        <strong>Tipo de cambio:</strong> {{ tipo_de_cambio }}  Sí Requieres cambiarlo ve a: <a href="{% url 'config_org' %}#sistema" target="_blank">Configuración</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>  
                 </div>
                 <div class="col-md-6 mt-2">
                     <label for="tasa_iva">Tasa del IVA actual</label>
@@ -85,7 +88,8 @@
                         <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%</option>
                         <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%</option>
                     </select>
-                </div>            
+                </div>  
+                         
             </div>
 
             <div class="row mt-2">
@@ -162,7 +166,6 @@
                 <div id="subtotal">Subtotal: {{ cotizacion.subtotal }}</div>
                 <div id="iva">IVA: {{ cotizacion.iva }}</div>
                 <div id="total">Total: {{ cotizacion.total }}</div>
-                <div id="moneda">Moneda: MXN</div>
             </div>
         </div>
 
@@ -217,118 +220,166 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 <script>
-    $(document).ready(function () {
+    // Almacenar el tipo de cambio
+    const TIPO_CAMBIO = 18; // Ejemplo de tipo de cambio: 1 USD = 18 MXN
+
+    // Función para convertir precios de MXN a USD
+    function convertirPrecio(precio, metodoPago) {
+        return metodoPago === 'USD' ? (precio / TIPO_CAMBIO).toFixed(2) : precio.toFixed(2);
+    }
+
+    // Función para actualizar precios según el método de pago
+    function actualizarPrecios() {
+        const metodoPago = $('#metodo_pago').val();
+        $('#concepto_formset .concepto-form').each(function() {
+            const precioElement = $(this).find("input[name$='-precio']");
+            const cantidadElement = $(this).find("input[name$='-cantidad_servicios']");
+            const precioOriginal = parseFloat(precioElement.data('precio-original')) || 0;
+
+            // Actualiza el precio en función del método de pago
+            if (metodoPago === 'USD') {
+                const precioConvertido = convertirPrecio(precioOriginal, metodoPago);
+                precioElement.val(precioConvertido);
+            } else {
+                // Si el método de pago es MXN, restablecer el precio original
+                precioElement.val(precioOriginal.toFixed(2));
+            }
+        });
+    }
+
+    // Función para calcular los totales
+    function actualizarTotales() {
+        let subtotal = 0;
+        const forms = document.querySelectorAll(".concepto-form");
+        const tasaIvaElement = document.querySelector("select[name='tasa_iva']");
+        const tasaIva = parseFloat(tasaIvaElement.value) || 0;
+        const metodoPagoElement = document.querySelector("select[name='metodo_pago']");
+        const metodoPago = metodoPagoElement.value;
+
+        forms.forEach(form => {
+            const precioElement = form.querySelector("input[name$='-precio']");
+            const cantidadElement = form.querySelector("input[name$='-cantidad_servicios']");
+            if (precioElement && cantidadElement) {
+                const precio = parseFloat(precioElement.value) || 0;
+                const cantidad = parseInt(cantidadElement.value) || 0;
+
+                subtotal += precio * cantidad;
+            }
+        });
+
+        const iva = subtotal * tasaIva;
+        const total = subtotal + iva;
+
+        // Actualiza el DOM con los totales
+        document.getElementById("subtotal").textContent = `Subtotal: ${subtotal.toFixed(2)} ${metodoPago === 'USD' ? 'USD' : 'MXN'}`;
+        document.getElementById("iva").textContent = `IVA: ${iva.toFixed(2)} ${metodoPago === 'USD' ? 'USD' : 'MXN'}`;
+        document.getElementById("total").textContent = `Total: ${total.toFixed(2)} ${metodoPago === 'USD' ? 'USD' : 'MXN'}`;
+    }
+
+    // Función para manejar el cambio de servicio
+    function obtenerDatosServicio(servicioId, outputElement, precioElement) {
+        if (servicioId) {
+            fetch(`/obtener_datos_servicio/${servicioId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    outputElement.html(`
+                        <div class="row pt-2 pb-2 pl-5">
+                            <div class="col">
+                                <strong>Servicio:</strong> ${data.nombre}<br>
+                                <strong>Método: </strong><code>${data.metodo}</code><br>
+                                <strong>Descripción:</strong> ${data.descripcion}<br>
+                                <strong>Precio sugerido:</strong> $${data.precio}<br>
+                            </div>
+                            <div class="col col-1">
+                                <div><a href="#" class="btn" class="text-end"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a></div>
+                            </div>
+                        </div>`);
+                    // Establece el precio en el campo de precio y guarda el precio original
+                    precioElement.val(data.precio);
+                    precioElement.data('precio-original', data.precio); // Guardar el precio original para futuras conversiones
+                    convertirPrecioSiUSD(precioElement);
+                }).catch(error => {
+                    console.error('Error:', error);
+                    outputElement.html('Error al obtener los datos del servicio.');
+                });
+        } else {
+            outputElement.html('');
+            precioElement.val('');
+        }
+    }
+
+    // Función para convertir precio si el método de pago es USD
+    function convertirPrecioSiUSD(precioElement) {
+        const metodoPago = $('#metodo_pago').val();
+        const precioOriginal = parseFloat(precioElement.data('precio-original')) || 0;
+
+        if (metodoPago === 'USD') {
+            const precioConvertido = convertirPrecio(precioOriginal, metodoPago);
+            precioElement.val(precioConvertido);
+        } else {
+            precioElement.val(precioOriginal.toFixed(2)); // Muestra el precio original en MXN
+        }
+    }
+
+    $(document).ready(function() {
+        // Inicializar Select2 y eventos para formularios
         function initializeSelect2AndEvents() {
-            $('#concepto_formset .concepto-form').each(function (index, form) {
-                var servicioSelect = $(form).find('select[name$="servicio"]');
-                var servicioDatosId = 'servicio-datos-' + index;
-                var servicioDatos = $(form).find('.servicio-datos');
+            $('#concepto_formset .concepto-form').each(function(index, form) {
+                const servicioSelect = $(form).find('select[name$="servicio"]');
+                const servicioDatosId = 'servicio-datos-' + index;
+                const servicioDatos = $(form).find('.servicio-datos');
                 servicioDatos.attr('id', servicioDatosId);
 
+                // Inicializa Select2
                 if (!servicioSelect.hasClass('select2-hidden-accessible')) {
                     servicioSelect.select2({
                         placeholder: "Selecciona un servicio",
-                        allowClear: true
+                        allowClear: true,
+                        class: 'form-control',
                     });
                 }
 
-                servicioSelect.off('change').on('change', function () {
-                    obtenerDatosServicio($(this).val(), $('#' + servicioDatosId));
+                // Manejar el cambio de servicio
+                servicioSelect.off('change').on('change', function() {
+                    const precioElement = $(form).find('input[name$="-precio"]');
+                    obtenerDatosServicio($(this).val(), $('#' + servicioDatosId), precioElement);
+                    actualizarPrecios();
+                    actualizarTotales();
                 });
             });
         }
 
-        $('#add-concepto-form').click(function () {
-            var formIdx = $('#id_conceptos-TOTAL_FORMS').val();
-            var formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
+        // Agregar un nuevo concepto
+        $('#add-concepto-form').click(function() {
+            const formIdx = $('#id_conceptos-TOTAL_FORMS').val();
+            let formTemplate = $('#empty_form').html().replace(/__prefix__/g, formIdx);
             formTemplate = formTemplate.replace(/__counter__/g, parseInt(formIdx) + 1);
 
             $('#concepto_formset').append(formTemplate);
             initializeSelect2AndEvents();
-
             $('#id_conceptos-TOTAL_FORMS').val(parseInt(formIdx) + 1);
         });
 
-        function obtenerDatosServicio(servicioId, outputElement) {
-            if (servicioId) {
-                fetch(`/obtener_datos_servicio/${servicioId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        outputElement.html(`
-                            <div class="row pt-2 pb-2 pl-5">
-                                <div class="col">
-                                    <strong>Servicio:</strong> ${data.nombre}<br>
-                                    <strong>Método: </strong><code>${data.metodo}</code><br>
-                                    <strong>Descripción:</strong> ${data.descripcion}<br>
-                                    <strong>Precio sugerido:</strong> ${data.precio}<br>
-                                </div>
-                                <div class="col col-1">
-                                    <div><a href="#" class="btn" class="text-end"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a></div>
-                                </div>
-                            </div>`);
-                    }).catch(error => {
-                        console.error('Error:', error);
-                        outputElement.html('Error al obtener los datos del servicio.');
-                    });
-            } else {
-                outputElement.html('');
-            }
-        }
-
-        initializeSelect2AndEvents();
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        function actualizarTotales() {
-            let subtotal = 0;
-            const forms = document.querySelectorAll(".concepto-form");
-            const tasaIvaElement = document.querySelector("select[name='tasa_iva']");
-            const tasaIva = parseFloat(tasaIvaElement.value) || 0;
-            const metodoPagoElement = document.querySelector("select[name='metodo_pago']");
-            const metodoPago = metodoPagoElement.value;
-            const tipoCambio = 18;  // Ejemplo de tipo de cambio USD a MXN
-
-            forms.forEach(form => {
-                const precioElement = form.querySelector("input[name$='-precio']");
-                const cantidadElement = form.querySelector("input[name$='-cantidad_servicios']");
-                if (precioElement && cantidadElement) {
-                    let precio = parseFloat(precioElement.value) || 0;
-                    const cantidad = parseInt(cantidadElement.value) || 0;
-
-                    if (metodoPago === 'USD') {
-                        precio *= tipoCambio;
-                    }
-
-                    subtotal += precio * cantidad;
-                }
-            });
-
-            const iva = subtotal * tasaIva;
-            const total = subtotal + iva;
-
-            document.getElementById("subtotal").textContent = `Subtotal: ${subtotal.toFixed(2)} MXN`;
-            document.getElementById("iva").textContent = `IVA: ${iva.toFixed(2)} MXN`;
-            document.getElementById("total").textContent = `Total: ${total.toFixed(2)} MXN`;
-        }
-
-        document.getElementById("concepto_formset").addEventListener("input", function (event) {
+        // Manejo de eventos de actualización de totales
+        $('#concepto_formset').on("input", function(event) {
             if (event.target.name.includes("precio") || event.target.name.includes("cantidad_servicios") || event.target.name === "tasa_iva") {
                 actualizarTotales();
             }
         });
 
-        document.querySelector("select[name='tasa_iva']").addEventListener("input", actualizarTotales);
-        document.querySelector("select[name='metodo_pago']").addEventListener("change", actualizarTotales);
+        // Actualizar totales al cambiar el método de pago
+        $('select[name="metodo_pago"]').change(function() {
+            actualizarPrecios();
+            actualizarTotales();
+        });
 
-        actualizarTotales();
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
+        // Configurar la gestión de fechas
         const fechaSolicitudInput = document.getElementById("id_fecha_solicitud");
         const fechaCaducidadInput = document.getElementById("id_fecha_caducidad");
 
-        fechaSolicitudInput.addEventListener("change", function () {
+        fechaSolicitudInput.addEventListener("change", function() {
             const fechaSolicitud = new Date(fechaSolicitudInput.value);
             if (!isNaN(fechaSolicitud.getTime())) {
                 const fechaCaducidad = new Date(fechaSolicitud);
@@ -339,8 +390,36 @@
                 fechaCaducidadInput.value = `${year}-${month}-${day}`;
             }
         });
+
+        // Inicializar eventos al cargar el documento
+        initializeSelect2AndEvents();
+        actualizarTotales();
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtener elementos
+        const metodoPagoSelect = document.getElementById('metodo_pago');
+        const alertTipoCambio = document.getElementById('alert-tipo-cambio');
+
+        // Función para mostrar/ocultar la alerta
+        function toggleAlerta() {
+            if (metodoPagoSelect.value === 'USD') {
+                alertTipoCambio.style.display = 'block'; // Mostrar alerta si es USD
+            } else {
+                alertTipoCambio.style.display = 'none';  // Ocultar alerta si no es USD
+            }
+        }
+
+        // Escuchar el cambio en el select
+        metodoPagoSelect.addEventListener('change', toggleAlerta);
+
+        // Llamar a la función al cargar la página para mostrar/ocultar según el valor inicial
+        toggleAlerta();
     });
 </script>
+
+
+
 <script>
     function abrirVentanaServicio() {
         const url = "{% url 'agregar_servicio' %}";

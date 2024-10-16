@@ -71,12 +71,6 @@ def seleccionar_correos(request, pk):
         # Llama a la función enviar_cotizacion pasando el mensaje personalizado
         return enviar_cotizacion(request, cotizacion.id, destinatarios, cuerpo_mensaje_personalizado)
 
-    return render(request, 'accounts/correos/seleccionar_correos.html', {
-        'cotizacion': cotizacion,
-        'cliente_correo': cliente_correo,
-        'usuario_correo': usuario_correo,
-        'correos_adicionales': correos_adicionales
-    })
 
 
 #   VISTA PARA RENDERIZAR FORMULARIO DE CONFIRMACIÓN
@@ -119,7 +113,7 @@ def formulario_descarga_subida(request, pk, usuario):
                 usuario=usuario_obj,
                 tipo='orden_trabajo_subida',
                 mensaje=f'Se ha subido la orden de trabajo para la cotización {cotizacion.id}',
-                enlace=reverse('cotizacion_detalle', args=[cotizacion.id])
+                enlace=cotizacion
             )
             messages.success(request, 'Orden de trabajo subida exitosamente.')
             return redirect('confirmacion_recepcion')

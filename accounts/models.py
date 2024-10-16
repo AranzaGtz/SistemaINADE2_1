@@ -5,6 +5,17 @@ from django.db import models
 from django.contrib.auth.models import  BaseUserManager, AbstractUser
 from django.utils.translation import gettext_lazy as _
 
+opciones_iva = [
+    ('0.08', '8%'),
+    ('0.16', '16%')
+]
+
+formatos_cotizacion = [
+    ('COT-{year}-{seq}', 'COT-{year}-{seq}'),
+    ('{year}-COT-{seq}', '{year}-COT-{seq}'),
+    ('COT-{seq}', 'COT-{seq}'),
+    ('{seq}', '{seq}')
+]
 
 # MODELO PARA DIRECCION
 class Direccion(models.Model):
@@ -18,7 +29,6 @@ class Direccion(models.Model):
     
     def __str__(self):
         return f"{self.calle}, No.{self.numero}, Col. {self.colonia}, {self.ciudad}, {self.estado}, C.P. {self.codigo}"
-
 
 #----------------------------------------------------
 # MODELO PARA MI ORGANIZACIÓN
@@ -43,6 +53,44 @@ class FormatoOrden (models.Model):
     titulo_documento = models.CharField(max_length=255, blank=True, default="Orden de Trabajo")  # Nuevo campo para el título del documento
     imagen_marca_agua = models.ImageField(upload_to='marca_agua/', blank=True, null=True)  # Nuevo campo para la imagen de marca de agua
 
+# MODELO PARA CONFIGURACIÓN GENERAL DEL SISTEMA
+class ConfiguracionSistema(models.Model):
+    moneda_predeterminada = models.CharField(
+        max_length=10,
+        choices=[
+            ('MXN', 'MXN - Moneda Nacional Mexicana'),
+            ('USD', 'USD - Dolar Estadunidense')
+        ],
+        default='MXN',
+        verbose_name=_("Moneda Predeterminada")
+    )
+
+    tasa_iva_default = models.CharField(
+        max_length=4, 
+        choices=opciones_iva, 
+        default='0.08',
+        verbose_name=_("Tasa de IVA Predeterminada")
+    )
+
+    formato_numero_cotizacion = models.CharField(
+        max_length=50, 
+        choices=formatos_cotizacion,
+        default='{seq}',
+        verbose_name=_("Formato de Número de Cotización")
+    )
+    
+    tipo_de_cambio_dolar = models.DecimalField(max_digits=10, decimal_places=4, default=Decimal('18.0'))
+
+    
+    def __str__(self):
+        return "Configuración General del Sistema"
+
+    class Meta:
+        verbose_name = "Configuración del Sistema"
+        verbose_name_plural = "Configuraciones del Sistema"
+        
+TIPO_DE_CAMBIO = Decimal('18.0')
+
 # MODELO PARA ORGANIZACION
 class Organizacion(models.Model):
     nombre = models.CharField(max_length=255, default='Ingenieria y Administración Estratégica, S.A. de C.V.')
@@ -62,10 +110,21 @@ class Organizacion(models.Model):
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)  # Campo para el logo
     f_cotizacion = models.ForeignKey(FormatoCotizacion, related_name='formatos', on_delete=models.CASCADE, null=True)
     f_orden = models.ForeignKey(FormatoOrden, related_name='formatos', on_delete=models.CASCADE, null=True)
+    # Clave foránea hacia ConfiguracionSistema
+    configuracion_sistema = models.ForeignKey(ConfiguracionSistema, on_delete=models.CASCADE, related_name='organizaciones',blank=True, null=True  )
+
+    def save(self, *args, **kwargs):
+        # Si no se proporciona una configuracion_sistema, crea una por defecto
+        if not self.configuracion_sistema:
+            self.configuracion_sistema = ConfiguracionSistema.objects.create(
+                moneda_predeterminada='MXN',  # Ajusta según tus necesidades
+                tasa_iva_default='0.08',
+                formato_numero_cotizacion='{seq}'
+            )
+        super(Organizacion, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
-
 
 
 # MODELO PARA USUARIOS ADMINISTRADORES
@@ -129,19 +188,6 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} | {self.username}"
-
-# MODELO PARA NOTIFICACIONES
-class Notificacion(models.Model):
-    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True )
-    tipo = models.CharField(max_length=100)
-    mensaje = models.TextField()
-    enlace = models.URLField()
-    leido = models.BooleanField(default=False)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-fecha_creacion']
-
 
 # MODELO PARA EMPRESA
 class Empresa(models.Model):
@@ -207,7 +253,7 @@ class Prospecto(models.Model):
     persona = models.ForeignKey(Persona, on_delete=models.CASCADE, related_name='prospecto')
 
 # MODELO DE COTIZACION
-TIPO_DE_CAMBIO = Decimal('18.0')
+
 class Cotizacion(models.Model):
     id_personalizado = models.CharField(max_length=4, unique=True, null=True, blank=True)
     fecha_solicitud = models.DateField(null=True, blank=True)
@@ -296,6 +342,20 @@ class Cotizacion(models.Model):
 
     def __str__(self):
         return self.id_personalizado
+    
+
+# MODELO PARA NOTIFICACIONES
+class Notificacion(models.Model):
+    usuario = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=True, null=True )
+    tipo = models.CharField(max_length=100)
+    mensaje = models.TextField()
+    enlace = models.ForeignKey(Cotizacion, on_delete=models.PROTECT, related_name='cotizacion')
+    leido = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_creacion']    
+
 
 # MODELO PARA METODO
 class Metodo(models.Model):
@@ -383,47 +443,6 @@ class OrdenTrabajoConcepto(models.Model):
 
     orden_de_trabajo = models.ForeignKey(OrdenTrabajo, related_name='conceptos', on_delete=models.CASCADE)
     concepto = models.ForeignKey(Concepto, on_delete=models.CASCADE)
-
-# MODELO PARA CONFIGURACIÓN GENERAL DEL SISTEMA
-class ConfiguracionSistema(models.Model):
-    moneda_predeterminada = models.CharField(
-        max_length=10,
-        choices=[
-            ('MXN', 'MXN - Moneda Nacional Mexicana'),
-            ('USD', 'USD - Dolar Estadunidense')
-        ],
-        default='MXN',
-        verbose_name=_("Moneda Predeterminada")
-    )
-    opciones_iva = [
-        ('0.08', '8%'),
-        ('0.16', '16%')
-    ]
-    tasa_iva_default = models.CharField(
-        max_length=4, 
-        choices=opciones_iva, 
-        default='0.08',
-        verbose_name=_("Tasa de IVA Predeterminada")
-    )
-    formatos_cotizacion = [
-        ('COT-{year}-{seq}', 'COT-{year}-{seq}'),
-        ('{year}-COT-{seq}', '{year}-COT-{seq}'),
-        ('COT-{seq}', 'COT-{seq}'),
-        ('{seq}', '{seq}')
-    ]
-    formato_numero_cotizacion = models.CharField(
-        max_length=50, 
-        choices=formatos_cotizacion,
-        default='{seq}',
-        verbose_name=_("Formato de Número de Cotización")
-    )
-    
-    def __str__(self):
-        return "Configuración General del Sistema"
-
-    class Meta:
-        verbose_name = "Configuración del Sistema"
-        verbose_name_plural = "Configuraciones del Sistema"
 
 # MODELO PARA QUEJAS
 class Queja(models.Model):

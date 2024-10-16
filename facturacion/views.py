@@ -176,14 +176,17 @@ def obtener_datos_cotizacion(request, cotizacion_id):
 
 @login_required
 def facturas_list(request):
-    
     emisor_rfc = get_emisor(request)
     cdfis_json = cfdis_all(emisor_rfc)
+
+    # Ordenar facturas de forma descendente por la fecha de creación (o el campo que uses para este propósito)
+    facturas = Factura.objects.all().order_by('-id')  # Asegúrate de que 'created_at' sea un campo válido en tu modelo
+
     context = {
-        'facturas' :  Factura.objects.all(),
+        'facturas': facturas,
         'cdfis': cdfis_json,
     }
-    return render (request, "facturacion/facturas.html",context)
+    return render(request, "facturacion/facturas.html", context)
 
 @login_required
 def factura_detalle(request, cfdi_id):
@@ -396,13 +399,9 @@ def crear_factura(request, id_personalizado):
             datos_p = pie_form.cleaned_data
             datos_t = totales_form.cleaned_data
             
-            tipo_moneda = datos_e['tipo_moneda']
             direccion = datos_p['direccion']
-            notificacion = datos_p['notificacion']
-            correos = datos_p['correos']
             subtotal = datos_t['subtotal']
             iva = datos_t['iva']
-            tasa_iva = datos_t['tasa_iva']
             total = datos_t['total']
 
             # Iteramos sobre los conceptos
@@ -446,7 +445,7 @@ def crear_factura(request, id_personalizado):
             print(aware_datetime.isoformat())
             cfdi_data = {
                 "NameId": "1",
-                "Currency": "MXN",
+                "Currency": datos_e['tipo_moneda'],
                 "Folio": get_new_cfdi_id(),
                 "Serie": "FAC",
                 "Date": aware_datetime.isoformat(),  # Fecha actual en formato ISO 8601
@@ -490,10 +489,10 @@ def crear_factura(request, id_personalizado):
                         "TaxObject": concepto['objeto_imp'],
                         "Taxes": [
                             {
-                                "Total": float(concepto['importe']) * 0.16,
+                                "Total": float(concepto['importe']) * datos_t['tasa_iva'],
                                 "Name": "IVA",
                                 "Base": float(concepto['importe']),
-                                "Rate": 0.16,
+                                "Rate": datos_t['tasa_iva'],
                                 "IsRetention": False
                             }
                         ],
@@ -502,6 +501,9 @@ def crear_factura(request, id_personalizado):
                     for concepto in conceptos_data
                 ]
             }
+            
+            
+            
             print(get_new_cfdi_id())
             response = crear_cfdi_api(cfdi_data)
 
@@ -533,7 +535,6 @@ def crear_factura(request, id_personalizado):
                     iva=datos_t['iva'],
                     total=response_data.get("Total"),
                     comentarios=response_data.get("Observations"),
-                    correos=correos,
                     estado=response_data.get("Status"),
                     OriginalString=response_data.get("OriginalString"),
                     CfdiSign=response_data.get("Complement", {}).get("TaxStamp", {}).get("CfdiSign"),
@@ -550,7 +551,7 @@ def crear_factura(request, id_personalizado):
         return redirect('home')
     
     encabezado_form = FacturaEncabezadoForm(initial={'OrderNumber': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
-    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
+    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas})
     totales_form = FacturaTotalesForm()
     
     context = {
