@@ -21,7 +21,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 # Importaciones de tu proyecto
 from SistemaINADE2.settings import EMAIL_HOST_USER, PASSWORD, SANDBOX_URL, USERNAME
 from accounts.helpers import get_unica_organizacion
-from accounts.models import Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
+from accounts.models import Concepto, Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
 from facturacion.models import CSD, Comprobante, Factura
 from .forms import (CSDForm, CancelarCFDI, ComprobantePagoForm, EmailForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm)
 
@@ -142,6 +142,7 @@ def get_new_cfdi_comp_id(): # FUNCION PARA BUSCAR EL SIGUIENTE NUEVO FOLIO DE UN
     else:
         next_id = 1
     print (f"{next_id:04d}")
+    return next_id
 
 def convertir_a_base64(file):
     return base64.b64encode(file.read()).decode('utf-8')
@@ -176,17 +177,14 @@ def obtener_datos_cotizacion(request, cotizacion_id):
 
 @login_required
 def facturas_list(request):
+    
     emisor_rfc = get_emisor(request)
     cdfis_json = cfdis_all(emisor_rfc)
-
-    # Ordenar facturas de forma descendente por la fecha de creación (o el campo que uses para este propósito)
-    facturas = Factura.objects.all().order_by('-id')  # Asegúrate de que 'created_at' sea un campo válido en tu modelo
-
     context = {
-        'facturas': facturas,
+        'facturas' :  Factura.objects.all(),
         'cdfis': cdfis_json,
     }
-    return render(request, "facturacion/facturas.html", context)
+    return render (request, "facturacion/facturas.html",context)
 
 @login_required
 def factura_detalle(request, cfdi_id):
@@ -399,9 +397,11 @@ def crear_factura(request, id_personalizado):
             datos_p = pie_form.cleaned_data
             datos_t = totales_form.cleaned_data
             
+            tipo_moneda = datos_e['tipo_moneda']
             direccion = datos_p['direccion']
             subtotal = datos_t['subtotal']
             iva = datos_t['iva']
+            tasa_iva = datos_t['tasa_iva']
             total = datos_t['total']
 
             # Iteramos sobre los conceptos
@@ -441,20 +441,18 @@ def crear_factura(request, id_personalizado):
                     except Servicio.DoesNotExist:
                         # Si el servicio no existe, podrías lanzar una excepción o manejar el error de otra forma
                         raise ValueError(f"El servicio con el código {codigo_servicio} no existe.")
-
-            print(aware_datetime.isoformat())
+            
             cfdi_data = {
                 "NameId": "1",
-                "Currency": datos_e['tipo_moneda'],
+                "Currency": "MXN",
                 "Folio": get_new_cfdi_id(),
                 "Serie": "FAC",
                 "Date": aware_datetime.isoformat(),  # Fecha actual en formato ISO 8601
                 "CfdiType": "I",
-                "LogoUrl": "",# ( string ) Url del logo, ej. https://dominio.com/mi-logo.png
                 "PaymentForm": datos_e['forma_pago'],
                 "PaymentMethod": datos_e['metodo_pago'],
                 "ExpeditionPlace": emisor.organizacion.direccion.codigo,
-                "Observations": datos_p['comentarios'],
+                "Observations": datos_p['comentarios'] if datos_p['comentarios'] else "",
                 "OrderNumber": datos_e['OrderNumber'],
                 "Issuer": {  # ( TaxEntityInfoViewModel ) Nodo que contiene el detalle del emisor.
                     "Rfc": get_emisor(request),
@@ -489,22 +487,20 @@ def crear_factura(request, id_personalizado):
                         "TaxObject": concepto['objeto_imp'],
                         "Taxes": [
                             {
-                                "Total": float(concepto['importe']) * datos_t['tasa_iva'],
+                                "Total": float(concepto['importe']) * float(datos_t['tasa_iva']),
                                 "Name": "IVA",
                                 "Base": float(concepto['importe']),
-                                "Rate": datos_t['tasa_iva'],
-                                "IsRetention": False
+                                "Rate": float(datos_t['tasa_iva']),
+                                "IsRetention": 0
                             }
                         ],
-                        "Total": round(float(concepto['importe']) * 1.16, 2)
+                        "Total": round(float(concepto['importe']) * (1+float(datos_t['tasa_iva'])),2)
                     }
                     for concepto in conceptos_data
                 ]
             }
             
-            
-            
-            print(get_new_cfdi_id())
+            print(cfdi_data)
             response = crear_cfdi_api(cfdi_data)
 
             if response.status_code == 201:
@@ -542,16 +538,45 @@ def crear_factura(request, id_personalizado):
                 )
                 nueva_factura.save() 
                 return redirect('factura_detalle',  cfdi_id )
+                
             else:
                 # Si ocurre un error, mostrar un mensaje detallado
                 error_code = response.status_code
-                error_message = response.json().get("message", "Ocurrió un error inesperado.")
-                full_error_message = f"Error al cargar CSD. Código: {error_code}. Mensaje: {error_message}. Detalles: {response.text}"
+                json_response = response.json()
+                
+                # Mensaje de error general
+                error_message = json_response.get("Message", "Ocurrió un error inesperado.")
+
+                # Detalles adicionales
+                error_details = json_response.get("Details", "No se proporcionaron detalles.")
+                
+                # Si hay un mensaje más detallado, puedes extraerlo
+                detailed_errors = []
+                if isinstance(json_response.get("Details"), list):
+                    for error in json_response["Details"]:
+                        field_name = error.get("Name", "Campo desconocido")
+                        field_message = error.get("Base", "Sin mensaje específico")
+                        detailed_errors.append(f"{field_name}: {field_message}")
+                
+                # Crear el mensaje final
+                full_error_message = (
+                    f"Error al cargar CSD. Código: {error_code}."
+                    f"Mensaje: {error_message}. Detalles: {', '.join(detailed_errors) if detailed_errors else error_details}"
+                )
+                
                 messages.error(request, full_error_message)
-        return redirect('home')
+                
+        else:
+            print(encabezado_form.errors)
+            print(pie_form.errors)
+            print(totales_form.errors)
+            print(request.POST)
+    else:
+            print('El formulario no es post')
+
     
     encabezado_form = FacturaEncabezadoForm(initial={'OrderNumber': orden.id_personalizado, 'tipo_moneda': orden.cotizacion.metodo_pago})
-    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas})
+    pie_form = FacturaPieForm(initial={'direccion': orden.direccion,'comentarios': orden.cotizacion.notas, 'correos': orden.cotizacion.correos_adicionales})
     totales_form = FacturaTotalesForm()
     
     context = {
@@ -677,6 +702,8 @@ def comprobante_factura(request, cfdi_id):
             cfdi_api = buscar_cfdi_return(cfdi_id)
             
             idd = get_new_cfdi_comp_id()
+            print("Nuevo Folio generado:", idd)  # Asegúrate de que este ID se esté generando correctamente
+
             
             #Aquí debes construir el JSON para la API de Facturama
             complemento_pago = {
@@ -790,6 +817,9 @@ def comprobante_factura(request, cfdi_id):
                 return JsonResponse({'success': False, 'message': 'Error en el servidor. Inténtalo de nuevo más tarde.', 'response_data': response_data}, status=400)  # Método no permitido
         else:
             return JsonResponse({'success': False, 'errors': form.errors})  # En caso de que el formulario no sea válido
+  
+            print(form.errors)  # Esto te dará información sobre por qué el formulario no es válido
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     else:
         form = ComprobantePagoForm(initial={
             'Amount': factura.total,

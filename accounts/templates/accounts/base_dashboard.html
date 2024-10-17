@@ -60,7 +60,7 @@
                         {% if organization_logo %}
                         <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;"
                             class="mr-2">
-                        {{ organization_name }}
+                            Lucresys
                         {% else %}
                         <p>No logo available</p>
                         {% endif %}
@@ -69,7 +69,7 @@
                 <div class="d-flex align-items-center">
                     <!-- Enlace de Notificaciones -->
 
-                    <a type="button" class="btn btn-Light position-relative" href="{% url 'notificaciones' %}">
+                    <a type="button" class="btn position-relative" href="{% url 'notificaciones' %}">
                         Notificaciones
                         {% if notificaciones_no_leidas > 0 %}
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

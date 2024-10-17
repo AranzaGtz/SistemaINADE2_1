@@ -283,7 +283,7 @@ class Cotizacion(models.Model):
 
     def calculate_subtotal(self):
         factor = Decimal('1.0') if self.metodo_pago == 'MXN' else TIPO_DE_CAMBIO
-        return sum(Decimal(concepto.cantidad_servicios) * Decimal(concepto.precio) * factor for concepto in self.conceptos.all())
+        return sum(Decimal(concepto.cantidad_servicios) * Decimal(concepto.precio) / factor for concepto in self.conceptos.all())
 
     def calculate_iva(self):
         # Convert tasa_iva to Decimal before multiplying

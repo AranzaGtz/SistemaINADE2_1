@@ -12,52 +12,46 @@
 </style>
 <div class="container-xxl mt-3 mb-5">
      <!-- FORMULARIO -->
-     <form method="post" enctype="multipart/form-data">
+     <form method="POST" action="">
           {% csrf_token %}
           {{ form.non_field_errors }}
           <!-- CARD -->
-          <div class="alert alert-primary">
-               <strong>Por favor, complete todos los campos requeridos con la información correcta.</strong><br>
-               Asegúrese de ingresar las fechas en el formato <strong>dd/mm/aaaa</strong>, y proporcionar una dirección de correo electrónico válida. Si tiene alguna pregunta, no dude en contactarnos.
-          </div>
-          <div class="card border-light ">
+          <div class="card border-light mb-3">
                <!-- ENCABEZADO DE CARD -->
-               <div class="card-header text-center bg-primary bg-gradient  text-white" >
-                    <div class="">
-                         <h3 >Facturar {{orden.id_personalizado}}</h3>
+               <div class="card-header text-center">
+                    <div class="p-2">
+                         <h3>Facturar {{orden.id_personalizado}}</h3>
+                         <div class="row">
+                              <div class="col col-1">
+                                   <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;"
+                                        class="mr-2">
+                              </div>
+                              <div class="col text-start card-text ">
+                                   <h5>Emisor</h5>
+                                   <p>
+                                        <strong>{{ organization_name }}</strong><br>
+                                        <strong>RFC:</strong>
+                                        <strong>Telefono: </strong>{{organization.telefono}} <br>
+                                        <strong>Direccion: </strong>{{ organization.direccion }}
+                                   </p>
+                              </div>
+                              <div class="col text-start">
+                                   <h5 class="card-title">Receptor</h5>
+                                   <strong>Nombre Receptor</strong> {{cliente.empresa.nombre_empresa}} <br>
+                                   <strong>RFC:</strong> {{cliente.empresa.rfc }} <br>
+                                   <strong>Regimen Fiscal: </strong> {{cliente.empresa.regimen_fiscal}}
+                                   <input type="hidden" name="id_cliente_rfc" id="id_cliente_rfc" value="{{ cliente.empresa.rfc }}">
+                                   <input type="hidden" name="id_cliente_reg" id="id_cliente_reg" value="{{ cliente.empresa.regimen_fiscal }}">
+                                   <input type="hidden" name="id_cliente_nombre" id="id_cliente_nombre" value="{{ cliente.empresa.nombre_empresa }}">
+                                   <input type="hidden" name="id_cliente_cp" id="id_cliente_cp" value="{{ cliente.empresa.direccion.codigo }}">
+                              </div>
+                         </div>
                     </div>
                </div>
                <!-- CUERPO DE CARD -->
-               <div class="card-body bg-light" >
-                    <div class="row mt-2 mb-2">
-                         <div class="col col-1">
-                              <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;" class="mr-2">
-                         </div>
-                         <div class="col text-start card-text ">
-                              <h5>Emisor</h5>
-                              <p>
-                                   <strong>{{ organization_name }}</strong><br>
-                                   <strong>RFC:</strong>
-                                   <strong>Telefono: </strong>{{organization.telefono}} <br>
-                                   <strong>Direccion: </strong>{{ organization.direccion }}
-                              </p>
-                         </div>
-                         <div class="col text-start">
-                              <h5 class="card-title">Receptor</h5>
-                              <strong>Nombre Receptor</strong> {{cliente.empresa.nombre_empresa}} <br>
-                              <strong>RFC:</strong> {{cliente.empresa.rfc }} <br>
-                              <strong>Regimen Fiscal: </strong> {{cliente.empresa.regimen_fiscal}}
-                              <input type="hidden" name="id_cliente_rfc" id="id_cliente_rfc" value="{{ cliente.empresa.rfc }}">
-                              <input type="hidden" name="id_cliente_reg" id="id_cliente_reg" value="{{ cliente.empresa.regimen_fiscal }}">
-                              <input type="hidden" name="id_cliente_nombre" id="id_cliente_nombre" value="{{ cliente.empresa.nombre_empresa }}">
-                              <input type="hidden" name="id_cliente_cp" id="id_cliente_cp" value="{{ cliente.empresa.direccion.codigo }}">
-                         </div>
-                         
-                    </div>
-                    <hr style="height: 5px; background-color: rgba(0, 0, 0, 0.513); border: none;">
-
-                    <div class="form-row d-flex justify-content-between">
-                         <div class="">
+               <div class="card-body ">
+                    <div class="form-row mb-3">
+                         <div class="form-group">
                               {{ encabezado_form.tipo_moneda.label_tag }}
                               {{ encabezado_form.tipo_moneda }}
                               {% if encabezado_form.tipo_moneda.errors %}
@@ -67,7 +61,7 @@
                               {% endif %}
                          </div>
 
-                         <div class="">
+                         <div class="form-group">
                               {{ encabezado_form.OrderNumber.label_tag }}
                               {{ encabezado_form.OrderNumber }}
                               {% if encabezado_form.OrderNumber.errors %}
@@ -76,7 +70,7 @@
                               </div>
                               {% endif %}
                          </div>
-                         <div class="">
+                         <div class="form-group">
                               {{ encabezado_form.uso_cfdi.label_tag }}
                               {{ encabezado_form.uso_cfdi }}
                               {% if encabezado_form.uso_cfdi.errors %}
@@ -86,7 +80,7 @@
                               {% endif %}
                          </div>
 
-                         <div class="">
+                         <div class="form-group">
                               {{ encabezado_form.forma_pago.label_tag }}
                               {{ encabezado_form.forma_pago }}
                               {% if encabezado_form.forma_pago.errors %}
@@ -96,7 +90,7 @@
                               {% endif %}
                          </div>
 
-                         <div class="">
+                         <div class="form-group">
                               {{ encabezado_form.metodo_pago.label_tag }}
                               {{ encabezado_form.metodo_pago }}
                               {% if encabezado_form.metodo_pago.errors %}
@@ -108,11 +102,6 @@
                          
                     </div>
                </div>
-               <!-- Alerta de tipo de cambio -->
-               <div id="alert-tipo-cambio" class="alert alert-warning alert-dismissible fade show mt-2" role="alert" style="display: none;">
-                    <strong>Tipo de cambio:</strong> {{ tipo_de_cambio }}  Sí Requieres cambiarlo ve a: <a href="{% url 'config_org' %}#sistema" target="_blank">Configuración</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-               </div> 
           </div>
 
           {{formset.as_p}}
@@ -189,10 +178,10 @@
 
                     <div class="form-group">
                          {{ totales_form.tasa_iva.label_tag }}
-                         <select name="tasa_iva" name="tasa_iva" id="tasa_iva" class="form-select" disabled>
-                              <option value="0.08" {% if orden.cotizacion.tasa_iva == '0.08' %}selected{% endif %}>8%
+                         <select name="tasa_iva" name="tasa_iva" id="tasa_iva" class="form-select">
+                              <option value="0.08" {% if cotizacion_form.tasa_iva.value == '0.08' %}selected{% endif %}>8%
                               </option>
-                              <option value="0.16" {% if orden.cotizacion.tasa_iva == '0.16' %}selected{% endif %}>16%
+                              <option value="0.16" {% if cotizacion_form.tasa_iva.value == '0.16' %}selected{% endif %}>16%
                               </option>
                          </select>
                          {% if totales_form.tasa_iva.errors %}
@@ -233,7 +222,7 @@
           </div>
 
           <div class="d-flex justify-content-end gap-3">
-               <button type="submit" class="btn btn-primary  p-2">Pre facturar</button>
+               <!-- <button type="submit" class="btn btn-primary  p-2">Pre facturar</button> -->
                <button type="submit" class="btn btn-success  p-2">Facturar</button>
                <button type="submit" class="btn btn-danger  p-2">Cancelar</button>
           </div>
@@ -242,28 +231,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script type="text/javascript">
-
-     document.addEventListener('DOMContentLoaded', function() {
-          // Obtener elementos
-          const metodoPagoSelect = document.getElementById('id_tipo_moneda');
-          const alertTipoCambio = document.getElementById('alert-tipo-cambio');
-  
-          // Función para mostrar/ocultar la alerta
-          function toggleAlerta() {
-              if (metodoPagoSelect.value === 'USD') {
-                  alertTipoCambio.style.display = 'block'; // Mostrar alerta si es USD
-              } else {
-                  alertTipoCambio.style.display = 'none';  // Ocultar alerta si no es USD
-              }
-          }
-  
-          // Escuchar el cambio en el select
-          metodoPagoSelect.addEventListener('change', toggleAlerta);
-  
-          // Llamar a la función al cargar la página para mostrar/ocultar según el valor inicial
-          toggleAlerta();
-      });
-
     document.addEventListener('DOMContentLoaded', function() {
         const tasaIvaSelect = document.getElementById('tasa_iva');
         const subtotalInput = document.getElementById('id_subtotal');
@@ -341,6 +308,13 @@
          calcularTotales();
      });
  });
+ document.addEventListener('DOMContentLoaded', function() {
+     const tipoMonedaField = document.getElementById('tipo_moneda_field');
+     tipoMonedaField.addEventListener('mousedown', function(e) {
+         e.preventDefault();  // Esto previene que el usuario abra el menú de opciones
+     });
+ });
+
 </script>
 
 

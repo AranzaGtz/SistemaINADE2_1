@@ -156,7 +156,7 @@ class FacturaEncabezadoForm(forms.ModelForm):
         model = Factura
         fields = ['tipo_moneda','OrderNumber', 'uso_cfdi', 'forma_pago','metodo_pago']
         widgets = {
-            'tipo_moneda': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione tipo moneda','disabled': 'true'}),
+            'tipo_moneda': forms.Select(attrs={'class': 'form-control ', 'placeholder': 'Seleccione tipo moneda'}),
             'OrderNumber': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ID de orden de compra','readonly': 'true'}),
             'uso_cfdi': forms.Select(attrs={'class': 'form-control'}),
             'forma_pago': forms.Select(attrs={'class': 'form-control'}),
