@@ -5,7 +5,7 @@
 {% block header %}Clientes{% endblock %}
 {% block content %}
 
-<div class="container-xxl">
+<div class="container-xl">
 
     <div class="row">
         <div class="col">
@@ -13,103 +13,195 @@
             <hr class="featurette-divider">
         </div>
     </div>
+    
+    <ul class="nav nav-tabs"> <!-- CONTENEDOR DE LINKS DE PESTAÑAS -->
+        <li class="nav-item">
+            <a class="nav-link active" href="#clientes_activos" data-bs-toggle="tab">Clientes Activos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link " href="#clientes_inactivos" data-bs-toggle="tab">Clientes Inactivos</a>
+        </li>
+    </ul>
+    <div class="tab-content"> <!-- CONTENEDOR DE PESTAÑAS -->
 
-    <!-- BUSCADOR -->
-    <div class="row mb-3 justify-content-center">
-        <div class="col-md-6">
-            <div class="input-group mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar clientes..." onkeyup="filterTable('searchInput', 'clientesTable')">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'clientesTable')">Buscar</button>
+        <div class="tab-pane fade show active" id="clientes_activos"> <!-- CONTENEDOR DE CLIENTES ACTIVOS -->
+    
+            <!-- BUSCADOR -->
+            <div class="row mb-3 justify-content-center mt-2">
+                <div class="col-md-6">
+                    <div class="input-group mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Buscar clientes..."
+                            onkeyup="filterTable('searchInput', 'clientesTable')">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="filterTable('searchInput', 'clientesTable')">Buscar</button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+    
+            <div class="row mb-3 justify-content-end">
+                <div class="col-auto">
+                    <a type="button" class="btn btn-warning" href="{% url 'empresas_cont_list' %}">
+                        Añadir Empresa
+                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#createClienteModal">
+                        Añadir Cliente
+                    </button>
+    
+                </div>
+            </div>
+    
+            <div class="row">
+                <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                    <table id="clientesTable" class="table table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th><a class="link-secondary" href="?order_by=id">#</a></th>
+                                <th colspan="1"><a class="link-secondary" href="?order_by=nombre">Cliente</a></th>
+                                <th><a class="link-secondary" href="?order_by=empresa__nombre_empresa">Empresa</a></th>
+                                <th><a class="link-secondary"
+                                        href="?order_by=informacion_contacto__correo_electronico">Correo</a>
+                                </th>
+                                <th colspan="1"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for persona in personas_page %}
+                            <tr>
+                                <td>{{ persona.id }}</td>
+                                <td>
+                                    {{ persona.titulo.abreviatura }}
+                                    {{ persona.nombre }}
+                                    {{ persona.apellidos }}
+                                </td>
+                                <td>{{ persona.empresa.nombre_empresa }}</td>
+                                <td>{{ persona.informacion_contacto.correo_electronico }}</td>
+                                <td>
+                                    <a href="{% url 'cotizacion_form' persona.id %}"
+                                        class="btn btn-success btn-sm">Cotizar</a>
+                                    <a href="{% url 'cliente_edit' persona.id %}" class="btn btn-primary btn-sm">
+                                        <img src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);">
+                                    </a>
+                                    <a href="#" onclick="eliminarCliente({{ persona.id }})" class="btn btn-danger btn-sm">
+                                        <img src="{% static 'img/x-square.svg' %}" style="filter: invert(1);">
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    
+            <div class="container-xxl">
+                <div class="alert alert-info" role="alert">
+                    <strong>Número de cotizaciones:</strong> {{ p }}
+                </div>
+                <nav aria-label="Paginación de cotizaciones">
+                    <ul class="pagination justify-content-center">
+                        {% if personas_page.has_previous %}
+                        <li class="page-item">
+                            <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Anterior</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item disabled">
+                            <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.
+                            </div>
+                        </li>
+                        {% if personas_page.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Última</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+    
+                </nav>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show mt-5" id="clientes_inactivos"> <!-- CONTENEDOR DE CLIENTES NO ACTIVOS -->
+            <div class="row">
+                <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                    <table id="clientesTable" class="table table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th><a class="link-secondary" href="?order_by=id">#</a></th>
+                                <th colspan="1"><a class="link-secondary" href="?order_by=nombre">Cliente</a></th>
+                                <th><a class="link-secondary" href="?order_by=empresa__nombre_empresa">Empresa</a></th>
+                                <th><a class="link-secondary"
+                                        href="?order_by=informacion_contacto__correo_electronico">Correo</a>
+                                </th>
+                                <th>
+
+                                </th>
+                                <th colspan="1"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for persona in personas_no_activas %}
+                            <tr>
+                                <td>{{ persona.id }}</td>
+                                <td>
+                                    {{ persona.titulo.abreviatura }}
+                                    {{ persona.nombre }}
+                                    {{ persona.apellidos }}
+                                </td>
+                                <td>{{ persona.empresa.nombre_empresa }}</td>
+                                <td>{{ persona.informacion_contacto.correo_electronico }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    
+            <div class="container-xxl">
+                <div class="alert alert-info" role="alert">
+                    <strong>Número de Clientes:</strong> {{ p2 }}
+                </div>
+                <nav aria-label="Paginación de cotizaciones">
+                    <ul class="pagination justify-content-center">
+                        {% if personas_page.has_previous %}
+                        <li class="page-item">
+                            <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Anterior</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item disabled">
+                            <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.
+                            </div>
+                        </li>
+                        {% if personas_page.has_next %}
+                        <li class="page-item">
+                            <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Siguiente</a>
+                        </li>
+                        <li class="page-item">
+                            <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
+                                class="btn btn-light btn-sm">Última</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+    
+                </nav>
             </div>
         </div>
     </div>
 
-    <div class="row mb-3 justify-content-end">
-        <div class="col-auto">
-            <a type="button" class="btn btn-warning"  href="{% url 'empresas_cont_list' %}">
-                Añadir Empresa
-            </a>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClienteModal">
-                Añadir Cliente
-            </button>
-            
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
-            <table id="clientesTable" class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th><a class="link-secondary" href="?order_by=id">#</a></th>
-                        <th colspan="1"><a class="link-secondary" href="?order_by=nombre">Cliente</a></th>
-                        <th><a class="link-secondary" href="?order_by=empresa__nombre_empresa">Empresa</a></th>
-                        <th><a class="link-secondary" href="?order_by=informacion_contacto__correo_electronico">Correo</a>
-                        </th>
-                        <th colspan="1"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for persona in personas_page %}
-                    <tr>
-                        <td>{{ persona.id }}</td>
-                        <td>
-                            {{ persona.titulo.abreviatura }}
-                            {{ persona.nombre }}
-                            {{ persona.apellidos }}
-                        </td>
-                        <td>{{ persona.empresa.nombre_empresa }}</td>
-                        <td>{{ persona.informacion_contacto.correo_electronico }}</td>
-                        <td>
-                            <a href="{% url 'cotizacion_form' persona.id %}" class="btn btn-success btn-sm">Cotizar</a>
-                            <a href="{% url 'cliente_edit' persona.id %}" class="btn btn-primary btn-sm">
-                                <img src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);">
-                            </a>
-                            <a href="#" onclick="eliminarCliente({{ persona.id }})" class="btn btn-danger btn-sm">
-                                <img src="{% static 'img/x-square.svg' %}" style="filter: invert(1);">
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="container-xxl">
-        <div class="alert alert-info" role="alert">
-            <strong>Número de cotizaciones:</strong> {{ personas }}
-        </div>
-        <nav aria-label="Paginación de cotizaciones">
-            <ul class="pagination justify-content-center">
-                {% if personas_page.has_previous %}
-                <li class="page-item">
-                    <a href="?page=1&order_by={{ request.GET.order_by }}" class="btn btn-light btn-sm">Primera</a>
-                </li>
-                <li class="page-item">
-                    <a href="?page={{ personas_page.previous_page_number }}&order_by={{ request.GET.order_by }}"
-                        class="btn btn-light btn-sm">Anterior</a>
-                </li>
-                {% endif %}
-                <li class="page-item disabled">
-                    <div class="m-1">Página {{ personas_page.number }} de {{ personas_page.paginator.num_pages }}.</div>
-                </li>
-                {% if personas_page.has_next %}
-                <li class="page-item">
-                    <a href="?page={{ personas_page.next_page_number }}&order_by={{ request.GET.order_by }}"
-                        class="btn btn-light btn-sm">Siguiente</a>
-                </li>
-                <li class="page-item">
-                    <a href="?page={{ personas_page.paginator.num_pages }}&order_by={{ request.GET.order_by }}"
-                        class="btn btn-light btn-sm">Última</a>
-                </li>
-                {% endif %}
-            </ul>
-    
-        </nav>
-    </div>
 </div>
 
 <!-- Modal para crear un nuevo cliente -->

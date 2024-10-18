@@ -17,6 +17,11 @@ formatos_cotizacion = [
     ('{seq}', '{seq}')
 ]
 
+monedas = [
+    ('MXN', 'MXN - Moneda Nacional Mexicana'),
+    #('USD', 'USD - Dolar Estadunidense')
+]
+
 # MODELO PARA DIRECCION
 class Direccion(models.Model):
     id = models.AutoField(primary_key=True)
@@ -57,10 +62,7 @@ class FormatoOrden (models.Model):
 class ConfiguracionSistema(models.Model):
     moneda_predeterminada = models.CharField(
         max_length=10,
-        choices=[
-            ('MXN', 'MXN - Moneda Nacional Mexicana'),
-            ('USD', 'USD - Dolar Estadunidense')
-        ],
+        choices=monedas,
         default='MXN',
         verbose_name=_("Moneda Predeterminada")
     )
@@ -204,10 +206,7 @@ class Empresa(models.Model):
         ('611', 'Régimen de Consolidación Fiscal'),] , default='612')
     nombre_empresa = models.CharField(max_length=100, null=False, blank=False)
     direccion = models.OneToOneField(Direccion, on_delete=models.CASCADE, null=True, blank=True)
-    tipo_moneda = [
-        ('MXN', 'MXN - Moneda Nacional Mexicana'),
-        ('USD', 'USD - Dolar Estadunidense')
-    ]
+    tipo_moneda = monedas
     moneda = models.CharField(max_length=10, choices=tipo_moneda, blank=True, null=True)
     condiciones_pago = models.CharField(max_length=200, null=False, blank=True, default='15')
     first_configuration = models.BooleanField(default=False)
@@ -258,15 +257,9 @@ class Cotizacion(models.Model):
     id_personalizado = models.CharField(max_length=4, unique=True, null=True, blank=True)
     fecha_solicitud = models.DateField(null=True, blank=True)
     fecha_caducidad = models.DateField(null=True, blank=True)
-    tipo_moneda = [
-        ('MXN', 'MXN - Moneda Nacional Mexicana'),
-        ('USD', 'USD - Dolar Estadunidense')
-    ]
+    tipo_moneda = monedas
     metodo_pago = models.CharField(max_length=100, choices=tipo_moneda)
-    opciones_iva = [
-        ('0.08', '8%'),
-        ('0.16', '16%')
-    ]
+    opciones_iva = opciones_iva
     tasa_iva = models.CharField(max_length=4, choices=opciones_iva)
     notas = models.TextField(blank=True, null=True)
     correos_adicionales = models.TextField(blank=True, null=True)

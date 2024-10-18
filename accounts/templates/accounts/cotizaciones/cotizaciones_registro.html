@@ -73,7 +73,8 @@
                     <label for="metodo_pago">Denominación</label>
                     <select name="metodo_pago" id="metodo_pago" class="form-select">
                         <option value="MXN" {% if cotizacion_form.metodo_pago.value == 'MXN' %}selected{% endif %}>MXN</option>
-                        <option value="USD" {% if cotizacion_form.metodo_pago.value == 'USD' %}selected{% endif %}>USD</option>
+                        <!-- <option value="USD" {% if cotizacion_form.metodo_pago.value == 'USD' %}selected{% endif %}>USD</option> -->
+                        <!-- Se deshabilitó el campo de tipo de moneda debido a dificultades en el manejo del cambio de MXN a USD, dado que la moneda principal para los servicios es MXN.-->
                     </select>
 
                     <!-- Alerta de tipo de cambio -->
@@ -293,7 +294,9 @@
                                 <strong>Precio sugerido:</strong> $${data.precio}<br>
                             </div>
                             <div class="col col-1">
-                                <div><a href="#" class="btn" class="text-end"><img src="/static/admin/img/icon-changelink.svg" alt="" width="20" height="20"></a></div>
+                                <a href="/servicios/edit/${data.id}/" class="btn btn-primary btn-sm" target="_blank">
+                                    <img src="{% static 'img/pencil-square.svg' %}" style="filter: invert(1);">
+                                </a>
                             </div>
                         </div>`);
                     // Establece el precio en el campo de precio y guarda el precio original

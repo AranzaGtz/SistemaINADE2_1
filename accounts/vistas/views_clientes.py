@@ -44,7 +44,9 @@ def lista_clientes(request):
 
     # Obtiene todas las personas activas y las ordena
     personas = Persona.objects.all().filter(activo=True).order_by(order_by)
-    poersonas = Persona.objects.all().count
+    p= personas.count
+    # Obtiene todas las personas activas y las ordena
+    personas_no_activas = Persona.objects.all().filter(activo=False).order_by(order_by)
 
     # Paginación
     paginator = Paginator(personas, 50)  # Muestra 50 personas por página
@@ -66,7 +68,9 @@ def lista_clientes(request):
         'empresas': empresas,
         'persona_form': persona_form,
         'empresa_form': empresa_form,
-        'personas': poersonas,
+        'personas_no_activas': personas_no_activas,
+        'p':p,
+        'p2':personas_no_activas.count
     }
 
     return render(request, 'accounts/clientes/clientes.html', context)

@@ -89,6 +89,7 @@ def obtener_datos_servicio(request, servicio_id):
     servicio = Servicio.objects.filter(id=servicio_id).first()
     if servicio:
         data = {
+            'id': servicio.id,
             'nombre': servicio.nombre_servicio,
             'descripcion': servicio.descripcion,
             'precio': servicio.precio_unitario,

@@ -184,7 +184,7 @@
 
         </div>
         
-        <!-- DETALLES -->
+        <!-- DOCUMENTOS -->
         <div class="tab-pane fade mt-5" id="documentos">
             <h4 class="text-info mb-4">Documentos Relacionados</h4>
             <div class="row">
@@ -211,8 +211,8 @@
                             Orden de Pedido
                         </div>
                         <div class="card-body">
-                            {% if cotizacion.orden_pedido_pdf %}
-                                <a href="{{ cotizacion.orden_pedido_pdf.url }}" class="btn btn-primary" target="_blank">Ver Orden de Pedido</a>
+                            {% if cotizacion.orden_cmpra_pdf %}
+                                <a href="{{ cotizacion.orden_cmpra_pdf.url }}" class="btn btn-primary" target="_blank">Ver Orden de Pedido</a>
                             {% else %}
                                 <p class="text-muted">No hay orden de pedido disponible.</p>
                             {% endif %}
@@ -291,9 +291,81 @@
     </div>
 </div>
 
-
+<!-- Modal para enviar cotización -->
+<div class="modal fade" id="EnviarCOT" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Eviar Cotización</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'seleccionar_correos' cotizacion.id %}" method="post" id="fEnviarCOT">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <h3>Selecciona los correos a los que deseas enviar la cotización:</h3>
+                        {% if cliente_correo %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="cliente" id="cliente" value="cliente">
+                            <label class="form-check-label" for="cliente">
+                                <strong>Cliente:</strong> {{ cliente_correo }}
+                            </label>
+                        </div>
+                        {% endif %}
+                        {% if usuario_correo %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="usuario" id="usuario" value="usuario">
+                            <label class="form-check-label" for="usuario">
+                                <strong>Tu correo:</strong> {{ usuario_correo }}
+                            </label>
+                        </div>
+                        {% endif %}
+                        {% for correo in correos_adicionales %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ correo }}" id="{{ correo }}" value="{{ correo }}">
+                            <label class="form-check-label" for="{{ correo }}">
+                                <strong>Adicional:</strong> {{ correo }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <!-- Spinner -->
+                    <div id="loading" style="display: none;" class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p>Por favor, espera...</p>
+                    </div>
+                    <div class="form-group mt-4">
+                        <label for="cuerpo_mensaje">Mensaje Personalizado: <code>(Opcional)</code></label>
+                
+                        <textarea class="form-control" id="cuerpo_mensaje" name="cuerpo_mensaje" rows="6">{{ cuerpo_mensaje_personalizado }}</textarea>
+                    </div>
+                    <div class="alert alert-warning" role="alert">
+                        Si no se agrega un mensaje, se utilizará un mensaje predeterminado.
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary" form="fEnviarCOT">Eviar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('fEnviarCOT'); // Reemplaza con el ID de tu formulario
+
+        form.addEventListener('submit', function () {
+            // Muestra el spinner
+            document.getElementById('loading').style.display = 'block';
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('fEditCOT'); // Reemplaza con el ID de tu formulario
 

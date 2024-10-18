@@ -24,6 +24,7 @@ from accounts.helpers import get_unica_organizacion
 from accounts.models import Concepto, Cotizacion, OrdenTrabajo, OrdenTrabajoConcepto, Servicio
 from facturacion.models import CSD, Comprobante, Factura
 from .forms import (CSDForm, CancelarCFDI, ComprobantePagoForm, EmailForm, FacturaEncabezadoForm, FacturaForm, FacturaPieForm, FacturaTotalesForm)
+from django.core.paginator import Paginator
 
 # Obtener la zona horaria UTC
 utc_timezone = pytz.UTC
@@ -48,8 +49,8 @@ def get_emisor(request): #   FUNCION PARA ENCONTRAR EL RFC PARA INDICAR EMISOR E
             return redirect('home')
         
         org = user_log.organizacion
-        csd = get_object_or_404(CSD, organizacion = org)
-        rfc = csd.rfc
+        rfc = org.csd.first().rfc # Acceder al RFC del primer CSD relacionado
+        print (rfc)
         return rfc
     except Exception as e:
         # Capturamos cualquier otro error no esperado y lo mostramos
@@ -177,14 +178,22 @@ def obtener_datos_cotizacion(request, cotizacion_id):
 
 @login_required
 def facturas_list(request):
-    
     emisor_rfc = get_emisor(request)
     cdfis_json = cfdis_all(emisor_rfc)
+
+    # Obtén todas las facturas
+    facturas_queryset = Factura.objects.all()
+    
+    # Configura la paginación
+    paginator = Paginator(facturas_queryset, 10)  # Muestra 10 facturas por página
+    page_number = request.GET.get('page')  # Obtiene el número de página de la URL
+    facturas = paginator.get_page(page_number)  # Obtiene las facturas de la página actual
+
     context = {
-        'facturas' :  Factura.objects.all(),
+        'facturas': facturas,
         'cdfis': cdfis_json,
     }
-    return render (request, "facturacion/facturas.html",context)
+    return render(request, "facturacion/facturas.html", context)
 
 @login_required
 def factura_detalle(request, cfdi_id):

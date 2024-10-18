@@ -1,4 +1,3 @@
-<!-- accounts/correos/formulario_descarga_subida.html -->
 <!DOCTYPE html>
 <html lang="es">
 
@@ -9,45 +8,47 @@
      {% load static %}
      <!-- Favicon -->
      <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
-     <title>Orden de Compra | INADE</title>
-
+     <title>Orden de Compra | Lucresys</title>
 </head>
 
 <body>
 
-     <header class="">
+     <header>
           <nav class="navbar bg-body-tertiary fixed-top">
-               <div class="container-fluid d-flex justify-content-between align-items-center">
+               <div class="d-flex justify-content-between align-items-center">
                     <div class="container">
-                         <a class="navbar-brand" href="#">INADE Laboratorio Ambiental</a>
+                         <a class="navbar-brand" href="#">Lucresys</a>
                     </div>
                </div>
           </nav>
      </header>
-     <div class="container mt-5" style="margin-top: 200pt;">
-          <h1 class="mb-4">Descargar Cotización y Subir Orden de Pedido</h1>
-          <h5 class="mb-4">Por favor, descargue la cotización y suba su orden de pedido utilizando el formulario a
-               continuación. Para descargar la cotización puede hacer clic en el siguiente link: <strong><a
-                         class="link-primary" href="{% url 'cotizacion_pdf' cotizacion.id %}">Descargar
-                         Cotización</a></strong>
-          </h5>
 
-          {% if messages %}
-          <ul class="messages mb-4">
-               {% for message in messages %}
-               <li{% if message.tags %} class="{{ message.tags }} mb-2" {% endif %}>{{ message }}</li>
-                    {% endfor %}
-          </ul>
-          {% endif %}
+     <!-- Centramos el contenido usando flexbox -->
+     <div class="d-flex justify-content-center align-items-center vh-100">
+          <div class="container-xxl text-start"> <!-- Contenedor limitado en anchura para centrar mejor -->
+               <h1 class="mb-4 text-center">Descargar Cotización y Subir Orden de Pedido</h1>
+               <h5 class="mb-4">Por favor, descargue la cotización y suba su orden de pedido utilizando el formulario a
+                    continuación. Para descargar la cotización puede hacer clic en el siguiente link:
+                    <strong><a class="link-primary" href="{% url 'cotizacion_pdf' cotizacion.id %}">Descargar
+                              Cotización</a></strong>
+               </h5>
 
+               {% if messages %}
+               <ul class="messages mb-4">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} mb-2" {% endif %}>{{ message }}</li>
+                         {% endfor %}
+               </ul>
+               {% endif %}
 
-          <form method="post" enctype="multipart/form-data" id="form" >
-               {% csrf_token %}
-               {{ form.as_p }}
-               <div class="text-end mt-3">
-                    <button type="submit" class="btn btn-primary">Cargar Orden de Compra</button>
-               </div>
-          </form>
+               <form method="post" enctype="multipart/form-data" id="form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="text-end mt-3">
+                         <button type="submit" class="btn btn-primary">Cargar Orden de Compra</button>
+                    </div>
+               </form>
+          </div>
      </div>
 
 </body>

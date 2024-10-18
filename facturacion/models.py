@@ -3,8 +3,24 @@ from django.db import models
 from accounts.models import   OrdenTrabajo, Organizacion, Persona
 from django.utils import timezone
 
+moneda = [
+    ('MXN', 'MXN - Moneda Nacional Mexicana'),
+    ('USD', 'USD - Dolar Estadunidense')
+]
+
+opciones_iva = [
+    ('0.08', '8%'),
+    ('0.16', '16%')
+]
+
+metodos_pago =[
+    ('01', 'Efectivo'),
+    ('02', 'Cheque Nominativo' ),
+    ('03', 'Transferencia electrónica de fondos'),
+]
+
 class CSD(models.Model):
-    organizacion = models.ForeignKey(Organizacion, on_delete=models.CASCADE, blank=True, null=True)  # Relación con Organización
+    organizacion = models.ForeignKey(Organizacion, related_name='csd', on_delete=models.CASCADE, blank=True, null=True)  # Relación con Organización
     rfc = models.CharField(max_length=13, unique=True)#Aqui Organizacion.rfc sea guardado automaticamente
     cer_file = models.FileField(upload_to='csds/cer/')
     key_file = models.FileField(upload_to='csds/key/')
@@ -24,11 +40,8 @@ class Factura(models.Model):
     emisor = models.ForeignKey(Organizacion, on_delete=models.PROTECT,default=0) # Relación con el emisor
     
     # Información de pago y moneda
-    tm = [
-        ('MXN', 'MXN - Moneda Nacional Mexicana'),
-        ('USD', 'USD - Dolar Estadunidense')
-    ]
-    tipo_moneda = models.CharField(max_length=100, choices=tm)
+
+    tipo_moneda = models.CharField(max_length=100, choices=moneda)
     uso_cfdi = models.CharField(max_length=5, choices=[('G01', 'Adquisición de mercancias'), ('G03', 'Gastos en general')], default='G03')
     forma_pago = models.CharField(max_length=5,choices=[('01', 'Efectivo'), ('03', 'Transferencia electrónica de fondos'),('99','Por definir')] , default='99')
     metodo_pago = models.CharField(max_length=5,choices=[('PUE', 'Pago en una sola exhibición'), ('PPD', 'Pago en parcialidades o diferido')] , default='PUE')
@@ -37,10 +50,7 @@ class Factura(models.Model):
     ExchangeRate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     Discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    opciones_iva = [
-        ('0.08', '8%'),
-        ('0.16', '16%')
-    ]
+
     tasa_iva = models.CharField(max_length=4, choices=opciones_iva)
     iva = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
     total = models.DecimalField(max_digits=10, decimal_places=2)
@@ -98,11 +108,7 @@ class Comprobante(models.Model):
     # Método de pago
     metodo_pago = models.CharField(
         max_length=5,
-        choices=[
-            ('01', 'Efectivo'),
-            ('02', 'Cheque Nominativo' ),
-            ('03', 'Transferencia electrónica de fondos'),
-        ],
+        choices=metodos_pago,
         default='03'
     )
     

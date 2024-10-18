@@ -3,7 +3,7 @@
 {% block title %}Facturas{% endblock %}
 {% block header %}Facturas{% endblock %}
 {% block content %}
-<div class="container-xxl">
+<div class="container-xl">
      <!-- SECCION DE TITULO ENCABEZANDO -->
      <div class="row">
           <div class="col">
@@ -21,11 +21,6 @@
                          <button class="btn btn-outline-secondary" type="button" onclick="filterTable('searchInput', 'cotizacionesTable')">Buscar</button>
                     </div>
                </div>
-          </div>
-     </div>
-     <div class="row mb-3 justify-content-end">
-          <div class="col-auto">
-               <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#NewFac">Nueva Factura</button>
           </div>
      </div>
 
@@ -67,6 +62,41 @@
                               {% endfor %}
                          </tbody>
                     </table>
+                   
+                    <nav aria-label="Page navigation">
+                         <ul class="pagination justify-content-center">
+                             {% if facturas.has_previous %}
+                                 <li class="page-item">
+                                     <a class="page-link" href="?page=1" aria-label="Primera">
+                                         <span aria-hidden="true">&laquo;</span> Primera
+                                     </a>
+                                 </li>
+                                 <li class="page-item">
+                                     <a class="page-link" href="?page={{ facturas.previous_page_number }}" aria-label="Anterior">
+                                         Anterior
+                                     </a>
+                                 </li>
+                             {% endif %}
+                     
+                             <li class="page-item disabled">
+                                 <span class="page-link">Página {{ facturas.number }} de {{ facturas.paginator.num_pages }}</span>
+                             </li>
+                     
+                             {% if facturas.has_next %}
+                                 <li class="page-item">
+                                     <a class="page-link" href="?page={{ facturas.next_page_number }}" aria-label="Siguiente">
+                                         Siguiente
+                                     </a>
+                                 </li>
+                                 <li class="page-item">
+                                     <a class="page-link" href="?page={{ facturas.paginator.num_pages }}" aria-label="Última">
+                                         Última &raquo;
+                                     </a>
+                                 </li>
+                             {% endif %}
+                         </ul>
+                     </nav>
+                     
                </div>
           </div> 
     </div>
@@ -83,11 +113,37 @@
                </div>
 
                <div class="modal-body">
-
-                    <form action="" method="POST" id="">
-                         
-                    
-                    </form>
+               
+                    <!-- TABLA -->
+                    <table id="ordenesTable" class="table table-hover">
+                         <!-- ENCABEZADO DE TABLA -->
+                         <thead class="thead-light">
+                              <tr>
+                                   <th>ID</th>
+                                   <th>Cotización</th>
+                                   <th>Cliente</th>
+                                   <th colspan="1">Opciones</th>
+                              </tr>
+                         </thead>
+                         <!-- CUERPO DE TABLA -->
+                         <tbody>
+                              {% for orden in ordenes %}
+                              <tr>
+                                   <td>{{ orden.id_personalizado }}</td>
+                                   <td>{{ orden.cotizacion }}</td>
+                                   <td>{{ orden.cotizacion.persona.empresa }} </td>
+                                   <td><a class="btn btn-success" href="{% url 'crear_factura' orden.id_personalizado %}">
+                                             <img src="{% static 'img/calculator-fill.svg' %}" style="filter: invert(1);"> Facturar</a>
+                                   </td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                   <td colspan="4">No hay órdenes disponibles.</td>
+                              </tr>
+                              {% endfor %}
+                         </tbody>
+                    </table>
+ 
                     <!-- Spinner -->
                     <div id="loading2" style="display: none;" class="text-center">
                          <div class="spinner-border text-secondary" role="status">

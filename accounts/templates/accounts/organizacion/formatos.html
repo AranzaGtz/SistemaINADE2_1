@@ -28,6 +28,7 @@
           <div class="tab-pane fade show active" id="organizacion"> <!-- CONTENEDOR DE ORGANIZCION -->
 
                <div class="row mt-5 mb-5"> <!-- TITULO -->
+                    
                     <div class="col">
                          <h2 class="">Organizacion</h2>
                     </div>
@@ -52,9 +53,26 @@
                          <div class="col">
                               <!-- Campo para Nombre -->
                               <div class="form-group">
+                                   <a href="#" data-bs-toggle="tooltip" data-bs-title="Default tooltip">inline links</a>
                                    {{ form.nombre.label_tag }}
                                    {{ form.nombre }}
-                                   <small class="form-text text-muted">Ingrese el nombre de la organización.</small>
+                                   <small class="form-text text-muted">
+                                        Ingrese el nombre de la organización. 
+                                   </small>
+                                   <div class="alert alert-warning " id="alert" role="alert">
+                                        <p>El nombre del emisor ahora se debe registrar en mayusculas y sin el régimen societario.</p>
+                                        <p>Debe registrarse tal y como se encuentra en la Cédula de Identificación Fiscal y Constancia de Situación Fiscal, respetando números, espacios y signos de puntuación.</p>
+                                        <p>
+                                             Ejemplo: <br>
+                                             <code>
+                                             Nombre o Razón Social: Empresa Importante S.A. DE C.V <br>
+                                             Debe colocarse: EMPRESA IMPORTANTE <br>
+                                             Estos datos los puedes obtener en la CIF <br>
+                                             Nota: Esto aplica tanto para personas físicas como morales</code>
+                                        </p>
+                                        Clave del Registro Federal de Contribuyentes del Emisor (recuerda que debes tener los CSD del RFC cargados) 
+                                   </div>
+                                      
                               </div>
 
                               <!-- Campo para Slogan -->
@@ -337,6 +355,9 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+     document.getElementById("id_nombre").addEventListener("input", function() {
+          this.value = this.value.toUpperCase();
+      });
      const swalWithBootstrapButtons = Swal.mixin({
           customClass: {
                confirmButton: "btn btn-success",

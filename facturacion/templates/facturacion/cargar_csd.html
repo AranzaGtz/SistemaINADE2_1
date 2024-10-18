@@ -71,6 +71,16 @@
           <form method="post" enctype="multipart/form-data">
                {% csrf_token %}
                {{ form.as_p }}
+               <div class="alert alert-warning " id="alert" role="alert">
+                    <h3 class="text-center">Consideraciones</h3>
+                    Valides Obligaciones
+                    <ol>
+                    <li>Habilitado para facturar (IVA exento, tasa 0% y 16%)</li>
+                    <li>Habilitado para facturar (IVA exento, tasa 0%, 8% y 16%) Zona Fronteriza Norte</li>
+                    <li>Habilitado para facturar (IVA exento, tasa 0%, 8% y 16%) Zona Fronteriza Sur</li>
+                    <li>Habilitado para facturar (IVA exento, tasa 0%, 8% y 16%) Zona Fronteriza Norte y Sur</li>
+                    </ol>
+               </div>
                <button type="submit" class="btn btn-primary">Cargar CSD</button>
                <button type="button" class="btn btn-danger" id="delete-csd-btn">Eliminar CSD actuales</button>
 

@@ -71,8 +71,6 @@ def seleccionar_correos(request, pk):
         # Llama a la función enviar_cotizacion pasando el mensaje personalizado
         return enviar_cotizacion(request, cotizacion.id, destinatarios, cuerpo_mensaje_personalizado)
 
-
-
 #   VISTA PARA RENDERIZAR FORMULARIO DE CONFIRMACIÓN
 def confirmar_recepcion(request, pk):
     cotizacion = get_object_or_404(Cotizacion, id=pk)

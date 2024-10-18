@@ -58,7 +58,7 @@
                         <!-- Por ejemplo, en cualquier archivo HTML como base.html o menu.html -->
 
                         {% if organization_logo %}
-                        <img src="{{ organization_logo }}" alt="Logo de la Organización" style="max-height: 40px;"
+                        <img src="{% static 'img/luck3.png' %}" alt="Logo de la Organización" style="max-height: 40px;"
                             class="mr-2">
                             Lucresys
                         {% else %}
@@ -69,7 +69,7 @@
                 <div class="d-flex align-items-center">
                     <!-- Enlace de Notificaciones -->
 
-                    <a type="button" class="btn position-relative" href="{% url 'notificaciones' %}">
+                    <a type="button" class="text-dark position-relative" href="{% url 'notificaciones' %}">
                         Notificaciones
                         {% if notificaciones_no_leidas > 0 %}
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -194,6 +194,11 @@
                             src="{% static 'img/question-circle.svg' %}"> Guía de operaciones</a>
                 </li>
             </ul>
+
+            <div class="col text-center">
+                <img src="{% static 'img/luck1.png' %}" alt="Logo de la Organización" style="max-height: 150px;" class="mr-2">
+            </div>
+            
         </div>
     </div>
 

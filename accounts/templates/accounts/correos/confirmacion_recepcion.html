@@ -8,30 +8,28 @@
     {% load static %}
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{% static 'img/droplet-half.svg' %}">
-    <title>Confirmación Cotización | INADE</title>
+    <title>Confirmación Cotización | Lucresys</title>
 
 </head>
-
 
 <body>
     <header class="">
         <nav class="navbar bg-body-tertiary fixed-top">
-            <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center">
                 <div class="container">
-                    <a class="navbar-brand" href="#">INADE Laboratorio Ambiental</a>
+                    <a class="navbar-brand" href="#">Lucresys</a>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container mt-5" style="margin-top: 200pt;">
-        <div class="mt-4">
-            <h1 class="mb-4 mt-4">Confirmación de Recepción </h1>
+    <!-- Centramos el contenido usando flexbox -->
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="text-center" >
+            <h1 class="mb-4" >Confirmación de Recepción</h1>
             <h5 class="mb-4">Gracias por confirmar la recepción de la cotización. Si tiene alguna pregunta o necesita asistencia adicional, no dude en contactarnos.</h5>
             <p class="bg-warning p-2 text-center"><strong>Ya puede cerrar la pestaña.</strong></p>
-            <div class="col text-center">
-                <img src="{% static 'img/logoinade.webp' %}" alt="Logo INADE" class="img-fluid mb-3" style="max-width: 150px;">
-            </div>
+            <img src="{% static 'img/logoinade.webp' %}" alt="Logo INADE" class="img-fluid mb-3" style="max-width: 150px;">
         </div>
     </div>
 </body>
