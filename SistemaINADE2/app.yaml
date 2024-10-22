@@ -1,0 +1,9 @@
+runtime: python39  # o la versión de Python que estés utilizando
+entrypoint: gunicorn -b :$PORT myproject.wsgi  # reemplaza "myproject" con el nombre de tu proyecto
+
+handlers:
+- url: /static
+  static_dir: staticfiles/  # Cambia a "staticfiles" para que coincida con tu configuración
+
+- url: /.*
+  script: auto
