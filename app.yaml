@@ -1,5 +1,5 @@
 runtime: python39  # o la versión de Python que estés utilizando
-entrypoint: gunicorn -b :$PORT myproject.wsgi  # reemplaza "myproject" con el nombre de tu proyecto
+entrypoint: gunicorn -b :$PORT SistemaINADE2.wsgi  # reemplaza "myproject" con el nombre de tu proyecto
 
 handlers:
 - url: /static
