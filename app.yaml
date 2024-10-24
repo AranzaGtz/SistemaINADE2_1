@@ -1,9 +1,16 @@
 runtime: python39  # o la versión de Python que estés utilizando
+instance_class: F1  # Clase de instancia (F1 es gratuita con limitaciones, F2 es paga)
 entrypoint: gunicorn -b :$PORT SistemaINADE2.wsgi  # reemplaza "myproject" con el nombre de tu proyecto
 
+env_variables:
+  DJANGO_SETTINGS_MODULE: "proyecto_django.settings"
+  SECRET_KEY: "tu-secreto-aqui"
+  DEBUG: "False"
+
+# Rutas para manejar archivos estáticos
 handlers:
 - url: /static
-  static_dir: staticfiles/  # Cambia a "staticfiles" para que coincida con tu configuración
+  static_dir: static/
 
 - url: /.*
   script: auto
