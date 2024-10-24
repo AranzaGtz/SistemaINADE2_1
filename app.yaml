@@ -10,7 +10,8 @@ env_variables:
 # Rutas para manejar archivos estáticos
 handlers:
 - url: /static
-  static_dir: static/
+  static_dir: staticfiles
+
 
 - url: /.*
   script: auto
