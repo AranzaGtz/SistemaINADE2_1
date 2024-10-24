@@ -329,13 +329,7 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <!-- Spinner -->
-                    <div id="loading" style="display: none;" class="text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
-                        <p>Por favor, espera...</p>
-                    </div>
+                    
                     <div class="form-group mt-4">
                         <label for="cuerpo_mensaje">Mensaje Personalizado: <code>(Opcional)</code></label>
                 
@@ -346,71 +340,48 @@
                     </div>
                     
                 </form>
+                <!-- Spinner -->
+                <div id="loading_email" style="display:none;" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p>Por favor, espera...</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="submit" class="btn btn-primary" form="fEnviarCOT">Eviar</button>
+                <button id="enviarBtn" type="submit" class="btn btn-primary" form="fEnviarCOT">Eviar</button>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('fEnviarCOT'); // Reemplaza con el ID de tu formulario
-
-        form.addEventListener('submit', function () {
-            // Muestra el spinner
-            document.getElementById('loading').style.display = 'block';
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('fEditCOT'); // Reemplaza con el ID de tu formulario
-
-        form.addEventListener('submit', function () {
-            // Muestra el spinner
-            document.getElementById('loading').style.display = 'block';
-        });
-    });
-    
+<script> 
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('fEnviarCOT');
         const enviarBtn = document.getElementById('enviarBtn');
-        const loading = document.getElementById('loading');
+        const loading = document.getElementById('loading_email');
     
         form.addEventListener('submit', function (event) {
             // Mostrar el spinner
-            loading.style.display = 'block';
+            loading_email.style.display = 'block';
     
             // Deshabilitar el botón de enviar para evitar múltiples envíos
             enviarBtn.disabled = true;
         });
-    });
-    // Espera a que el contenido del documento esté completamente cargado antes de ejecutar el script
-    
-    document.addEventListener("DOMContentLoaded", function () {
-        // Obtiene la referencia al modal de eliminación de cotización por su ID
+
+        // Código del modal de eliminación de cotización
         var deleteCotizacionModal = document.getElementById('deleteCotizacionModal');
-
-        // Agrega un evento cuando el modal de eliminación se muestra
-        deleteCotizacionModal.addEventListener('show.bs.modal', function (event) {
-            // Obtiene el botón que activó el modal (el botón relacionado)
-            var button = event.relatedTarget;
-
-            // Obtiene el ID de la cotización desde el atributo data-cotizacion-id del botón
-            var cotizacionId = button.getAttribute('data-cotizacion-id');
-
-            // Obtiene el formulario de eliminación de cotización por su ID
-            var form = document.getElementById('deleteCotizacionForm');
-
-            // Obtiene la acción actual del formulario y reemplaza '0' con el cotizacionId obtenido
-            var action = form.getAttribute('action').replace('0', cotizacionId);
-
-            // Actualiza la acción del formulario con la nueva URL que incluye el cotizacionId
-            form.setAttribute('action', action);
-        });
+    
+        if (deleteCotizacionModal) {
+            deleteCotizacionModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var cotizacionId = button.getAttribute('data-cotizacion-id');
+                var form = document.getElementById('deleteCotizacionForm');
+                var action = form.getAttribute('action').replace('0', cotizacionId);
+                form.setAttribute('action', action);
+            });
+        }
     });
 
 

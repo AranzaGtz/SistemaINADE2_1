@@ -362,7 +362,7 @@ def cargar_csd(request):
                     # Si no es un JSON válido o faltan claves, mostrar el texto completo
                     detailed_error = response.text
 
-                # Mostrar el mensaje de error
+                # Mostrar el mensaje de errro
                 messages.error(request, f"Error al cargar CSD: {detailed_error}")
     else:
         form = CSDForm()
@@ -807,7 +807,7 @@ def comprobante_factura(request, cfdi_id):
                     folio = idd,
                     factura = factura,
                     cfdi_id = response_data.get("Id"),
-                    fecha_pago = date,
+                    fecha_pago = datetime.combine(datetime.min.time().replace(hour=12, minute=0)),
                     monto_pagado = Amount,
                     metodo_pago = PaymentForm,
                 )

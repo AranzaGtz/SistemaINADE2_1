@@ -1,7 +1,18 @@
 runtime: python310
 
+<<<<<<< Updated upstream
 instance_class: F1  # Clase de instancia (F1 es gratuita con limitaciones, F2 es paga)
 entrypoint: gunicorn -b :$PORT SistemaINADE2.wsgi  # reemplaza "myproject" con el nombre de tu proyecto
+=======
+instance_class: F2  # Instancia con más recursos (puedes cambiar según tus necesidades)
+
+  # o la versión de Python que estés utilizando
+entrypoint: gunicorn -b :$PORT SistemaINADE2_1.wsgi  # reemplaza "myproject" con el nombre de tu proyecto
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: "SistemaINADE2_1.settings"
+  DEBUG: "False"
+>>>>>>> Stashed changes
 
 env_variables:
   DJANGO_SETTINGS_MODULE: "proyecto_django.settings"
@@ -11,8 +22,24 @@ env_variables:
 # Rutas para manejar archivos estáticos
 handlers:
 - url: /static
+<<<<<<< Updated upstream
   static_dir: staticfiles
 
+=======
+  static_dir: static/  # Cambia a "staticfiles" para que coincida con tu configuración
+>>>>>>> Stashed changes
 
 - url: /.*
   script: auto
+
+readiness_check:
+  app_start_timeout_sec: 300
+
+
+beta_settings:
+  cloud_sql_instances: "proyecto:region:instancia_sql"  # Solo si usas Cloud SQL
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 1
+  max_instances: 3

@@ -40,7 +40,6 @@
             <li><a class="dropdown-item" href="{% url 'crear_factura' orden_trabajo.id_personalizado %}"><img src="{% static 'img/calculator-fill.svg' %}">  Facturar</a></li>
             <li><a class="dropdown-item" href="{% url 'orden_trabajo_pdf' orden_trabajo.id_personalizado %}" target="_blank"><img src="{% static 'img/filetype-pdf.svg' %}">Ver PDF</a></li>
             <li><a href="{% url 'enviar_orden' orden_trabajo.id_personalizado orden_trabajo.receptor.email %}" class="dropdown-item"><img src="{% static 'img/envelope.svg' %}"> Enviar Orden de Trabajo</a></li>
-            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EnviarCOT"><img src="{% static 'img/envelope.svg' %}"> Enviar por correo</button>
         </ul>
     </div>
     
@@ -73,11 +72,6 @@
         </div>
     </div>
 
-
-
-
-    
-
     <h2>Conceptos Asociados</h2>
     <!-- DETALLES DE CONCEPTOS -->
     <h3 class="text-center">Servicios</h3>
@@ -106,6 +100,7 @@
             </tbody>
         </table>
     </div>
+
 </div>
 
 {% endblock %}

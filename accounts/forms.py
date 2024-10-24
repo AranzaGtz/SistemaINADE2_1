@@ -175,7 +175,7 @@ class ServicioForm(forms.ModelForm):
             'clave_cfdi':forms.Select(attrs={'class':'form-control'}),
             'nombre_servicio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del servicio o concepto'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción del servicio o concepto', 'rows': 2}),
-            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido'}),
+            'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Precio sugerido','readonly': 'readonly'  }),
             'subcontrato': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
             'acreditado': forms.CheckboxInput(attrs={'class': 'custom-checkbox-class control-form'}),
             'objeto_impuesto': forms.Select(attrs={'class':'form-control'}),

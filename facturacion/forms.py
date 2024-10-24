@@ -76,9 +76,12 @@ class EmailForm(forms.Form):
     )
 
 
+
 #   FORMULARIO PARA GENERAR COMPROBANTE DE PAGO
 class ComprobantePagoForm(forms.Form):
-    Date = forms.DateTimeField(label='Fecha de Pago',widget=forms.DateTimeInput(attrs={'type': 'datetime-local','class': 'form-control', 'id': 'Date'}), required=False)
+    # Establece la fecha actual como valor predeterminado
+    default_date = datetime.now().replace(hour=12, minute=0, second=0, microsecond=0)
+    Date = forms.DateTimeField(label='Fecha de Pago',widget=forms.DateInput(attrs={'type': 'datetime-local','class': 'form-control', 'id': 'default_date'}), required=False)
     PaymentForm = forms.ChoiceField(choices=METODOS_PAGO_CHOICES, label='Método de pago', widget=forms.Select(attrs={'class':'form-select', 'id': 'PaymentForm'}), required=False)
     Amount = forms.DecimalField(label='Monto', widget=forms.NumberInput(attrs={'class': 'form-control', 'id': 'Amount'}), required=False)
     OperationNumber = forms.CharField(label='Referencia', widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'OperationNumber'}), required=False)
